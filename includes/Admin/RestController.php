@@ -41,9 +41,19 @@ final class RestController {
 					'callback'            => array( $this, 'create_calculator' ),
 					'permission_callback' => array( $this, 'can_manage' ),
 					'args'                => array(
-						'title'       => array( 'required' => true, 'type' => 'string', 'sanitize_callback' => 'sanitize_text_field' ),
-						'template'    => array( 'type' => 'string', 'sanitize_callback' => 'sanitize_key' ),
-						'duplicateOf' => array( 'type' => 'integer', 'sanitize_callback' => 'absint' ),
+						'title'       => array(
+							'required'          => true,
+							'type'              => 'string',
+							'sanitize_callback' => 'sanitize_text_field',
+						),
+						'template'    => array(
+							'type'              => 'string',
+							'sanitize_callback' => 'sanitize_key',
+						),
+						'duplicateOf' => array(
+							'type'              => 'integer',
+							'sanitize_callback' => 'absint',
+						),
 					),
 				),
 			)
@@ -62,7 +72,10 @@ final class RestController {
 					'callback'            => array( $this, 'update_calculator' ),
 					'permission_callback' => array( $this, 'can_manage' ),
 					'args'                => array(
-						'title'  => array( 'type' => 'string', 'sanitize_callback' => 'sanitize_text_field' ),
+						'title'  => array(
+							'type'              => 'string',
+							'sanitize_callback' => 'sanitize_text_field',
+						),
 						'config' => array( 'type' => 'object' ),
 					),
 				),

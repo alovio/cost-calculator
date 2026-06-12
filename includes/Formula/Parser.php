@@ -58,7 +58,12 @@ final class Parser {
 			}
 			$this->next();
 			$right = $this->expression( $bp + 1 ); // Left-associative.
-			$left  = [ 'type' => $node, 'op' => $t['value'], 'left' => $left, 'right' => $right ];
+			$left  = [
+				'type'  => $node,
+				'op'    => $t['value'],
+				'left'  => $left,
+				'right' => $right,
+			];
 		}
 
 		return $left;
@@ -72,14 +77,23 @@ final class Parser {
 
 		switch ( $t['type'] ) {
 			case 'num':
-				return [ 'type' => 'num', 'value' => DecimalMath::toScaled( $t['value'] ) ];
+				return [
+					'type'  => 'num',
+					'value' => DecimalMath::toScaled( $t['value'] ),
+				];
 
 			case 'field':
-				return [ 'type' => 'field', 'id' => $t['value'] ];
+				return [
+					'type' => 'field',
+					'id'   => $t['value'],
+				];
 
 			case 'op':
 				if ( '-' === $t['value'] ) {
-					return [ 'type' => 'neg', 'operand' => $this->expression( self::BP_MUL + 1 ) ];
+					return [
+						'type'    => 'neg',
+						'operand' => $this->expression( self::BP_MUL + 1 ),
+					];
 				}
 				break;
 
@@ -103,7 +117,11 @@ final class Parser {
 				if ( count( $args ) < $min || count( $args ) > $max ) {
 					throw new FormulaError( 'arity', sprintf( '%s() expects %d-%d arguments', $t['value'], $min, $max ), $t['pos'] );
 				}
-				return [ 'type' => 'call', 'name' => $t['value'], 'args' => $args ];
+				return [
+					'type' => 'call',
+					'name' => $t['value'],
+					'args' => $args,
+				];
 		}
 
 		throw new FormulaError( 'syntax', 'Unexpected token', $t['pos'] );
@@ -116,7 +134,7 @@ final class Parser {
 	private function next(): ?array {
 		$t = $this->peek();
 		if ( null !== $t ) {
-			$this->i++;
+			++$this->i;
 		}
 		return $t;
 	}

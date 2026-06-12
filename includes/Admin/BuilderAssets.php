@@ -23,18 +23,18 @@ final class BuilderAssets {
 			return;
 		}
 
-		$asset_file = ALC_DIR . 'build/index.asset.php';
+		$asset_file = ALOVIO_CALC_DIR . 'build/index.asset.php';
 		if ( ! file_exists( $asset_file ) ) {
 			return;
 		}
 		$asset = require $asset_file;
 
 		wp_enqueue_media(); // Option image picker (wp.media frame).
-		wp_enqueue_script( 'alc-builder', ALC_URL . 'build/index.js', $asset['dependencies'], $asset['version'], true );
-		wp_set_script_translations( 'alc-builder', 'alovio-calculator', ALC_DIR . 'languages' );
+		wp_enqueue_script( 'alc-builder', ALOVIO_CALC_URL . 'build/index.js', $asset['dependencies'], $asset['version'], true );
+		wp_set_script_translations( 'alc-builder', 'alovio-calculator', ALOVIO_CALC_DIR . 'languages' );
 
-		if ( file_exists( ALC_DIR . 'build/index.css' ) ) {
-			wp_enqueue_style( 'alc-builder', ALC_URL . 'build/index.css', array(), $asset['version'] );
+		if ( file_exists( ALOVIO_CALC_DIR . 'build/index.css' ) ) {
+			wp_enqueue_style( 'alc-builder', ALOVIO_CALC_URL . 'build/index.css', array(), $asset['version'] );
 			wp_style_add_data( 'alc-builder', 'rtl', 'replace' );
 		}
 
@@ -55,7 +55,7 @@ final class BuilderAssets {
 				'root'        => esc_url_raw( rest_url( '/' ) ),
 				'nonce'       => wp_create_nonce( 'wp_rest' ),
 				'fieldTypes'  => FieldTypes::all(),
-				'isPro'       => (bool) apply_filters( 'alc_is_pro', false ),
+				'isPro'       => (bool) apply_filters( 'alovio_calc_is_pro', false ),
 				'templates'   => $templates,
 				'exportNonce' => wp_create_nonce( 'alc_export_entries' ),
 				'adminPost'   => esc_url_raw( admin_url( 'admin-post.php' ) ),

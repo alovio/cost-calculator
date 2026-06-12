@@ -12,16 +12,16 @@ final class FormulaGraph {
 		$ids      = array_keys( $idToRefs );
 		$idSet    = array_flip( $ids );
 		$indegree = array_fill_keys( $ids, 0 );
-		$edges    = []; // dependency => dependents[]
+		$edges    = []; // Map from each dependency id to the ids that depend on it.
 
 		foreach ( $idToRefs as $id => $refs ) {
 			foreach ( array_unique( $refs ) as $ref ) {
 				if ( isset( $idSet[ $ref ] ) && $ref !== $id ) {
 					$edges[ $ref ][] = $id;
-					$indegree[ $id ]++;
+					++$indegree[ $id ];
 				}
 				if ( $ref === $id ) { // Self-reference is a cycle of one.
-					$indegree[ $id ]++;
+					++$indegree[ $id ];
 				}
 			}
 		}
@@ -46,6 +46,9 @@ final class FormulaGraph {
 
 		$cycles = array_values( array_diff( $ids, $order ) );
 
-		return [ 'order' => $order, 'cycles' => $cycles ];
+		return [
+			'order'  => $order,
+			'cycles' => $cycles,
+		];
 	}
 }

@@ -93,7 +93,7 @@ final class DecimalMath {
 		$q = intdiv( $x, self::SCALE );
 		$r = $x - $q * self::SCALE;
 		if ( $r > 0 ) {
-			$q++;
+			++$q;
 		}
 		$result = $q * self::SCALE;
 		self::guard( abs( $result ) );
@@ -104,7 +104,7 @@ final class DecimalMath {
 		$q = intdiv( $x, self::SCALE );
 		$r = $x - $q * self::SCALE;
 		if ( $r < 0 ) {
-			$q--;
+			--$q;
 		}
 		$result = $q * self::SCALE;
 		self::guard( abs( $result ) );
@@ -116,7 +116,7 @@ final class DecimalMath {
 		$q = intdiv( $n, $d );
 		$r = $n - $q * $d;
 		if ( 2 * $r >= $d ) {
-			$q++;
+			++$q;
 		}
 		return $q;
 	}

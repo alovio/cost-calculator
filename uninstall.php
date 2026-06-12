@@ -8,7 +8,7 @@
 
 defined( 'WP_UNINSTALL_PLUGIN' ) || exit;
 
-function alc_uninstall_site(): void {
+function alovio_calc_uninstall_site(): void {
 	if ( ! get_option( 'alc_delete_on_uninstall' ) ) {
 		return;
 	}
@@ -28,11 +28,16 @@ function alc_uninstall_site(): void {
 }
 
 if ( is_multisite() ) {
-	foreach ( get_sites( array( 'fields' => 'ids', 'number' => 0 ) ) as $alc_site_id ) {
-		switch_to_blog( (int) $alc_site_id );
-		alc_uninstall_site();
+	foreach ( get_sites(
+		array(
+			'fields' => 'ids',
+			'number' => 0,
+		)
+	) as $alovio_calc_site_id ) {
+		switch_to_blog( (int) $alovio_calc_site_id );
+		alovio_calc_uninstall_site();
 		restore_current_blog();
 	}
 } else {
-	alc_uninstall_site();
+	alovio_calc_uninstall_site();
 }

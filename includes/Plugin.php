@@ -18,7 +18,7 @@ final class Plugin {
 	private function __construct() {}
 
 	public function boot(): void {
-		register_activation_hook( ALC_FILE, [ $this, 'activate' ] );
+		register_activation_hook( ALOVIO_CALC_FILE, [ $this, 'activate' ] );
 		add_action( 'init', [ $this, 'init' ] );
 		add_action(
 			'wp_initialize_site',
@@ -26,7 +26,7 @@ final class Plugin {
 				if ( ! function_exists( 'is_plugin_active_for_network' ) ) {
 					require_once ABSPATH . 'wp-admin/includes/plugin.php';
 				}
-				if ( is_plugin_active_for_network( plugin_basename( ALC_FILE ) ) ) {
+				if ( is_plugin_active_for_network( plugin_basename( ALOVIO_CALC_FILE ) ) ) {
 					switch_to_blog( (int) $new_site->blog_id );
 					Entries\EntriesTable::install();
 					restore_current_blog();
@@ -50,15 +50,15 @@ final class Plugin {
 
 	public function activate( bool $network_wide = false ): void {
 		Entries\EntriesTable::install_for_network( $network_wide );
-		update_option( 'alc_version', ALC_VERSION );
+		update_option( 'alc_version', ALOVIO_CALC_VERSION );
 	}
 
 	public function init(): void {
 		load_plugin_textdomain( 'alovio-calculator' );
 		Fields\FieldRepository::register_post_type();
-		if ( file_exists( ALC_DIR . 'build/block/block.json' ) ) {
+		if ( file_exists( ALOVIO_CALC_DIR . 'build/block/block.json' ) ) {
 			register_block_type(
-				ALC_DIR . 'build/block',
+				ALOVIO_CALC_DIR . 'build/block',
 				array(
 					'render_callback' => static fn( $attributes ) => Frontend\Shortcode::render_calculator( absint( $attributes['calculatorId'] ?? 0 ) ),
 				)

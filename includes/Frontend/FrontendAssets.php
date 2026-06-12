@@ -16,15 +16,15 @@ final class FrontendAssets {
 	}
 
 	public function register_assets(): void {
-		$asset_file = ALC_DIR . 'build/frontend.asset.php';
+		$asset_file = ALOVIO_CALC_DIR . 'build/frontend.asset.php';
 		if ( ! file_exists( $asset_file ) ) {
 			return;
 		}
 		$asset = require $asset_file;
 
-		wp_register_script( 'alc-frontend', ALC_URL . 'build/frontend.js', $asset['dependencies'], $asset['version'], true );
-		if ( file_exists( ALC_DIR . 'build/frontend.css' ) ) {
-			wp_register_style( 'alc-frontend', ALC_URL . 'build/frontend.css', array(), $asset['version'] );
+		wp_register_script( 'alc-frontend', ALOVIO_CALC_URL . 'build/frontend.js', $asset['dependencies'], $asset['version'], true );
+		if ( file_exists( ALOVIO_CALC_DIR . 'build/frontend.css' ) ) {
+			wp_register_style( 'alc-frontend', ALOVIO_CALC_URL . 'build/frontend.css', array(), $asset['version'] );
 			wp_style_add_data( 'alc-frontend', 'rtl', 'replace' );
 		}
 		self::$registered = true;

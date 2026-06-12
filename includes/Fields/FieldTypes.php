@@ -19,7 +19,7 @@ final class FieldTypes {
 	private const REFERENCEABLE = [ 'number', 'slider', 'select', 'radio', 'checkbox_group', 'toggle', 'quantity', 'formula' ];
 
 	public static function all(): array {
-		return apply_filters( 'alc_field_types', self::FREE );
+		return apply_filters( 'alovio_calc_field_types', self::FREE );
 	}
 
 	public static function is_choice( string $type ): bool {

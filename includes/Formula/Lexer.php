@@ -13,7 +13,7 @@ final class Lexer {
 			$c = $expr[ $i ];
 
 			if ( ' ' === $c || "\t" === $c || "\n" === $c || "\r" === $c ) {
-				$i++;
+				++$i;
 				continue;
 			}
 
@@ -21,7 +21,11 @@ final class Lexer {
 				if ( ! preg_match( '/\{([a-z0-9_]+)\}/A', $expr, $m, 0, $i ) ) {
 					throw new FormulaError( 'syntax', 'Malformed field reference', $i );
 				}
-				$tokens[] = [ 'type' => 'field', 'value' => $m[1], 'pos' => $i ];
+				$tokens[] = [
+					'type'  => 'field',
+					'value' => $m[1],
+					'pos'   => $i,
+				];
 				$i       += strlen( $m[0] );
 				continue;
 			}
@@ -32,47 +36,79 @@ final class Lexer {
 				if ( $end < $len && ( '.' === $expr[ $end ] || preg_match( '/[0-9a-z_]/i', $expr[ $end ] ) ) ) {
 					throw new FormulaError( 'syntax', 'Malformed number', $i );
 				}
-				$tokens[] = [ 'type' => 'num', 'value' => $m[0], 'pos' => $i ];
+				$tokens[] = [
+					'type'  => 'num',
+					'value' => $m[0],
+					'pos'   => $i,
+				];
 				$i        = $end;
 				continue;
 			}
 
 			if ( preg_match( '/[a-z_]/i', $c ) ) {
 				preg_match( '/[a-z_][a-z0-9_]*/Ai', $expr, $m, 0, $i );
-				$tokens[] = [ 'type' => 'ident', 'value' => strtolower( $m[0] ), 'pos' => $i ];
+				$tokens[] = [
+					'type'  => 'ident',
+					'value' => strtolower( $m[0] ),
+					'pos'   => $i,
+				];
 				$i       += strlen( $m[0] );
 				continue;
 			}
 
 			$two = substr( $expr, $i, 2 );
 			if ( in_array( $two, [ '>=', '<=', '==', '!=' ], true ) ) {
-				$tokens[] = [ 'type' => 'cmp', 'value' => $two, 'pos' => $i ];
+				$tokens[] = [
+					'type'  => 'cmp',
+					'value' => $two,
+					'pos'   => $i,
+				];
 				$i       += 2;
 				continue;
 			}
 			if ( '>' === $c || '<' === $c ) {
-				$tokens[] = [ 'type' => 'cmp', 'value' => $c, 'pos' => $i ];
-				$i++;
+				$tokens[] = [
+					'type'  => 'cmp',
+					'value' => $c,
+					'pos'   => $i,
+				];
+				++$i;
 				continue;
 			}
 			if ( '+' === $c || '-' === $c || '*' === $c || '/' === $c ) {
-				$tokens[] = [ 'type' => 'op', 'value' => $c, 'pos' => $i ];
-				$i++;
+				$tokens[] = [
+					'type'  => 'op',
+					'value' => $c,
+					'pos'   => $i,
+				];
+				++$i;
 				continue;
 			}
 			if ( '(' === $c ) {
-				$tokens[] = [ 'type' => 'lparen', 'value' => $c, 'pos' => $i ];
-				$i++;
+				$tokens[] = [
+					'type'  => 'lparen',
+					'value' => $c,
+					'pos'   => $i,
+				];
+				++$i;
 				continue;
 			}
 			if ( ')' === $c ) {
-				$tokens[] = [ 'type' => 'rparen', 'value' => $c, 'pos' => $i ];
-				$i++;
+				$tokens[] = [
+					'type'  => 'rparen',
+					'value' => $c,
+					'pos'   => $i,
+				];
+				++$i;
 				continue;
 			}
 			if ( ',' === $c ) {
-				$tokens[] = [ 'type' => 'comma', 'value' => $c, 'pos' => $i ];
-				$i++;
+				$tokens[] = [
+					'type'  => 'comma',
+					'value' => $c,
+					'pos'   => $i,
+				];
+				++$i;
 				continue;
 			}
 

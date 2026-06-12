@@ -34,7 +34,10 @@ final class EntriesRepository {
 		$offset = max( 0, ( $page - 1 ) * $per_page );
 		$rows   = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM {$table} {$where} ORDER BY id DESC LIMIT %d OFFSET %d", $per_page, $offset ), ARRAY_A ); // phpcs:ignore WordPress.DB.PreparedSQL -- table name + pre-prepared where
 		$total  = (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$table} {$where}" ); // phpcs:ignore WordPress.DB.PreparedSQL
-		return [ 'rows' => $rows ?: [], 'total' => $total ];
+		return [
+			'rows'  => is_array( $rows ) ? $rows : [],
+			'total' => $total,
+		];
 	}
 
 	public function set_status( int $id, string $status ): void {
@@ -52,7 +55,7 @@ final class EntriesRepository {
 		global $wpdb;
 		$table = EntriesTable::table_name();
 		$row   = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$table} WHERE id = %d", $id ), ARRAY_A ); // phpcs:ignore WordPress.DB.PreparedSQL
-		return $row ?: null;
+		return is_array( $row ) ? $row : null;
 	}
 
 	/** Used by the CSV exporter — ALL rows, no pagination. */
@@ -60,7 +63,8 @@ final class EntriesRepository {
 		global $wpdb;
 		$table = EntriesTable::table_name();
 		$where = $calculator_id > 0 ? $wpdb->prepare( 'WHERE calculator_id = %d', $calculator_id ) : '';
-		return $wpdb->get_results( "SELECT * FROM {$table} {$where} ORDER BY id ASC", ARRAY_A ) ?: []; // phpcs:ignore WordPress.DB.PreparedSQL
+		$rows = $wpdb->get_results( "SELECT * FROM {$table} {$where} ORDER BY id ASC", ARRAY_A ); // phpcs:ignore WordPress.DB.PreparedSQL
+		return is_array( $rows ) ? $rows : [];
 	}
 
 	public function delete_by_email( string $email ): int {
@@ -72,6 +76,7 @@ final class EntriesRepository {
 	public function get_by_email( string $email ): array {
 		global $wpdb;
 		$table = EntriesTable::table_name();
-		return $wpdb->get_results( $wpdb->prepare( "SELECT * FROM {$table} WHERE email = %s ORDER BY id ASC", $email ), ARRAY_A ) ?: []; // phpcs:ignore WordPress.DB.PreparedSQL
+		$rows = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM {$table} WHERE email = %s ORDER BY id ASC", $email ), ARRAY_A ); // phpcs:ignore WordPress.DB.PreparedSQL
+		return is_array( $rows ) ? $rows : [];
 	}
 }

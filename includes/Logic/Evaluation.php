@@ -82,7 +82,12 @@ final class Evaluation {
 				continue;
 			}
 			$isCurrency  = 'formula' === $field['type'] || self::is_priced( $field );
-			$lineItems[] = [ 'id' => $id, 'label' => $field['label'], 'amount' => $values[ $id ], 'isCurrency' => $isCurrency ];
+			$lineItems[] = [
+				'id'         => $id,
+				'label'      => $field['label'],
+				'amount'     => $values[ $id ],
+				'isCurrency' => $isCurrency,
+			];
 		}
 
 		return [

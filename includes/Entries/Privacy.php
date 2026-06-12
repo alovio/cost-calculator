@@ -32,13 +32,31 @@ final class Privacy {
 	public function export( string $email_address ): array {
 		$items = array();
 		foreach ( ( new EntriesRepository() )->get_by_email( $email_address ) as $row ) {
-			$data = array(
-				array( 'name' => __( 'Name', 'alovio-calculator' ), 'value' => $row['name'] ),
-				array( 'name' => __( 'Email', 'alovio-calculator' ), 'value' => $row['email'] ),
-				array( 'name' => __( 'Phone', 'alovio-calculator' ), 'value' => $row['phone'] ),
-				array( 'name' => __( 'Message', 'alovio-calculator' ), 'value' => (string) $row['message'] ),
-				array( 'name' => __( 'Quote total', 'alovio-calculator' ), 'value' => $row['total'] ),
-				array( 'name' => __( 'Submitted at', 'alovio-calculator' ), 'value' => $row['created_at'] ),
+			$data    = array(
+				array(
+					'name'  => __( 'Name', 'alovio-calculator' ),
+					'value' => $row['name'],
+				),
+				array(
+					'name'  => __( 'Email', 'alovio-calculator' ),
+					'value' => $row['email'],
+				),
+				array(
+					'name'  => __( 'Phone', 'alovio-calculator' ),
+					'value' => $row['phone'],
+				),
+				array(
+					'name'  => __( 'Message', 'alovio-calculator' ),
+					'value' => (string) $row['message'],
+				),
+				array(
+					'name'  => __( 'Quote total', 'alovio-calculator' ),
+					'value' => $row['total'],
+				),
+				array(
+					'name'  => __( 'Submitted at', 'alovio-calculator' ),
+					'value' => $row['created_at'],
+				),
 			);
 			$items[] = array(
 				'group_id'    => 'alc_entries',

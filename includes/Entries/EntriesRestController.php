@@ -28,9 +28,21 @@ final class EntriesRestController {
 				'callback'            => array( $this, 'list_entries' ),
 				'permission_callback' => array( $this, 'can_manage' ),
 				'args'                => array(
-					'calculator' => array( 'type' => 'integer', 'sanitize_callback' => 'absint', 'default' => 0 ),
-					'page'       => array( 'type' => 'integer', 'sanitize_callback' => 'absint', 'default' => 1 ),
-					'per_page'   => array( 'type' => 'integer', 'sanitize_callback' => 'absint', 'default' => 20 ),
+					'calculator' => array(
+						'type'              => 'integer',
+						'sanitize_callback' => 'absint',
+						'default'           => 0,
+					),
+					'page'       => array(
+						'type'              => 'integer',
+						'sanitize_callback' => 'absint',
+						'default'           => 1,
+					),
+					'per_page'   => array(
+						'type'              => 'integer',
+						'sanitize_callback' => 'absint',
+						'default'           => 20,
+					),
 				),
 			)
 		);
@@ -43,7 +55,10 @@ final class EntriesRestController {
 					'callback'            => array( $this, 'update_entry' ),
 					'permission_callback' => array( $this, 'can_manage' ),
 					'args'                => array(
-						'status' => array( 'type' => 'string', 'sanitize_callback' => 'sanitize_key' ),
+						'status' => array(
+							'type'              => 'string',
+							'sanitize_callback' => 'sanitize_key',
+						),
 					),
 				),
 				array(
@@ -61,8 +76,8 @@ final class EntriesRestController {
 
 	/** @param \WP_REST_Request $request */
 	public function list_entries( $request ) {
-		$per_page = min( 100, max( 1, (int) $request->get_param( 'per_page' ) ) );
-		$result   = $this->repo->paginate(
+		$per_page       = min( 100, max( 1, (int) $request->get_param( 'per_page' ) ) );
+		$result         = $this->repo->paginate(
 			(int) $request->get_param( 'calculator' ),
 			max( 1, (int) $request->get_param( 'page' ) ),
 			$per_page

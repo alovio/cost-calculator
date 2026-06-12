@@ -15,18 +15,18 @@
 
 defined( 'ABSPATH' ) || exit;
 
-define( 'ALC_VERSION', '0.1.0' );
-define( 'ALC_FILE', __FILE__ );
-define( 'ALC_DIR', plugin_dir_path( __FILE__ ) );
-define( 'ALC_URL', plugin_dir_url( __FILE__ ) );
+define( 'ALOVIO_CALC_VERSION', '0.1.0' );
+define( 'ALOVIO_CALC_FILE', __FILE__ );
+define( 'ALOVIO_CALC_DIR', plugin_dir_path( __FILE__ ) );
+define( 'ALOVIO_CALC_URL', plugin_dir_url( __FILE__ ) );
 
 spl_autoload_register(
-	static function ( $class ) {
-		if ( 0 !== strpos( $class, 'Alovio\\Calculator\\' ) ) {
+	static function ( $class_name ) {
+		if ( 0 !== strpos( $class_name, 'Alovio\\Calculator\\' ) ) {
 			return;
 		}
-		$relative = substr( $class, strlen( 'Alovio\\Calculator\\' ) );
-		$path     = ALC_DIR . 'includes/' . str_replace( '\\', '/', $relative ) . '.php';
+		$relative = substr( $class_name, strlen( 'Alovio\\Calculator\\' ) );
+		$path     = ALOVIO_CALC_DIR . 'includes/' . str_replace( '\\', '/', $relative ) . '.php';
 		if ( is_readable( $path ) ) {
 			require $path;
 		}

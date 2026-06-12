@@ -27,7 +27,7 @@ final class Formula {
 	public static function functions(): array {
 		$fns = Functions::SPECS;
 		if ( function_exists( 'apply_filters' ) ) {
-			$fns = apply_filters( 'alc_formula_functions', $fns );
+			$fns = apply_filters( 'alovio_calc_formula_functions', $fns );
 		}
 		return $fns;
 	}

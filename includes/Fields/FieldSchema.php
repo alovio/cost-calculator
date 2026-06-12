@@ -12,9 +12,20 @@ final class FieldSchema {
 			'schemaVersion' => self::SCHEMA_VERSION,
 			'fields'        => [],
 			'settings'      => [
-				'currency'  => [ 'symbol' => '$', 'position' => 'before', 'decimals' => 2, 'thousandSep' => ',', 'decimalSep' => '.' ],
+				'currency'  => [
+					'symbol'      => '$',
+					'position'    => 'before',
+					'decimals'    => 2,
+					'thousandSep' => ',',
+					'decimalSep'  => '.',
+				],
 				'theme'     => [ 'accent' => '#0a66ff' ],
-				'quoteForm' => [ 'enabled' => false, 'fields' => [ 'name', 'email' ], 'notifyEmail' => '', 'successMessage' => '' ],
+				'quoteForm' => [
+					'enabled'        => false,
+					'fields'         => [ 'name', 'email' ],
+					'notifyEmail'    => '',
+					'successMessage' => '',
+				],
 			],
 		];
 	}
@@ -57,10 +68,10 @@ final class FieldSchema {
 
 	private static function normalize_field( array $raw, string $id, string $type ): array {
 		$field = [
-			'id'            => $id,
-			'type'          => $type,
-			'label'         => sanitize_text_field( (string) ( $raw['label'] ?? '' ) ),
-			'showInSummary' => ! empty( $raw['showInSummary'] ),
+			'id'              => $id,
+			'type'            => $type,
+			'label'           => sanitize_text_field( (string) ( $raw['label'] ?? '' ) ),
+			'showInSummary'   => ! empty( $raw['showInSummary'] ),
 			// Carried through raw; validated in normalize_conditions() once all ids are known.
 			'conditions'      => $raw['conditions'] ?? [],
 			'conditionMatch'  => $raw['conditionMatch'] ?? 'all',

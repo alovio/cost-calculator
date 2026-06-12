@@ -14,7 +14,7 @@ final class EntryMailer {
 		if ( '' === $to ) {
 			$to = get_option( 'admin_email' );
 		}
-		$lines   = array();
+		$lines = array();
 		/* translators: %s: calculator title. */
 		$lines[] = sprintf( __( 'New quote request — %s', 'alovio-calculator' ), $calculator->post_title );
 		foreach ( $contact as $k => $v ) {
@@ -30,7 +30,8 @@ final class EntryMailer {
 		$subject = sprintf( __( '[%s] New quote request', 'alovio-calculator' ), wp_specialchars_decode( get_bloginfo( 'name' ), ENT_QUOTES ) );
 		$sent    = wp_mail( $to, $subject, implode( "\n", $lines ) );
 		if ( ! $sent && defined( 'WP_DEBUG' ) && WP_DEBUG ) {
-			error_log( 'Alovio Calculator: quote notification email failed to send.' ); // §12: logged silently; the entry is already stored. phpcs:ignore WordPress.PHP.DevelopmentFunctions
+			// Spec §12: logged silently; the entry is already stored.
+			error_log( 'Alovio Calculator: quote notification email failed to send.' ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log -- WP_DEBUG-guarded.
 		}
 	}
 }

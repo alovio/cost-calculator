@@ -39,7 +39,12 @@ final class EntriesTable {
 			self::install();
 			return;
 		}
-		foreach ( get_sites( [ 'fields' => 'ids', 'number' => 0 ] ) as $site_id ) {
+		foreach ( get_sites(
+			[
+				'fields' => 'ids',
+				'number' => 0,
+			]
+		) as $site_id ) {
 			switch_to_blog( (int) $site_id );
 			self::install();
 			restore_current_blog();

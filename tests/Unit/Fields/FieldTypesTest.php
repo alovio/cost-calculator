@@ -8,7 +8,7 @@ use Brain\Monkey\Filters;
 class FieldTypesTest extends TestCase {
 
 	public function test_free_list_matches_spec_section_6(): void {
-		Filters\expectApplied( 'alc_field_types' )->andReturnFirstArg();
+		Filters\expectApplied( 'alovio_calc_field_types' )->andReturnFirstArg();
 		$this->assertSame(
 			[ 'number', 'slider', 'select', 'radio', 'checkbox_group', 'toggle', 'quantity', 'text', 'heading', 'html', 'formula' ],
 			FieldTypes::all()
