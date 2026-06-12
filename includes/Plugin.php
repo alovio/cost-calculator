@@ -29,5 +29,6 @@ final class Plugin {
 
 	public function init(): void {
 		load_plugin_textdomain( 'alovio-calculator' );
+		Fields\FieldRepository::register_post_type();
 	}
 }
