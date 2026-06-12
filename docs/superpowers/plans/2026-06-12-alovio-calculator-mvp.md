@@ -2738,7 +2738,7 @@ Vertical briefs for the other five (each ~5–7 fields):
 - **print-quote**: product (radio: flyer/poster/sticker w/ unit prices), quantity (number, min 50), double-sided (toggle, **price 1** — boolean flag: a price-0 toggle is 0 whether on or off, so `if({double}, …)` would never fire; price 1 makes on ⇒ 1; it is referenced ONLY inside the `if` condition of `if({double} > 0, {qty} * 0.05, 0)`, never added to the total directly), express production (toggle priced), total with `max(…, 25)` minimum-order clamp.
 - **agency-estimate**: project type (radio priced), pages (slider), CMS setup (toggle priced), SEO package (select priced), care-plan note (heading conditional on SEO option via `contains`), total formula with `round(…, 0)`.
 - **salon-pricing**: treatment (radio priced), hair length (select priced), add-ons (checkbox_group, 3 priced options), weekend appointment (toggle priced), total formula.
-- **rental-cost**: unit type (radio priced/day), days (quantity min 1 default 1), insurance (toggle priced/day → formula `({unit} + if({insurance}, 12, 0)) * {days}`), delivery (toggle priced flat), total formula.
+- **rental-cost**: unit type (radio priced/day), days (quantity min 1 default 1), insurance (toggle priced/day → formula `({unit} + if({insurance} > 0, 12, 0)) * {days}` — use the `> 0` idiom consistently), delivery (toggle priced flat), total formula.
 
 - [ ] **Step 4: Run tests** (`vendor/bin/phpunit --filter PresetsTest`) — all three tests must pass for all six presets.
 
@@ -3302,7 +3302,7 @@ final class Evaluation {
 }
 ```
 
-NOTE: check the copied `ConditionalLogic::active_map()` signature first (Task 15 Step 6 already did) — if it takes a bare fields array instead of `[ 'fields' => … ]`, adjust the one call site here.
+NOTE: the `active_map( [ 'fields' => … ], $values )` signature used here is the verified CF signature — see Task 15 Step 6.
 
 - [ ] **Step 4: Run** `vendor/bin/phpunit --filter EvaluationTest` — iterate to green; then full suite.
 
@@ -3932,7 +3932,7 @@ Renders (spec §8): wrapper `.alc-calculator[data-alc-id]` with the accent CSS c
   - the summary contains the initial total formatted via `CurrencyFormatter` for default values (compute the expected string by hand from the test config);
   - with `quoteForm.enabled = true` the output contains `name="alc_website"` (honeypot) and inputs for exactly the enabled contact fields; with it disabled, no `<form` at all;
   - `aria-live="polite"` present on the total element;
-  - every summary row carries `data-alc-line="{field-id}"` (the hook Task 34's `summary.js` matches on);
+  - every summary row carries `data-alc-line="{field-id}"` and the total element carries `data-alc-total` (the two hooks Task 34's `summary.js` matches on);
   - the decoded payload pins `calculatorId`, `settings.quoteForm.fields`, and a non-empty `successMessage` (the renderer resolves an empty stored `successMessage` to the translated default `__( "Thanks! We'll be in touch shortly.", 'alovio-calculator' )` — the frontend bundle has no wp-i18n, so the translated fallback MUST ship in the payload).
 
 - [ ] **Step 2: Implement** `CalculatorRenderer::render( int $id, array $config ): string`. Structure (keep each helper ≤40 lines; one `render_field` switch delegating to per-type private methods):
@@ -3982,10 +3982,10 @@ PHP registration in `Plugin::init()`: `register_block_type( ALC_DIR . 'build/blo
 
 - [ ] **Step 3: `FrontendAssets.php`** — registers `alc-frontend` script (`build/frontend.js` + asset deps) and `alc-frontend` style on `wp_enqueue_scripts` but **enqueues only when marked needed** (static flag set by shortcode/block render; plus a `has_block( 'alovio/calculator' )` / `has_shortcode` pre-check in `wp` action for footer-printed styles). Late marking is handled by calling `wp_enqueue_script` directly inside `mark_needed()` if `wp_enqueue_scripts` already fired.
 
-- [ ] **Step 4: Build, verify `build/block.js` + emitted `block.json`, `php -l` all new files, full PHPUnit, commit**
+- [ ] **Step 4: Build, verify `build/block/index.js` + `build/block/block.json` sit side by side, `php -l` all new files, full PHPUnit, commit**
 
 ```bash
-npm run build && ls build/ && vendor/bin/phpunit
+npm run build && ls build/block/ && vendor/bin/phpunit
 git add src/block webpack.config.js includes/Frontend/Shortcode.php includes/Frontend/FrontendAssets.php includes/Plugin.php
 git commit -m "feat: shortcode + dynamic block embedding with conditional assets"
 ```
@@ -4012,7 +4012,7 @@ git commit -m "feat: shortcode + dynamic block embedding with conditional assets
 
 - [ ] **Step 3: `calculator.js`** — DOM wiring per instance: read config JSON; `prepare()` once; collect raw values from inputs (`[data-alc-field]` scoping; checkbox groups → array; toggle → checked); on delegated `input`/`change`: `run()` → toggle `hidden` per `active` (and `aria-hidden`), update each summary line + slider `<output>`, update total via `formatCurrency`. Total element keeps `aria-live="polite"` from server markup.
 
-- [ ] **Step 4: `summary.js`** — render line items into the server-rendered `.alc-summary` (match by `data-alc-line` id, add/remove rows as activity changes); mobile dock handled purely in CSS (Task 36).
+- [ ] **Step 4: `summary.js`** — render line items into the server-rendered `.alc-summary` (match rows by `[data-alc-line]` id, add/remove rows as activity changes; write the total into `[data-alc-total]`); mobile dock handled purely in CSS (Task 36).
 
 - [ ] **Step 5: `src/frontend.js` entry:**
 
@@ -4143,7 +4143,7 @@ function alc_uninstall_site(): void {
 }
 
 if ( is_multisite() ) {
-	foreach ( get_sites( [ 'fields' => 'ids' ] ) as $site_id ) {
+	foreach ( get_sites( [ 'fields' => 'ids', 'number' => 0 ] ) as $site_id ) {
 		switch_to_blog( (int) $site_id );
 		alc_uninstall_site();
 		restore_current_blog();
