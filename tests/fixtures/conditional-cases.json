@@ -1,0 +1,11 @@
+[
+  { "name": "no condition is active", "condition": null, "values": {}, "expectedActive": true },
+  { "name": "show + match -> active", "condition": { "field": "a", "operator": "is", "value": "yes", "action": "show" }, "values": { "a": "yes" }, "expectedActive": true },
+  { "name": "show + no match -> inactive", "condition": { "field": "a", "operator": "is", "value": "yes", "action": "show" }, "values": { "a": "no" }, "expectedActive": false },
+  { "name": "hide + match -> inactive", "condition": { "field": "a", "operator": "is", "value": "yes", "action": "hide" }, "values": { "a": "yes" }, "expectedActive": false },
+  { "name": "hide + no match -> active", "condition": { "field": "a", "operator": "is", "value": "yes", "action": "hide" }, "values": { "a": "no" }, "expectedActive": true },
+  { "name": "is_not + differs -> active", "condition": { "field": "a", "operator": "is_not", "value": "yes", "action": "show" }, "values": { "a": "no" }, "expectedActive": true },
+  { "name": "is_not + equals -> inactive", "condition": { "field": "a", "operator": "is_not", "value": "yes", "action": "show" }, "values": { "a": "yes" }, "expectedActive": false },
+  { "name": "require action is always active", "condition": { "field": "a", "operator": "is", "value": "yes", "action": "require" }, "values": { "a": "no" }, "expectedActive": true },
+  { "name": "missing controller value treated as empty", "condition": { "field": "a", "operator": "is", "value": "", "action": "show" }, "values": {}, "expectedActive": true }
+]
