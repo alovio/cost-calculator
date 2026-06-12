@@ -55,7 +55,7 @@ includes/
   Fields/  FieldSchema.php       normalize/validate config JSON (80% reuse)
            FieldRepository.php   CPT-backed load/save of _alc_config (adapt)
            FieldTypes.php        registry + alc_field_types filter (pattern reuse)
-  Logic/   ConditionalLogic.php  COPIED VERBATIM from woo-checkout-fields
+  Logic/   ConditionalLogic.php  copied verbatim (modulo namespace) from woo-checkout-fields
   Formula/ Lexer.php, Parser.php, Evaluator.php, DecimalMath.php   ★ NET-NEW
   Frontend/CalculatorRenderer.php  server render (adapted from ProductFormRenderer, 60-80%)
            FrontendAssets.php    conditional enqueue (95% reuse)
@@ -76,7 +76,18 @@ tests/    PHPUnit + fixtures (formula-cases.json ★, conditional-cases.json cop
 docs/superpowers/specs/
 ```
 
-**Admin app:** one top-level menu page mounting a React app with internal views: calculator list (with duplicate + copy-shortcode actions), builder, entries, settings. All data via `alc/v1` REST (`GET/POST /calculators`, `GET/PUT/DELETE /calculators/{id}`, `GET/DELETE /entries`, paginated). CSV export via `admin-post.php` (nonce + capability).
+**Admin app:** one top-level menu page mounting a React app with internal views: calculator list (with duplicate + copy-shortcode actions), builder, entries, settings.
+
+**Full REST contract (`alc/v1`):**
+
+| Route | Auth | Purpose |
+|---|---|---|
+| `GET/POST /calculators` | `manage_options` + REST nonce | list / create |
+| `GET/PUT/DELETE /calculators/{id}` | `manage_options` + REST nonce | load / save / delete config |
+| `GET /entries`, `DELETE /entries/{id}`, `PUT /entries/{id}` | `manage_options` + REST nonce | paginated list / delete / mark read |
+| `POST /quote` | **public, no nonce** (see §10) | quote submission |
+
+CSV export via `admin-post.php` (nonce + capability).
 
 ## 5. Data Model
 
@@ -121,14 +132,28 @@ CREATE TABLE {$prefix}alc_entries (
 );
 ```
 
-No IP addresses stored (GDPR-lean). Privacy module registers WP personal-data exporter + eraser keyed on email. `uninstall.php` deletes data only when the "delete data on uninstall" setting is opted in.
+No IP addresses stored (GDPR-lean; the rate limiter hashes IPs into transient keys and never persists them). Privacy module registers WP personal-data exporter + eraser keyed on email. `uninstall.php` deletes data only when the "delete data on uninstall" setting is opted in.
+
+**Multisite:** table creation runs per-site on activation; network activation iterates sites; `wp_initialize_site` hook creates the table for new subsites; opted-in uninstall iterates sites on network uninstall.
 
 ## 6. Field Types (all FREE — this is the wedge)
 
 `number`, `slider`, `select`, `radio` (incl. basic image choice via media-library `image` per option), `checkbox-group`, `toggle`, `quantity`, `text` (excluded from math), `heading`/`divider`, `html`, **`formula`** (computed line).
 
-- Choice fields carry **per-option `price`** (UI transferred from woo-product-options FieldSettings).
-- Numeric value of a field for formulas: number/slider/quantity → value; radio/select → selected option price; checkbox-group → sum of checked option prices; toggle → its price when on, else 0; text/heading/html → not referenceable.
+- Choice fields carry **per-option `price`**. This is *new* builder UI (the shipped FieldSettings has per-field price and string-array options only — §4's "75% reuse, add per-option price" framing is the accurate one). Option `value`s are auto-generated unique slugs (`opt_xxxx`); the UI shows labels, rules and submissions store slugs — this also makes substring `contains` matching collision-safe.
+- **Formula value map** (what a field contributes to `{field_id}` references): number/slider/quantity → value; radio/select → selected option price; checkbox-group → sum of checked option prices; toggle → its price when on, else 0; text/heading/html → not referenceable.
+- **Condition value map** (what the copied string-map comparator sees per field type — the new value-collector contract):
+
+| Field type | Exposed condition value |
+|---|---|
+| number / slider / quantity | numeric string of current value |
+| select / radio | selected option **slug** (not price) |
+| checkbox-group | comma-joined selected option slugs (`contains` = membership; safe because slugs are unique) |
+| toggle | `"1"` when on, `""` when off |
+| text | trimmed raw string |
+| formula / heading / html | **not available as condition controllers** (see §7) |
+
+- Condition actions exposed in the UI: **`show` / `hide` only**. The copied engine's `require` path exists but is unused in MVP (no dead UI wired to it).
 - Every field: `showInSummary` flag and conditional rules.
 - **Conditional logic fully free:** multi-conditions (`all`/`any`) + all five operators (`is, is_not, contains, gt, lt`). Hidden-by-condition fields contribute 0 to all formulas (enforced identically in PHP and JS via `active_map`).
 
@@ -138,6 +163,7 @@ No IP addresses stored (GDPR-lean). Privacy module registers WP personal-data ex
 - **Implementation:** Pratt parser → AST → evaluator. Same grammar implemented twice: PHP (`includes/Formula/`) and JS (`src/shared/formula/`).
 - **Decimal safety:** all numbers converted to scale-4 integers (×10⁴); arithmetic on integers; division re-scales; rounding = half-away-from-zero in both languages; overflow guard at ±9×10¹³ (beyond any real quote). Division by zero → result 0 + builder warning badge.
 - **Dependency graph:** formula→formula references topologically sorted; cycles detected → builder error badge; at runtime a cyclic/broken formula evaluates to 0 and (for admins only) renders a notice.
+- **Formula fields cannot be condition controllers** (ConditionEditor filters them out of the controller dropdown; FieldSchema rejects such rules on save). This keeps the two engines acyclic by construction: conditions read only raw inputs, then formulas evaluate over the resulting active set — exactly the runtime order in §8.
 - **Parity testing:** `tests/fixtures/formula-cases.json` (expression + inputs + expected) consumed by both PHPUnit and Jest — same pattern as the existing `conditional-cases.json`.
 - **Builder UX:** expression input with live syntax/reference validation and an insert-field-token dropdown. Errors never block saving — badge in builder, safe-0 on the front end.
 
@@ -155,9 +181,10 @@ No IP addresses stored (GDPR-lean). Privacy module registers WP personal-data ex
 ## 10. Quote / Lead Capture
 
 - Per-calculator toggle. Form fields fixed set, configurable subset: name (required), email (required), phone, message.
-- Submission: REST `POST /alc/v1/quote` with nonce + honeypot field + per-IP transient rate limit (e.g. 5/min). Server recomputes the total from submitted values (PHP engine is authoritative); stores entry (snapshot + total); sends `wp_mail` admin notification (to `quoteForm.notifyEmail`, default site admin email).
+- Submission: REST `POST /alc/v1/quote` — **deliberately no WP nonce** (REST nonces expire and get baked into cached HTML, guaranteeing 403s on LiteSpeed/WP Rocket/Cloudflare pages; this is a contact-form-class endpoint with no auth context or privileged side effect, so CSRF protection adds risk, not safety). Abuse controls instead: honeypot field + per-IP transient rate limit (5/min) + strict type-aware sanitization + payload size cap. Server recomputes the total from submitted values (PHP engine is authoritative — client total is ignored); stores entry (snapshot + total); sends `wp_mail` admin notification (to `quoteForm.notifyEmail`, default site admin email).
+- **Response contract:** `201 {ok:true}` on success; `400 {ok:false, code, message, fieldErrors:{field:msg}}` on validation failure; `429` on rate limit. Front end: inline success message (per-calculator configurable text, default "Thanks! We'll be in touch shortly."), quote form resets, calculator selections persist; field errors render inline; network failure shows a generic retry message.
 - Admin: Entries view (filter by calculator, paginate, view snapshot, mark read, delete, CSV export).
-- The Nth-quote-collected moment fires the review-prompt nudge (dismissible, once — Guideline 11 compliant).
+- The **3rd** collected quote fires the review-prompt nudge (dismissible, shown once — Guideline 11 compliant).
 
 ## 11. Templates
 
@@ -195,3 +222,5 @@ Textdomain `alovio-calculator`, all strings translatable, `wp_set_script_transla
 | Builder polish slips the 4–6-week window | builder framework is ~100% reused; only FieldSettings/Formula panel/SettingsTab are new UI |
 | Free-tier ceiling (30–40K niche cap) | accepted in research; revenue path = funnel conversion + Featured Plugins eligibility |
 | wp.org guideline misstep post-auto-approve | PHPCS/WPCS + Plugin Check gates; no telemetry; single upsell surface |
+
+**Build-order note for planning:** implement the formula engine + parity fixtures first — it is the only large net-new unit, everything else consumes it, and its correctness is the product's reputation backbone.
