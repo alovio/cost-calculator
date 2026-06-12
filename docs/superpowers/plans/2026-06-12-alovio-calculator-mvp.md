@@ -2376,6 +2376,11 @@ final class FieldSchema {
 			'type'          => $type,
 			'label'         => sanitize_text_field( (string) ( $raw['label'] ?? '' ) ),
 			'showInSummary' => ! empty( $raw['showInSummary'] ),
+			// Carried through raw; validated in normalize_conditions() once all ids are known.
+			// (Without this carry-through the conditions test fails — found during execution.)
+			'conditions'      => $raw['conditions'] ?? [],
+			'conditionMatch'  => $raw['conditionMatch'] ?? 'all',
+			'conditionAction' => $raw['conditionAction'] ?? 'show',
 		];
 
 		switch ( $type ) {
