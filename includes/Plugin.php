@@ -42,6 +42,8 @@ final class Plugin {
 		( new Entries\Privacy() )->register();
 		( new Admin\AdminPage() )->register();
 		( new Admin\BuilderAssets() )->register();
+		( new Frontend\Shortcode() )->register();
+		( new Frontend\FrontendAssets() )->register();
 		// Services register themselves here as later tasks add them.
 	}
 
@@ -53,5 +55,13 @@ final class Plugin {
 	public function init(): void {
 		load_plugin_textdomain( 'alovio-calculator' );
 		Fields\FieldRepository::register_post_type();
+		if ( file_exists( ALC_DIR . 'build/block/block.json' ) ) {
+			register_block_type(
+				ALC_DIR . 'build/block',
+				array(
+					'render_callback' => static fn( $attributes ) => Frontend\Shortcode::render_calculator( absint( $attributes['calculatorId'] ?? 0 ) ),
+				)
+			);
+		}
 	}
 }

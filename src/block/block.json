@@ -1,0 +1,13 @@
+{
+    "$schema": "https://schemas.wp.org/trunk/block.json",
+    "apiVersion": 3,
+    "name": "alovio/calculator",
+    "title": "Alovio Calculator",
+    "category": "widgets",
+    "icon": "calculator",
+    "description": "Embed a cost/quote calculator.",
+    "textdomain": "alovio-calculator",
+    "attributes": { "calculatorId": { "type": "number", "default": 0 } },
+    "supports": { "html": false },
+    "editorScript": "file:./index.js"
+}
