@@ -61,6 +61,7 @@ includes/
            FrontendAssets.php    conditional enqueue (95% reuse)
            Shortcode.php, Block/ (block.json, render callback → same renderer)
   Entries/ EntriesTable.php (dbDelta), EntriesRepository.php,
+           QuoteController.php (public POST /quote route),
            EntryMailer.php (wp_mail admin notification), CsvExporter.php,
            Privacy.php (WP personal-data exporter/eraser by email)
   Templates/Presets.php          6 vertical JSON presets
@@ -132,7 +133,7 @@ CREATE TABLE {$prefix}alc_entries (
 );
 ```
 
-No IP addresses stored (GDPR-lean; the rate limiter hashes IPs into transient keys and never persists them). Privacy module registers WP personal-data exporter + eraser keyed on email. `uninstall.php` deletes data only when the "delete data on uninstall" setting is opted in.
+No IP addresses stored (GDPR-lean; the rate limiter hashes IPs into short-lived transient keys and never stores raw IPs). Privacy module registers WP personal-data exporter + eraser keyed on email. `uninstall.php` deletes data only when the "delete data on uninstall" setting is opted in.
 
 **Multisite:** table creation runs per-site on activation; network activation iterates sites; `wp_initialize_site` hook creates the table for new subsites; opted-in uninstall iterates sites on network uninstall.
 
@@ -161,7 +162,7 @@ No IP addresses stored (GDPR-lean; the rate limiter hashes IPs into transient ke
 
 - **Syntax:** `{field_id}` references; `+ - * / ( )`; functions `if(cond, a, b)`, `min`, `max`, `round(x, n=0)`, `ceil`, `floor`, `abs`; comparison operators inside `if`: `> < >= <= == !=`; numeric literals with `.` decimal separator (locale formatting is display-only, never parsed).
 - **Implementation:** Pratt parser → AST → evaluator. Same grammar implemented twice: PHP (`includes/Formula/`) and JS (`src/shared/formula/`).
-- **Decimal safety:** all numbers converted to scale-4 integers (×10⁴) **rounding at the conversion boundary** (`(int) round($v * 10000)` / `Math.round(v * 10000)` — naive multiplication of e.g. `4.1` yields `41000.00000000001`, exactly the artifact class this engine exists to kill); arithmetic on integers; division re-scales; rounding = half-away-from-zero in both languages; overflow guard at ±9×10¹³ (beyond any real quote). Division by zero → result 0 + builder warning badge.
+- **Decimal safety:** all numbers converted to scale-4 integers (×10⁴) **rounding at the conversion boundary** (PHP `(int) round($v * 10000)`; JS must be sign-aware since `Math.round` rounds half toward +∞: `Math.sign(v) * Math.round(Math.abs(v) * 10000)` — naive multiplication of e.g. `4.1` yields `41000.00000000001`, exactly the artifact class this engine exists to kill; parity fixtures must include a negative half-value case); arithmetic on integers; division re-scales; rounding = half-away-from-zero in both languages; overflow guard at ±9×10¹³ (beyond any real quote). Division by zero → result 0 + builder warning badge.
 - **Dependency graph:** formula→formula references topologically sorted; cycles detected → builder error badge; at runtime a cyclic/broken formula evaluates to 0 and (for admins only) renders a notice.
 - **Formula fields cannot be condition controllers** (ConditionEditor filters them out of the controller dropdown; FieldSchema rejects such rules on save). This keeps the two engines acyclic by construction: conditions read only raw inputs, then formulas evaluate over the resulting active set — exactly the runtime order in §8.
 - **Parity testing:** `tests/fixtures/formula-cases.json` (expression + inputs + expected) consumed by both PHPUnit and Jest — same pattern as the existing `conditional-cases.json`.
