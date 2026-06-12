@@ -44,7 +44,8 @@ final class Plugin {
 		( new Admin\BuilderAssets() )->register();
 		( new Frontend\Shortcode() )->register();
 		( new Frontend\FrontendAssets() )->register();
-		// Services register themselves here as later tasks add them.
+		( new Admin\ReviewNudge() )->register();
+		Pro\ProModule::register();
 	}
 
 	public function activate( bool $network_wide = false ): void {
