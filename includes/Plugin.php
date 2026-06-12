@@ -36,6 +36,7 @@ final class Plugin {
 			1
 		);
 		( new Admin\RestController() )->register();
+		( new Entries\QuoteController() )->register();
 		// Services register themselves here as later tasks add them.
 	}
 
