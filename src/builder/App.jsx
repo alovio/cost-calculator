@@ -10,6 +10,7 @@ import FieldSettings from './FieldSettings';
 import SettingsTab from './SettingsTab';
 import CalculatorList from './CalculatorList';
 import EntriesList from './EntriesList';
+import ProTab from './ProTab';
 
 const T = 'alovio-calculator';
 
@@ -128,19 +129,26 @@ function Builder( { calculatorId, onBack } ) {
 				tabs={ [
 					{ name: 'fields', title: __( 'Fields', T ) },
 					{ name: 'settings', title: __( 'Settings', T ) },
+					...( window.ALC_BUILDER && window.ALC_BUILDER.isPro
+						? []
+						: [ { name: 'pro', title: __( 'Pro', T ) } ] ),
 				] }
 			>
-				{ ( tab ) =>
-					tab.name === 'fields' ? (
-						<div className="alc-build">
-							<FieldPalette />
-							<Canvas />
-							<FieldSettings />
-						</div>
-					) : (
-						<SettingsTab />
-					)
-				}
+				{ ( tab ) => {
+					if ( tab.name === 'fields' ) {
+						return (
+							<div className="alc-build">
+								<FieldPalette />
+								<Canvas />
+								<FieldSettings />
+							</div>
+						);
+					}
+					if ( tab.name === 'pro' ) {
+						return <ProTab />;
+					}
+					return <SettingsTab />;
+				} }
 			</TabPanel>
 			{ notice && notice.type === 'success' && (
 				<Snackbar onRemove={ () => setNotice( null ) }>{ notice.text }</Snackbar>
