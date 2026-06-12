@@ -35,6 +35,7 @@ final class Plugin {
 			10,
 			1
 		);
+		( new Admin\RestController() )->register();
 		// Services register themselves here as later tasks add them.
 	}
 
