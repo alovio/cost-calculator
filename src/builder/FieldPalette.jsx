@@ -3,21 +3,20 @@ import { Button } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { STORE } from './store';
 
-const T = 'alovio-calculator';
 const FALLBACK = [ 'number', 'slider', 'select', 'radio', 'checkbox_group', 'toggle', 'quantity', 'text', 'heading', 'html', 'formula' ];
 
 const LABELS = {
-	number: __( 'Number', T ),
-	slider: __( 'Slider', T ),
-	select: __( 'Dropdown', T ),
-	radio: __( 'Multiple choice', T ),
-	checkbox_group: __( 'Checkboxes', T ),
-	toggle: __( 'Toggle', T ),
-	quantity: __( 'Quantity', T ),
-	text: __( 'Text', T ),
-	heading: __( 'Heading', T ),
-	html: __( 'HTML content', T ),
-	formula: __( 'Formula (calculated)', T ),
+	number: __( 'Number', 'alovio-calculator' ),
+	slider: __( 'Slider', 'alovio-calculator' ),
+	select: __( 'Dropdown', 'alovio-calculator' ),
+	radio: __( 'Multiple choice', 'alovio-calculator' ),
+	checkbox_group: __( 'Checkboxes', 'alovio-calculator' ),
+	toggle: __( 'Toggle', 'alovio-calculator' ),
+	quantity: __( 'Quantity', 'alovio-calculator' ),
+	text: __( 'Text', 'alovio-calculator' ),
+	heading: __( 'Heading', 'alovio-calculator' ),
+	html: __( 'HTML content', 'alovio-calculator' ),
+	formula: __( 'Formula (calculated)', 'alovio-calculator' ),
 };
 
 export default function FieldPalette() {
@@ -25,8 +24,8 @@ export default function FieldPalette() {
 	const types = ( window.ALC_BUILDER && window.ALC_BUILDER.fieldTypes ) || FALLBACK;
 
 	return (
-		<div className="alc-palette" aria-label={ __( 'Field types', T ) }>
-			<h3>{ __( 'Add field', T ) }</h3>
+		<div className="alc-palette" aria-label={ __( 'Field types', 'alovio-calculator' ) }>
+			<h3>{ __( 'Add field', 'alovio-calculator' ) }</h3>
 			{ types.map( ( type ) => (
 				<Button key={ type } variant="secondary" className="alc-palette__btn" onClick={ () => addField( type ) }>
 					{ LABELS[ type ] || type }

@@ -4,7 +4,6 @@ import { Button } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { STORE } from './store';
 
-const T = 'alovio-calculator';
 
 export default function Canvas() {
 	const fields = useSelect( ( select ) => select( STORE ).getFields(), [] );
@@ -14,7 +13,7 @@ export default function Canvas() {
 	const [ overIndex, setOverIndex ] = useState( null );
 
 	if ( ! fields.length ) {
-		return <div className="alc-canvas alc-canvas--empty">{ __( 'Add a field from the left to get started.', T ) }</div>;
+		return <div className="alc-canvas alc-canvas--empty">{ __( 'Add a field from the left to get started.', 'alovio-calculator' ) }</div>;
 	}
 
 	const onDrop = ( to ) => {
@@ -50,15 +49,15 @@ export default function Canvas() {
 						onDrop={ () => onDrop( i ) }
 						onDragEnd={ () => { setDragIndex( null ); setOverIndex( null ); } }
 					>
-						<span className="alc-canvas__grip" aria-hidden="true" title={ __( 'Drag to reorder', T ) }>⠿</span>
+						<span className="alc-canvas__grip" aria-hidden="true" title={ __( 'Drag to reorder', 'alovio-calculator' ) }>⠿</span>
 						<span className="alc-canvas__label">
 							{ f.label || f.type } <em>({ f.type })</em>
 						</span>
 						<span className="alc-canvas__ops">
-							<Button size="small" disabled={ i === 0 } onClick={ ( e ) => { e.stopPropagation(); reorder( i, i - 1 ); } } aria-label={ __( 'Move up', T ) }>↑</Button>
-							<Button size="small" disabled={ i === fields.length - 1 } onClick={ ( e ) => { e.stopPropagation(); reorder( i, i + 1 ); } } aria-label={ __( 'Move down', T ) }>↓</Button>
-							<Button size="small" onClick={ ( e ) => { e.stopPropagation(); duplicateField( f.id ); } } aria-label={ __( 'Duplicate', T ) }>⧉</Button>
-							<Button size="small" isDestructive onClick={ ( e ) => { e.stopPropagation(); removeField( f.id ); } } aria-label={ __( 'Delete', T ) }>✕</Button>
+							<Button size="small" disabled={ i === 0 } onClick={ ( e ) => { e.stopPropagation(); reorder( i, i - 1 ); } } aria-label={ __( 'Move up', 'alovio-calculator' ) }>↑</Button>
+							<Button size="small" disabled={ i === fields.length - 1 } onClick={ ( e ) => { e.stopPropagation(); reorder( i, i + 1 ); } } aria-label={ __( 'Move down', 'alovio-calculator' ) }>↓</Button>
+							<Button size="small" onClick={ ( e ) => { e.stopPropagation(); duplicateField( f.id ); } } aria-label={ __( 'Duplicate', 'alovio-calculator' ) }>⧉</Button>
+							<Button size="small" isDestructive onClick={ ( e ) => { e.stopPropagation(); removeField( f.id ); } } aria-label={ __( 'Delete', 'alovio-calculator' ) }>✕</Button>
 						</span>
 					</li>
 				);

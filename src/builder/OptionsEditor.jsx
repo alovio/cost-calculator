@@ -1,7 +1,6 @@
 import { Button, TextControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
-const T = 'alovio-calculator';
 
 /**
  * Per-option editor for select/radio/checkbox_group: label + price (+ image on radio).
@@ -21,7 +20,7 @@ export default function OptionsEditor( { field, set } ) {
 			return;
 		}
 		const frame = window.wp.media( {
-			title: __( 'Choose option image', T ),
+			title: __( 'Choose option image', 'alovio-calculator' ),
 			library: { type: 'image' },
 			multiple: false,
 		} );
@@ -34,18 +33,18 @@ export default function OptionsEditor( { field, set } ) {
 
 	return (
 		<div className="alc-options">
-			<span className="alc-options__title">{ __( 'Options', T ) }</span>
+			<span className="alc-options__title">{ __( 'Options', 'alovio-calculator' ) }</span>
 			{ options.map( ( o, i ) => (
 				<div className="alc-options__row" key={ o.value || `new-${ i }` }>
 					<TextControl
-						label={ __( 'Label', T ) }
+						label={ __( 'Label', 'alovio-calculator' ) }
 						hideLabelFromVision
-						placeholder={ __( 'Label', T ) }
+						placeholder={ __( 'Label', 'alovio-calculator' ) }
 						value={ o.label || '' }
 						onChange={ ( label ) => update( i, { label } ) }
 					/>
 					<TextControl
-						label={ __( 'Price', T ) }
+						label={ __( 'Price', 'alovio-calculator' ) }
 						hideLabelFromVision
 						placeholder="0"
 						type="number"
@@ -57,17 +56,17 @@ export default function OptionsEditor( { field, set } ) {
 						<span className="alc-options__image">
 							{ o.image > 0 && o.imageUrl && <img src={ o.imageUrl } alt="" width="32" height="32" /> }
 							<Button size="small" onClick={ () => pickImage( i ) }>
-								{ o.image > 0 ? __( 'Change', T ) : __( 'Image', T ) }
+								{ o.image > 0 ? __( 'Change', 'alovio-calculator' ) : __( 'Image', 'alovio-calculator' ) }
 							</Button>
 							{ o.image > 0 && (
 								<Button size="small" isDestructive onClick={ () => update( i, { image: 0, imageUrl: '' } ) }>✕</Button>
 							) }
 						</span>
 					) }
-					<Button size="small" isDestructive disabled={ options.length < 2 } onClick={ () => remove( i ) } aria-label={ __( 'Remove option', T ) }>✕</Button>
+					<Button size="small" isDestructive disabled={ options.length < 2 } onClick={ () => remove( i ) } aria-label={ __( 'Remove option', 'alovio-calculator' ) }>✕</Button>
 				</div>
 			) ) }
-			<Button variant="secondary" size="small" onClick={ add }>{ __( '+ Add option', T ) }</Button>
+			<Button variant="secondary" size="small" onClick={ add }>{ __( '+ Add option', 'alovio-calculator' ) }</Button>
 		</div>
 	);
 }

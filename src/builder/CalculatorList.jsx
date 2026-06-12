@@ -4,7 +4,6 @@ import { __ } from '@wordpress/i18n';
 import { listCalculators, createCalculator, deleteCalculator, getSettings, saveSettings } from './api';
 import TemplatePicker from './TemplatePicker';
 
-const T = 'alovio-calculator';
 
 export default function CalculatorList( { onEdit, onEntries } ) {
 	const [ items, setItems ] = useState( null );
@@ -16,7 +15,7 @@ export default function CalculatorList( { onEdit, onEntries } ) {
 	const refresh = () =>
 		listCalculators()
 			.then( setItems )
-			.catch( () => setError( __( 'Could not load calculators.', T ) ) );
+			.catch( () => setError( __( 'Could not load calculators.', 'alovio-calculator' ) ) );
 
 	useEffect( () => {
 		refresh();
@@ -39,7 +38,7 @@ export default function CalculatorList( { onEdit, onEntries } ) {
 
 	const remove = async ( item ) => {
 		// eslint-disable-next-line no-alert
-		if ( window.confirm( __( 'Delete this calculator? Its entries stay in the database.', T ) ) ) {
+		if ( window.confirm( __( 'Delete this calculator? Its entries stay in the database.', 'alovio-calculator' ) ) ) {
 			await deleteCalculator( item.id );
 			refresh();
 		}
@@ -59,42 +58,42 @@ export default function CalculatorList( { onEdit, onEntries } ) {
 	return (
 		<div className="alc-app">
 			<div className="alc-topbar">
-				<h1 className="alc-heading">{ __( 'Alovio Calculator', T ) }</h1>
-				<Button variant="primary" onClick={ () => setPicking( true ) }>{ __( 'Add new', T ) }</Button>
-				<Button variant="secondary" onClick={ onEntries }>{ __( 'Entries', T ) }</Button>
+				<h1 className="alc-heading">{ __( 'Alovio Calculator', 'alovio-calculator' ) }</h1>
+				<Button variant="primary" onClick={ () => setPicking( true ) }>{ __( 'Add new', 'alovio-calculator' ) }</Button>
+				<Button variant="secondary" onClick={ onEntries }>{ __( 'Entries', 'alovio-calculator' ) }</Button>
 			</div>
 
 			{ ! items.length && (
-				<p className="alc-empty">{ __( 'No calculators yet — create your first one from a template.', T ) }</p>
+				<p className="alc-empty">{ __( 'No calculators yet — create your first one from a template.', 'alovio-calculator' ) }</p>
 			) }
 
 			{ !! items.length && (
 				<table className="widefat striped alc-table">
 					<thead>
 						<tr>
-							<th>{ __( 'Name', T ) }</th>
-							<th>{ __( 'Shortcode', T ) }</th>
-							<th>{ __( 'Updated', T ) }</th>
-							<th>{ __( 'Actions', T ) }</th>
+							<th>{ __( 'Name', 'alovio-calculator' ) }</th>
+							<th>{ __( 'Shortcode', 'alovio-calculator' ) }</th>
+							<th>{ __( 'Updated', 'alovio-calculator' ) }</th>
+							<th>{ __( 'Actions', 'alovio-calculator' ) }</th>
 						</tr>
 					</thead>
 					<tbody>
 						{ items.map( ( item ) => (
 							<tr key={ item.id }>
 								<td>
-									<Button variant="link" onClick={ () => onEdit( item.id ) }>{ item.title || __( '(untitled)', T ) }</Button>
+									<Button variant="link" onClick={ () => onEdit( item.id ) }>{ item.title || __( '(untitled)', 'alovio-calculator' ) }</Button>
 								</td>
 								<td>
 									<code>{ item.shortcode }</code>{ ' ' }
 									<Button size="small" onClick={ () => copyShortcode( item ) }>
-										{ copiedId === item.id ? __( 'Copied!', T ) : __( 'Copy', T ) }
+										{ copiedId === item.id ? __( 'Copied!', 'alovio-calculator' ) : __( 'Copy', 'alovio-calculator' ) }
 									</Button>
 								</td>
 								<td>{ item.updated }</td>
 								<td className="alc-table__ops">
-									<Button size="small" variant="secondary" onClick={ () => onEdit( item.id ) }>{ __( 'Edit', T ) }</Button>
-									<Button size="small" onClick={ () => duplicate( item ) }>{ __( 'Duplicate', T ) }</Button>
-									<Button size="small" isDestructive onClick={ () => remove( item ) }>{ __( 'Delete', T ) }</Button>
+									<Button size="small" variant="secondary" onClick={ () => onEdit( item.id ) }>{ __( 'Edit', 'alovio-calculator' ) }</Button>
+									<Button size="small" onClick={ () => duplicate( item ) }>{ __( 'Duplicate', 'alovio-calculator' ) }</Button>
+									<Button size="small" isDestructive onClick={ () => remove( item ) }>{ __( 'Delete', 'alovio-calculator' ) }</Button>
 								</td>
 							</tr>
 						) ) }
@@ -104,10 +103,10 @@ export default function CalculatorList( { onEdit, onEntries } ) {
 
 			{ deleteOnUninstall !== null && (
 				<details className="alc-danger-zone">
-					<summary>{ __( 'Plugin settings', T ) }</summary>
+					<summary>{ __( 'Plugin settings', 'alovio-calculator' ) }</summary>
 					<ToggleControl
-						label={ __( 'Delete all plugin data on uninstall', T ) }
-						help={ __( 'When enabled, deleting the plugin removes calculators, entries and settings permanently.', T ) }
+						label={ __( 'Delete all plugin data on uninstall', 'alovio-calculator' ) }
+						help={ __( 'When enabled, deleting the plugin removes calculators, entries and settings permanently.', 'alovio-calculator' ) }
 						checked={ deleteOnUninstall }
 						onChange={ ( on ) => {
 							setDeleteOnUninstall( on );

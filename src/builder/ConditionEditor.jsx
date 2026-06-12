@@ -3,14 +3,13 @@ import { ToggleControl, SelectControl, TextControl, Button } from '@wordpress/co
 import { __ } from '@wordpress/i18n';
 import { STORE } from './store';
 
-const T = 'alovio-calculator';
 
 const OP_LABELS = {
-	is: __( 'is', T ),
-	is_not: __( 'is not', T ),
-	contains: __( 'contains', T ),
-	gt: __( 'greater than', T ),
-	lt: __( 'less than', T ),
+	is: __( 'is', 'alovio-calculator' ),
+	is_not: __( 'is not', 'alovio-calculator' ),
+	contains: __( 'contains', 'alovio-calculator' ),
+	gt: __( 'greater than', 'alovio-calculator' ),
+	lt: __( 'less than', 'alovio-calculator' ),
 };
 
 /** Spec §6: conditions reference INPUT fields only — never formula/heading/html. */
@@ -53,17 +52,17 @@ function defaultValueFor( controller ) {
 
 function ValueInput( { controller, value, onChange } ) {
 	if ( ! controller ) {
-		return <TextControl label={ __( 'Value', T ) } value={ value } onChange={ onChange } />;
+		return <TextControl label={ __( 'Value', 'alovio-calculator' ) } value={ value } onChange={ onChange } />;
 	}
 	if ( controller.type === 'toggle' ) {
 		// Users never type the '1'/'' literals — spec §6.
 		return (
 			<SelectControl
-				label={ __( 'Value', T ) }
+				label={ __( 'Value', 'alovio-calculator' ) }
 				value={ value }
 				options={ [
-					{ label: __( 'On', T ), value: '1' },
-					{ label: __( 'Off', T ), value: '' },
+					{ label: __( 'On', 'alovio-calculator' ), value: '1' },
+					{ label: __( 'Off', 'alovio-calculator' ), value: '' },
 				] }
 				onChange={ onChange }
 			/>
@@ -76,17 +75,17 @@ function ValueInput( { controller, value, onChange } ) {
 			.map( ( o ) => ( { label: o.label || o.value, value: o.value } ) );
 		return (
 			<SelectControl
-				label={ __( 'Value', T ) }
+				label={ __( 'Value', 'alovio-calculator' ) }
 				value={ value }
-				options={ opts.length ? opts : [ { label: __( '— save first to reference new options —', T ), value: '' } ] }
+				options={ opts.length ? opts : [ { label: __( '— save first to reference new options —', 'alovio-calculator' ), value: '' } ] }
 				onChange={ onChange }
 			/>
 		);
 	}
 	if ( NUMERIC.includes( controller.type ) ) {
-		return <TextControl type="number" label={ __( 'Value', T ) } value={ value } onChange={ onChange } />;
+		return <TextControl type="number" label={ __( 'Value', 'alovio-calculator' ) } value={ value } onChange={ onChange } />;
 	}
-	return <TextControl label={ __( 'Value', T ) } value={ value } onChange={ onChange } />;
+	return <TextControl label={ __( 'Value', 'alovio-calculator' ) } value={ value } onChange={ onChange } />;
 }
 
 function RuleRow( { rule, controllers, onChange, onRemove, canRemove } ) {
@@ -96,7 +95,7 @@ function RuleRow( { rule, controllers, onChange, onRemove, canRemove } ) {
 	return (
 		<div className="alc-rule">
 			<SelectControl
-				label={ __( 'When field', T ) }
+				label={ __( 'When field', 'alovio-calculator' ) }
 				value={ rule.field }
 				options={ controllers.map( ( f ) => ( { label: f.label || f.type, value: f.id } ) ) }
 				onChange={ ( v ) => {
@@ -105,14 +104,14 @@ function RuleRow( { rule, controllers, onChange, onRemove, canRemove } ) {
 				} }
 			/>
 			<SelectControl
-				label={ __( 'Operator', T ) }
+				label={ __( 'Operator', 'alovio-calculator' ) }
 				value={ ops.includes( rule.operator ) ? rule.operator : ops[ 0 ] }
 				options={ opOptions( ops ) }
 				onChange={ ( operator ) => onChange( { ...rule, operator } ) }
 			/>
 			<ValueInput controller={ controller } value={ rule.value } onChange={ ( value ) => onChange( { ...rule, value } ) } />
 			{ canRemove && (
-				<Button isDestructive variant="link" onClick={ onRemove }>{ __( 'Remove rule', T ) }</Button>
+				<Button isDestructive variant="link" onClick={ onRemove }>{ __( 'Remove rule', 'alovio-calculator' ) }</Button>
 			) }
 		</div>
 	);
@@ -155,19 +154,19 @@ export default function ConditionEditor( { field } ) {
 	return (
 		<div className="alc-condition">
 			<ToggleControl
-				label={ __( 'Conditional logic', T ) }
-				help={ __( 'Show or hide this field based on another field.', T ) }
+				label={ __( 'Conditional logic', 'alovio-calculator' ) }
+				help={ __( 'Show or hide this field based on another field.', 'alovio-calculator' ) }
 				checked={ enabled }
 				onChange={ toggle }
 			/>
 			{ enabled && (
 				<>
 					<SelectControl
-						label={ __( 'Match', T ) }
+						label={ __( 'Match', 'alovio-calculator' ) }
 						value={ field.conditionMatch || 'all' }
 						options={ [
-							{ label: __( 'All rules (AND)', T ), value: 'all' },
-							{ label: __( 'Any rule (OR)', T ), value: 'any' },
+							{ label: __( 'All rules (AND)', 'alovio-calculator' ), value: 'all' },
+							{ label: __( 'Any rule (OR)', 'alovio-calculator' ), value: 'any' },
 						] }
 						onChange={ ( v ) => updateField( field.id, { conditionMatch: v } ) }
 					/>
@@ -181,13 +180,13 @@ export default function ConditionEditor( { field } ) {
 							canRemove={ rules.length > 1 }
 						/>
 					) ) }
-					<Button variant="secondary" onClick={ addRule }>{ __( '+ Add rule', T ) }</Button>
+					<Button variant="secondary" onClick={ addRule }>{ __( '+ Add rule', 'alovio-calculator' ) }</Button>
 					<SelectControl
-						label={ __( 'Then', T ) }
+						label={ __( 'Then', 'alovio-calculator' ) }
 						value={ field.conditionAction || 'show' }
 						options={ [
-							{ label: __( 'Show this field', T ), value: 'show' },
-							{ label: __( 'Hide this field', T ), value: 'hide' },
+							{ label: __( 'Show this field', 'alovio-calculator' ), value: 'show' },
+							{ label: __( 'Hide this field', 'alovio-calculator' ), value: 'hide' },
 						] }
 						onChange={ ( v ) => updateField( field.id, { conditionAction: v } ) }
 					/>

@@ -5,7 +5,6 @@ import { __ } from '@wordpress/i18n';
 import apiFetch from '@wordpress/api-fetch';
 import ServerSideRender from '@wordpress/server-side-render';
 
-const T = 'alovio-calculator';
 
 export default function Edit( { attributes, setAttributes } ) {
 	const { calculatorId } = attributes;
@@ -19,13 +18,13 @@ export default function Edit( { attributes, setAttributes } ) {
 	}, [] );
 
 	const options = [
-		{ label: __( '— choose a calculator —', T ), value: 0 },
+		{ label: __( '— choose a calculator —', 'alovio-calculator' ), value: 0 },
 		...( calculators || [] ).map( ( c ) => ( { label: c.title || `#${ c.id }`, value: c.id } ) ),
 	];
 
 	const picker = (
 		<SelectControl
-			label={ __( 'Calculator', T ) }
+			label={ __( 'Calculator', 'alovio-calculator' ) }
 			value={ calculatorId }
 			options={ options }
 			onChange={ ( v ) => setAttributes( { calculatorId: parseInt( v, 10 ) || 0 } ) }
@@ -35,10 +34,10 @@ export default function Edit( { attributes, setAttributes } ) {
 	return (
 		<div { ...blockProps }>
 			<InspectorControls>
-				<PanelBody title={ __( 'Calculator', T ) }>{ picker }</PanelBody>
+				<PanelBody title={ __( 'Calculator', 'alovio-calculator' ) }>{ picker }</PanelBody>
 			</InspectorControls>
 			{ ! calculatorId && (
-				<Placeholder icon="calculator" label={ __( 'Alovio Calculator', T ) }>
+				<Placeholder icon="calculator" label={ __( 'Alovio Calculator', 'alovio-calculator' ) }>
 					{ calculators === null ? <Spinner /> : picker }
 				</Placeholder>
 			) }

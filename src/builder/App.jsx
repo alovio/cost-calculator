@@ -12,7 +12,6 @@ import CalculatorList from './CalculatorList';
 import EntriesList from './EntriesList';
 import ProTab from './ProTab';
 
-const T = 'alovio-calculator';
 
 export default function App() {
 	const [ view, setView ] = useState( 'list' );
@@ -55,7 +54,7 @@ function Builder( { calculatorId, onBack } ) {
 				setTitle( calc.title || '' );
 				savedRef.current = snapshot( calc.config.fields || [], calc.config.settings || {}, calc.title || '' );
 			} )
-			.catch( () => setNotice( { type: 'error', text: __( 'Could not load this calculator.', T ) } ) )
+			.catch( () => setNotice( { type: 'error', text: __( 'Could not load this calculator.', 'alovio-calculator' ) } ) )
 			.finally( () => setLoading( false ) );
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [ calculatorId ] );
@@ -84,16 +83,16 @@ function Builder( { calculatorId, onBack } ) {
 			hydrate( saved.config.fields || [], saved.config.settings || {} );
 			setTitle( saved.title || '' );
 			savedRef.current = snapshot( saved.config.fields || [], saved.config.settings || {}, saved.title || '' );
-			setNotice( { type: 'success', text: __( 'Calculator saved.', T ) } );
+			setNotice( { type: 'success', text: __( 'Calculator saved.', 'alovio-calculator' ) } );
 		} catch ( e ) {
-			setNotice( { type: 'error', text: __( 'Save failed. Please try again.', T ) } );
+			setNotice( { type: 'error', text: __( 'Save failed. Please try again.', 'alovio-calculator' ) } );
 		}
 		setSaving( false );
 	};
 
 	const back = () => {
 		// eslint-disable-next-line no-alert
-		if ( ! dirty || window.confirm( __( 'You have unsaved changes. Leave anyway?', T ) ) ) {
+		if ( ! dirty || window.confirm( __( 'You have unsaved changes. Leave anyway?', 'alovio-calculator' ) ) ) {
 			onBack();
 		}
 	};
@@ -109,29 +108,29 @@ function Builder( { calculatorId, onBack } ) {
 	return (
 		<div className="alc-app">
 			<div className="alc-topbar">
-				<Button variant="tertiary" onClick={ back }>← { __( 'All calculators', T ) }</Button>
+				<Button variant="tertiary" onClick={ back }>← { __( 'All calculators', 'alovio-calculator' ) }</Button>
 				<TextControl
 					className="alc-title-input"
-					label={ __( 'Calculator name', T ) }
+					label={ __( 'Calculator name', 'alovio-calculator' ) }
 					hideLabelFromVision
 					value={ title }
 					onChange={ setTitle }
 				/>
 				<Button variant="primary" onClick={ save } isBusy={ saving } disabled={ saving }>
-					{ dirty ? __( 'Save changes •', T ) : __( 'Save changes', T ) }
+					{ dirty ? __( 'Save changes •', 'alovio-calculator' ) : __( 'Save changes', 'alovio-calculator' ) }
 				</Button>
-				{ dirty && <span className="alc-unsaved">{ __( 'Unsaved changes', T ) }</span> }
+				{ dirty && <span className="alc-unsaved">{ __( 'Unsaved changes', 'alovio-calculator' ) }</span> }
 			</div>
 			{ notice && notice.type === 'error' && (
 				<Notice status="error" onRemove={ () => setNotice( null ) }>{ notice.text }</Notice>
 			) }
 			<TabPanel
 				tabs={ [
-					{ name: 'fields', title: __( 'Fields', T ) },
-					{ name: 'settings', title: __( 'Settings', T ) },
+					{ name: 'fields', title: __( 'Fields', 'alovio-calculator' ) },
+					{ name: 'settings', title: __( 'Settings', 'alovio-calculator' ) },
 					...( window.ALC_BUILDER && window.ALC_BUILDER.isPro
 						? []
-						: [ { name: 'pro', title: __( 'Pro', T ) } ] ),
+						: [ { name: 'pro', title: __( 'Pro', 'alovio-calculator' ) } ] ),
 				] }
 			>
 				{ ( tab ) => {

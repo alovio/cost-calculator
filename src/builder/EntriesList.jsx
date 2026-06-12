@@ -3,7 +3,6 @@ import { Button, Spinner, Notice, SelectControl, Modal } from '@wordpress/compon
 import { __ } from '@wordpress/i18n';
 import { listEntries, updateEntry, deleteEntry, listCalculators } from './api';
 
-const T = 'alovio-calculator';
 const PER_PAGE = 20;
 
 export default function EntriesList( { onBack } ) {
@@ -17,7 +16,7 @@ export default function EntriesList( { onBack } ) {
 	const refresh = () =>
 		listEntries( { calculator, page, per_page: PER_PAGE } )
 			.then( setData )
-			.catch( () => setError( __( 'Could not load entries.', T ) ) );
+			.catch( () => setError( __( 'Could not load entries.', 'alovio-calculator' ) ) );
 
 	useEffect( () => {
 		listCalculators().then( setCalculators ).catch( () => {} );
@@ -35,7 +34,7 @@ export default function EntriesList( { onBack } ) {
 
 	const remove = async ( row ) => {
 		// eslint-disable-next-line no-alert
-		if ( window.confirm( __( 'Delete this entry permanently?', T ) ) ) {
+		if ( window.confirm( __( 'Delete this entry permanently?', 'alovio-calculator' ) ) ) {
 			await deleteEntry( row.id );
 			setOpen( null );
 			refresh();
@@ -48,14 +47,14 @@ export default function EntriesList( { onBack } ) {
 	return (
 		<div className="alc-app">
 			<div className="alc-topbar">
-				<Button variant="tertiary" onClick={ onBack }>← { __( 'All calculators', T ) }</Button>
-				<h1 className="alc-heading">{ __( 'Entries', T ) }</h1>
+				<Button variant="tertiary" onClick={ onBack }>← { __( 'All calculators', 'alovio-calculator' ) }</Button>
+				<h1 className="alc-heading">{ __( 'Entries', 'alovio-calculator' ) }</h1>
 				<SelectControl
-					label={ __( 'Calculator', T ) }
+					label={ __( 'Calculator', 'alovio-calculator' ) }
 					hideLabelFromVision
 					value={ String( calculator ) }
 					options={ [
-						{ label: __( 'All calculators', T ), value: '0' },
+						{ label: __( 'All calculators', 'alovio-calculator' ), value: '0' },
 						...calculators.map( ( c ) => ( { label: c.title, value: String( c.id ) } ) ),
 					] }
 					onChange={ ( v ) => {
@@ -63,24 +62,24 @@ export default function EntriesList( { onBack } ) {
 						setPage( 1 );
 					} }
 				/>
-				<Button variant="secondary" href={ exportUrl }>{ __( 'Export CSV', T ) }</Button>
+				<Button variant="secondary" href={ exportUrl }>{ __( 'Export CSV', 'alovio-calculator' ) }</Button>
 			</div>
 
 			{ error && <Notice status="error" isDismissible={ false }>{ error }</Notice> }
 			{ ! data && ! error && <Spinner /> }
 
-			{ data && ! data.rows.length && <p className="alc-empty">{ __( 'No entries yet.', T ) }</p> }
+			{ data && ! data.rows.length && <p className="alc-empty">{ __( 'No entries yet.', 'alovio-calculator' ) }</p> }
 
 			{ data && !! data.rows.length && (
 				<table className="widefat striped alc-table">
 					<thead>
 						<tr>
-							<th>{ __( 'Date', T ) }</th>
-							<th>{ __( 'Name', T ) }</th>
-							<th>{ __( 'Email', T ) }</th>
-							<th>{ __( 'Total', T ) }</th>
-							<th>{ __( 'Status', T ) }</th>
-							<th>{ __( 'Actions', T ) }</th>
+							<th>{ __( 'Date', 'alovio-calculator' ) }</th>
+							<th>{ __( 'Name', 'alovio-calculator' ) }</th>
+							<th>{ __( 'Email', 'alovio-calculator' ) }</th>
+							<th>{ __( 'Total', 'alovio-calculator' ) }</th>
+							<th>{ __( 'Status', 'alovio-calculator' ) }</th>
+							<th>{ __( 'Actions', 'alovio-calculator' ) }</th>
 						</tr>
 					</thead>
 					<tbody>
@@ -92,11 +91,11 @@ export default function EntriesList( { onBack } ) {
 								<td>{ row.total }</td>
 								<td><span className={ `alc-badge alc-badge--${ row.status }` }>{ row.status }</span></td>
 								<td className="alc-table__ops">
-									<Button size="small" variant="secondary" onClick={ () => setOpen( row ) }>{ __( 'View', T ) }</Button>
+									<Button size="small" variant="secondary" onClick={ () => setOpen( row ) }>{ __( 'View', 'alovio-calculator' ) }</Button>
 									{ row.status === 'new' && (
-										<Button size="small" onClick={ () => markRead( row ) }>{ __( 'Mark read', T ) }</Button>
+										<Button size="small" onClick={ () => markRead( row ) }>{ __( 'Mark read', 'alovio-calculator' ) }</Button>
 									) }
-									<Button size="small" isDestructive onClick={ () => remove( row ) }>{ __( 'Delete', T ) }</Button>
+									<Button size="small" isDestructive onClick={ () => remove( row ) }>{ __( 'Delete', 'alovio-calculator' ) }</Button>
 								</td>
 							</tr>
 						) ) }
@@ -115,10 +114,10 @@ export default function EntriesList( { onBack } ) {
 			{ open && (
 				<Modal title={ `${ open.name } — ${ open.created_at }` } onRequestClose={ () => setOpen( null ) }>
 					<p>
-						<strong>{ __( 'Email:', T ) }</strong> { open.email }
-						{ open.phone && <> · <strong>{ __( 'Phone:', T ) }</strong> { open.phone }</> }
+						<strong>{ __( 'Email:', 'alovio-calculator' ) }</strong> { open.email }
+						{ open.phone && <> · <strong>{ __( 'Phone:', 'alovio-calculator' ) }</strong> { open.phone }</> }
 					</p>
-					{ open.message && <p><strong>{ __( 'Message:', T ) }</strong> { open.message }</p> }
+					{ open.message && <p><strong>{ __( 'Message:', 'alovio-calculator' ) }</strong> { open.message }</p> }
 					{ open.snapshot && Array.isArray( open.snapshot.lineItems ) && (
 						<table className="widefat striped">
 							<tbody>
@@ -129,7 +128,7 @@ export default function EntriesList( { onBack } ) {
 									</tr>
 								) ) }
 								<tr>
-									<th>{ __( 'Total', T ) }</th>
+									<th>{ __( 'Total', 'alovio-calculator' ) }</th>
 									<th>{ open.total }</th>
 								</tr>
 							</tbody>
@@ -137,9 +136,9 @@ export default function EntriesList( { onBack } ) {
 					) }
 					<div className="alc-modal-actions">
 						{ open.status === 'new' && (
-							<Button variant="secondary" onClick={ () => { markRead( open ); setOpen( null ); } }>{ __( 'Mark read', T ) }</Button>
+							<Button variant="secondary" onClick={ () => { markRead( open ); setOpen( null ); } }>{ __( 'Mark read', 'alovio-calculator' ) }</Button>
 						) }
-						<Button isDestructive onClick={ () => remove( open ) }>{ __( 'Delete', T ) }</Button>
+						<Button isDestructive onClick={ () => remove( open ) }>{ __( 'Delete', 'alovio-calculator' ) }</Button>
 					</div>
 				</Modal>
 			) }
