@@ -40,6 +40,8 @@ final class Plugin {
 		( new Entries\EntriesRestController() )->register();
 		( new Entries\CsvExporter() )->register();
 		( new Entries\Privacy() )->register();
+		( new Admin\AdminPage() )->register();
+		( new Admin\BuilderAssets() )->register();
 		// Services register themselves here as later tasks add them.
 	}
 
