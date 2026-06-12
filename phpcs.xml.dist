@@ -1,0 +1,45 @@
+<?xml version="1.0"?>
+<ruleset name="Alovio Calculator">
+	<description>WPCS + PHPCompatibility gates for the Alovio Calculator plugin.</description>
+
+	<file>alovio-calculator.php</file>
+	<file>uninstall.php</file>
+	<file>includes</file>
+
+	<arg value="ps"/>
+	<arg name="extensions" value="php"/>
+	<arg name="parallel" value="8"/>
+
+	<rule ref="WordPress-Extra">
+		<!-- PSR-4 class files (autoloader maps Namespace => includes/). -->
+		<exclude name="WordPress.Files.FileName"/>
+		<!-- The codebase uses short arrays throughout (WPCS ^3.0 sniff name). -->
+		<exclude name="Universal.Arrays.DisallowShortArraySyntax"/>
+		<!-- The formula engine deliberately mirrors its JS twin's camelCase API
+		     (toScaled/fromScaled/…) — parity is a product guarantee (spec §7). -->
+		<exclude name="WordPress.NamingConventions.ValidFunctionName"/>
+		<exclude name="WordPress.NamingConventions.ValidVariableName"/>
+	</rule>
+
+	<rule ref="WordPress.NamingConventions.PrefixAllGlobals">
+		<properties>
+			<property name="prefixes" type="array">
+				<element value="alovio"/>
+				<element value="ALOVIO"/>
+				<element value="Alovio\Calculator"/>
+			</property>
+		</properties>
+	</rule>
+
+	<rule ref="WordPress.WP.I18n">
+		<properties>
+			<property name="text_domain" type="array">
+				<element value="alovio-calculator"/>
+			</property>
+		</properties>
+	</rule>
+
+	<rule ref="PHPCompatibilityWP"/>
+	<config name="testVersion" value="7.4-"/>
+	<config name="minimum_wp_version" value="6.2"/>
+</ruleset>

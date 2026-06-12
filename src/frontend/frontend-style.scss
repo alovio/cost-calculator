@@ -1,0 +1,228 @@
+/* Alovio Calculator front-end theme — tokens via CSS custom properties (spec §8).
+   Everything namespaced .alc-; logical properties for RTL safety. */
+
+.alc-calculator {
+	--alc-radius: 8px;
+	display: grid;
+	grid-template-columns: 1fr 280px;
+	gap: 24px;
+	align-items: start;
+	font: inherit;
+
+	*,
+	*::before,
+	*::after {
+		box-sizing: border-box;
+	}
+}
+
+.alc-field {
+	margin-block-end: 18px;
+
+	> label,
+	legend {
+		display: block;
+		font-weight: 600;
+		margin-block-end: 6px;
+	}
+
+	input[type='number'],
+	input[type='text'],
+	select {
+		width: 100%;
+		max-width: 320px;
+		padding: 8px 10px;
+		border: 1px solid #c8c8cf;
+		border-radius: var(--alc-radius);
+	}
+
+	fieldset {
+		border: 0;
+		padding: 0;
+		margin: 0;
+	}
+
+	&[hidden] {
+		display: none !important; /* beat theme resets */
+	}
+}
+
+.alc-slider {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+
+	input[type='range'] {
+		flex: 1;
+		accent-color: var(--alc-accent);
+	}
+
+	output {
+		min-inline-size: 3ch;
+		font-weight: 600;
+	}
+}
+
+.alc-choice {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	padding: 6px 0;
+	cursor: pointer;
+
+	input {
+		accent-color: var(--alc-accent);
+	}
+
+	&__image img {
+		inline-size: 40px;
+		block-size: 40px;
+		object-fit: cover;
+		border-radius: calc(var(--alc-radius) / 2);
+	}
+}
+
+.alc-toggle {
+	display: inline-flex;
+	align-items: center;
+	gap: 8px;
+	cursor: pointer;
+
+	input {
+		accent-color: var(--alc-accent);
+		inline-size: 36px;
+		block-size: 20px;
+	}
+}
+
+.alc-line {
+	display: flex;
+	justify-content: space-between;
+	font-weight: 600;
+}
+
+.alc-summary {
+	position: sticky;
+	inset-block-start: 24px;
+	padding: 18px;
+	border: 1px solid #e0e0e6;
+	border-radius: var(--alc-radius);
+	background: #fafafa;
+
+	&__lines {
+		list-style: none;
+		margin: 0 0 12px;
+		padding: 0;
+
+		li {
+			display: flex;
+			justify-content: space-between;
+			gap: 12px;
+			padding-block: 4px;
+			border-block-end: 1px dashed #e4e4ea;
+			font-size: 0.92em;
+		}
+	}
+}
+
+.alc-total {
+	display: flex;
+	justify-content: space-between;
+	align-items: baseline;
+	margin: 0;
+	font-size: 1.15em;
+	font-weight: 700;
+
+	&__value {
+		color: var(--alc-accent);
+		font-size: 1.3em;
+	}
+}
+
+.alc-quote {
+	grid-column: 1 / -1;
+	margin-block-start: 8px;
+	padding: 18px;
+	border: 1px solid #e0e0e6;
+	border-radius: var(--alc-radius);
+
+	h3 {
+		margin-block-start: 0;
+	}
+
+	&__field {
+		display: block;
+		margin-block-end: 12px;
+
+		input,
+		textarea {
+			display: block;
+			width: 100%;
+			max-width: 420px;
+			padding: 8px 10px;
+			border: 1px solid #c8c8cf;
+			border-radius: var(--alc-radius);
+		}
+	}
+
+	&__submit {
+		padding: 10px 22px;
+		border: 0;
+		border-radius: var(--alc-radius);
+		background: var(--alc-accent);
+		color: #fff;
+		font-weight: 600;
+		cursor: pointer;
+
+		&:disabled {
+			opacity: 0.6;
+			cursor: default;
+		}
+	}
+}
+
+.alc-field-error {
+	display: block;
+	color: #b32d2e;
+	font-size: 0.85em;
+	margin-block-start: 4px;
+}
+
+.alc-quote-feedback.is-error {
+	color: #b32d2e;
+	margin-block-start: 10px;
+}
+
+.alc-quote-success {
+	font-weight: 600;
+	color: #007017;
+}
+
+/* Honeypot: visually hidden, NOT display:none (bots skip those). */
+.alc-hp {
+	position: absolute !important;
+	inline-size: 1px;
+	block-size: 1px;
+	overflow: hidden;
+	clip: rect(0 0 0 0);
+	clip-path: inset(50%);
+}
+
+.alc-calculator :focus-visible {
+	outline: 2px solid var(--alc-accent);
+	outline-offset: 2px;
+}
+
+@media (max-width: 720px) {
+	.alc-calculator {
+		grid-template-columns: 1fr;
+	}
+
+	.alc-summary {
+		position: sticky;
+		inset-block-end: 0;
+		inset-block-start: auto;
+		z-index: 10;
+		box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.08);
+	}
+}

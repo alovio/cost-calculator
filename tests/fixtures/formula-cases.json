@@ -1,0 +1,32 @@
+{
+    "cases": [
+        { "name": "integer addition", "expression": "1 + 2", "values": {}, "expected": "3" },
+        { "name": "float artifact killer", "expression": "0.1 + 0.2", "values": {}, "expected": "0.3" },
+        { "name": "boundary rounding 4.1", "expression": "{a} * 3", "values": { "a": "4.1" }, "expected": "12.3" },
+        { "name": "precedence", "expression": "1 + 2 * 3", "values": {}, "expected": "7" },
+        { "name": "parens", "expression": "(1 + 2) * 3", "values": {}, "expected": "9" },
+        { "name": "unary minus", "expression": "-2 * 3 + 10", "values": {}, "expected": "4" },
+        { "name": "division rounding", "expression": "10 / 3", "values": {}, "expected": "3.3333" },
+        { "name": "negative division rounding", "expression": "-10 / 3", "values": {}, "expected": "-3.3333" },
+        { "name": "field refs", "expression": "{area} * {rate} + {express}", "values": { "area": "50", "rate": "2.5", "express": "50" }, "expected": "175" },
+        { "name": "if true branch", "expression": "if({qty} >= 10, {qty} * 0.9, {qty})", "values": { "qty": "10" }, "expected": "9" },
+        { "name": "if false branch", "expression": "if({qty} >= 10, {qty} * 0.9, {qty})", "values": { "qty": "9" }, "expected": "9" },
+        { "name": "if lazy untaken division by zero", "expression": "if(1 == 1, 7, 1 / 0)", "values": {}, "expected": "7" },
+        { "name": "nested calls", "expression": "max(min({a}, 100), if({a} > 50, 50, 0))", "values": { "a": "75" }, "expected": "75" },
+        { "name": "round default", "expression": "round(2.5)", "values": {}, "expected": "3" },
+        { "name": "round negative half away from zero", "expression": "round(-2.5)", "values": {}, "expected": "-3" },
+        { "name": "round to 2 decimals half away", "expression": "round(1.235, 2)", "values": {}, "expected": "1.24" },
+        { "name": "round negative half at 4th decimal via mul", "expression": "{a} * 0.5", "values": { "a": "-0.0001" }, "expected": "-0.0001" },
+        { "name": "negative half at conversion boundary", "expression": "{a} * 1", "values": { "a": "-0.00005" }, "expected": "-0.0001" },
+        { "name": "ceil floor", "expression": "ceil(2.1) + floor(2.9)", "values": {}, "expected": "5" },
+        { "name": "ceil floor negative", "expression": "ceil(-2.5) + floor(-2.5)", "values": {}, "expected": "-5" },
+        { "name": "abs", "expression": "abs(-12.5)", "values": {}, "expected": "12.5" },
+        { "name": "comparison yields one or zero", "expression": "(2 > 1) + (1 > 2)", "values": {}, "expected": "1" },
+        { "name": "division by zero errors", "expression": "1 / {z}", "values": { "z": "0" }, "expected": { "error": "div_zero" } },
+        { "name": "overflow errors", "expression": "{big} * {big}", "values": { "big": "999999999" }, "expected": { "error": "overflow" } },
+        { "name": "unknown field errors", "expression": "{ghost} + 1", "values": {}, "expected": { "error": "unknown_field" } },
+        { "name": "syntax error", "expression": "1 + + 2", "values": {}, "expected": { "error": "syntax" } },
+        { "name": "unknown function error", "expression": "sqrt(4)", "values": {}, "expected": { "error": "unknown_function" } },
+        { "name": "arity error", "expression": "if(1, 2)", "values": {}, "expected": { "error": "arity" } }
+    ]
+}
