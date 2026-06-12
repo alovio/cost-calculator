@@ -29,7 +29,7 @@
 ### Task 1: Repository skeleton + main plugin file
 
 **Files:**
-- Create: `alovio-calculator.php`, `.gitignore`, `readme.txt`, `includes/.gitkeep` (placeholder dir), `src/.gitkeep`
+- Create: `alovio-calculator.php`, `.gitignore`, `readme.txt`
 
 - [ ] **Step 1: Create `.gitignore`**
 
@@ -39,11 +39,10 @@ vendor/
 build/
 *.log
 .DS_Store
-composer.lock
-package-lock.json
+.phpunit.result.cache
 ```
 
-(Lockfiles excluded to mirror the sibling repos' convention — check `cat /Users/tahir/woo-checkout-fields/.gitignore`; if it commits lockfiles, commit them here too and delete those two lines.)
+(Lockfiles are deliberately NOT ignored — CF commits both `composer.lock` and `package-lock.json` (verified via `git ls-files` there), so this repo does too; they get committed in Tasks 3 and 4.)
 
 - [ ] **Step 2: Create `alovio-calculator.php`**
 
@@ -220,7 +219,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 ```
 
-- [ ] **Step 4: Create `tests/TestCase.php`** (Brain Monkey base — mirror of `CF tests/`; check `ls /Users/tahir/woo-checkout-fields/tests/` and reuse its base class shape if it differs)
+- [ ] **Step 4: Create `tests/TestCase.php`** (Brain Monkey base). NOTE: CF differs in two known ways — its layout is `tests/php/Unit` and its TestCase pre-stubs common WP functions in `setUp()`. **The inlined files below are authoritative**: we use `tests/Unit` (matching this plan's composer.json + phpunit.xml.dist) and a bare Brain Monkey base; each test stubs exactly the WP functions it needs (later chunks' tests all do this explicitly).
 
 ```php
 <?php
@@ -267,7 +266,7 @@ Expected: `OK (1 test, 1 assertion)`
 - [ ] **Step 7: Commit**
 
 ```bash
-git add composer.json phpunit.xml.dist tests/bootstrap.php tests/TestCase.php tests/Unit/SmokeTest.php
+git add composer.json composer.lock phpunit.xml.dist tests/bootstrap.php tests/TestCase.php tests/Unit/SmokeTest.php
 git commit -m "test: PHPUnit + Brain Monkey harness with smoke test"
 ```
 
@@ -340,7 +339,7 @@ Expected: build emits `build/index.js` + `build/frontend.js` (with `.asset.php` 
 - [ ] **Step 7: Commit**
 
 ```bash
-git add package.json webpack.config.js src/index.js src/frontend.js src/shared/formula/__tests__/smoke.test.js
+git add package.json package-lock.json webpack.config.js src/index.js src/frontend.js src/shared/formula/__tests__/smoke.test.js
 git commit -m "chore: wp-scripts toolchain (webpack entries + jest)"
 ```
 
@@ -619,7 +618,9 @@ final class DecimalMath {
 		if ( $r > 0 ) {
 			$q++;
 		}
-		return $q * self::SCALE;
+		$result = $q * self::SCALE;
+		self::guard( abs( $result ) );
+		return $result;
 	}
 
 	public static function floorToInt( int $x ): int {
@@ -628,7 +629,9 @@ final class DecimalMath {
 		if ( $r < 0 ) {
 			$q--;
 		}
-		return $q * self::SCALE;
+		$result = $q * self::SCALE;
+		self::guard( abs( $result ) );
+		return $result;
 	}
 
 	/** Integer division n/d (n ≥ 0, d > 0), half away from zero. */
@@ -1471,6 +1474,8 @@ final class Formula {
 }
 ```
 
+NOTE for the future Pro add-on (not MVP work): the `alc_formula_functions` filter extends what the *parser* accepts, but `Evaluator::call()` has no dispatch for unknown names (they fall through to `unknown_function` → safe 0). The Pro add-on will need an evaluation-callback mechanism, not just the filter.
+
 - [ ] **Step 4: Create `includes/Formula/FormulaGraph.php`** (Kahn's algorithm)
 
 ```php
@@ -1569,6 +1574,7 @@ These fixtures are THE parity contract — Jest consumes the same file in Chunk 
         { "name": "round negative half away from zero", "expression": "round(-2.5)", "values": {}, "expected": "-3" },
         { "name": "round to 2 decimals half away", "expression": "round(1.235, 2)", "values": {}, "expected": "1.24" },
         { "name": "round negative half at 4th decimal via mul", "expression": "{a} * 0.5", "values": { "a": "-0.0001" }, "expected": "-0.0001" },
+        { "name": "negative half at conversion boundary", "expression": "{a} * 1", "values": { "a": "-0.00005" }, "expected": "-0.0001" },
         { "name": "ceil floor", "expression": "ceil(2.1) + floor(2.9)", "values": {}, "expected": "5" },
         { "name": "ceil floor negative", "expression": "ceil(-2.5) + floor(-2.5)", "values": {}, "expected": "-5" },
         { "name": "abs", "expression": "abs(-12.5)", "values": {}, "expected": "12.5" },
@@ -1631,7 +1637,7 @@ class FormulaCasesTest extends TestCase {
 - [ ] **Step 3: Run**
 
 Run: `vendor/bin/phpunit --filter FormulaCasesTest`
-Expected: PASS — 27 cases. If any case fails, the engine (not the fixture) is wrong unless you can argue the fixture contradicts a DecimalMathTest assertion — fixtures are the contract.
+Expected: PASS — 28 cases. If any case fails, the engine (not the fixture) is wrong unless you can argue the fixture contradicts a DecimalMathTest assertion — fixtures are the contract. (The "negative half at conversion boundary" case pins the sign-aware `toScaled` cross-engine: naive JS `Math.round` would yield 0 there.)
 
 - [ ] **Step 4: Commit**
 
@@ -1827,7 +1833,9 @@ export function ceilToInt( x ) {
 	if ( x - q * SCALE > 0 ) {
 		q++;
 	}
-	return q * SCALE;
+	const result = q * SCALE;
+	guard( Math.abs( result ) );
+	return result;
 }
 
 export function floorToInt( x ) {
@@ -1835,9 +1843,13 @@ export function floorToInt( x ) {
 	if ( x - q * SCALE < 0 ) {
 		q--;
 	}
-	return q * SCALE;
+	const result = q * SCALE;
+	guard( Math.abs( result ) );
+	return result;
 }
 ```
+
+Input-domain note: JS `Number()` accepts a few strings PHP `is_numeric` rejects (hex, `null`→0, `true`→1). Unreachable through the lexer (digits pre-validated) and harmless at runtime because callers (Chunk 7's `compute.js`) pass sanitized decimal strings and the PHP server stays authoritative — do not add a stricter regex; just never feed `toScaled` un-coerced user input outside those callers.
 
 - [ ] **Step 4: Delete the smoke test and run**
 
@@ -1925,7 +1937,7 @@ export const FUNCTION_SPECS = {
 };
 ```
 
-- [ ] **Step 4: Create `src/shared/formula/lexer.js`** — port `Lexer.php` exactly. Signature: `export function tokenize( expr )`. Same regexes (`/\{([a-z0-9_]+)\}/y` sticky regex replaces PHP's `/A` anchor; set `re.lastIndex = i` before `exec`), same `FormulaError( 'syntax', …, pos )` throws for unknown char / malformed number / unterminated field. Import `FormulaError` from `./decimal`.
+- [ ] **Step 4: Create `src/shared/formula/lexer.js`** — port `Lexer.php` exactly. Signature: `export function tokenize( expr )`. Same regexes — the sticky-`y` + `lastIndex` conversion replaces PHP's `/A` anchor for ALL THREE anchored regexes (field, number, ident); same `FormulaError( 'syntax', …, pos )` throws for unknown char / malformed number / unterminated field. Import `FormulaError` from `./decimal`.
 
 - [ ] **Step 5: Create `src/shared/formula/parser.js`** — port `Parser.php` exactly. Signature: `export function parse( tokens, functionSpecs )` (functional style instead of a class is fine; keep an index closure). Same binding powers (cmp 10, add 20, mul 30, unary = mul+1), same node shapes, same error codes (`syntax`, `unknown_function`, `arity`). Numbers scaled via `toScaled` at parse time.
 
@@ -2026,7 +2038,7 @@ export function references( ast ) {
 - [ ] **Step 7: Run the full JS suite**
 
 Run: `npm test`
-Expected: PASS — decimal + parser + graph + all 27 parity cases. The parity suite passing against the same JSON the PHP suite passes against IS the §7 parity guarantee.
+Expected: PASS — decimal + parser + graph + all 28 parity cases. The parity suite passing against the same JSON the PHP suite passes against IS the §7 parity guarantee.
 
 - [ ] **Step 8: Commit**
 
@@ -2059,13 +2071,15 @@ cp /Users/tahir/woo-checkout-fields/src/frontend/conditional-logic.js src/fronte
 
 - [ ] **Step 4: Write the regression test** — first inspect how CF tests this engine:
 
-Run: `ls /Users/tahir/woo-checkout-fields/tests/Unit/ && grep -rl conditional-cases /Users/tahir/woo-checkout-fields/tests/`
-Copy that test file to `tests/Unit/Logic/ConditionalLogicTest.php`, change its namespace to `Alovio\Calculator\Tests\Unit\Logic` and its imports to `Alovio\Calculator\Logic\ConditionalLogic`, and point its fixture path at `tests/fixtures/conditional-cases.json`. If CF's test extends a different base class, extend our `Alovio\Calculator\Tests\TestCase` instead.
+Run: `ls /Users/tahir/woo-checkout-fields/tests/php/Unit/ && grep -rl conditional-cases /Users/tahir/woo-checkout-fields/tests/`
+(CF's PHP tests live under `tests/php/Unit/` — the file is `tests/php/Unit/ConditionalLogicTest.php`.) Copy that test file to `tests/Unit/Logic/ConditionalLogicTest.php`, change its namespace to `Alovio\Calculator\Tests\Unit\Logic` and its imports to `Alovio\Calculator\Logic\ConditionalLogic`, and point its fixture path at `tests/fixtures/conditional-cases.json`. If CF's test extends a different base class, extend our `Alovio\Calculator\Tests\TestCase` instead.
+
+Also copy the JS parity test (spec §13 requires the JS engine run against the same fixtures): `cp /Users/tahir/woo-checkout-fields/tests/js/conditional-logic.test.js tests/js/conditional-logic.test.js`, then fix its two paths — engine import → `../../src/frontend/conditional-logic`, fixture require → `../fixtures/conditional-cases.json`. (wp-scripts' Jest `testMatch` covers `tests/js/*.test.js`.)
 
 - [ ] **Step 5: Run**
 
-Run: `vendor/bin/phpunit --filter ConditionalLogicTest`
-Expected: PASS — every fixture case green with zero engine edits. If anything fails, the copy was modified — re-copy; do not "fix" the engine.
+Run: `vendor/bin/phpunit --filter ConditionalLogicTest && npm test -- conditional-logic`
+Expected: PASS on both sides — every fixture case green with zero engine edits. If anything fails, the copy was modified — re-copy; do not "fix" the engine.
 
 - [ ] **Step 6: Add a calculator-specific guard test** to the same file: `active_map` with a `conditions[]`/`conditionMatch: 'any'` group referencing a toggle exposed as `"1"`/`""` (spec §6 table) — asserts our value conventions work against the untouched engine:
 
@@ -2082,13 +2096,13 @@ public function test_toggle_convention_drives_visibility(): void {
 }
 ```
 
-NOTE: before running, open the copied `ConditionalLogic.php` and check `active_map()`'s exact signature — CF passes the group as `[ 'fields' => […] ]` or a bare field array; match whatever the copied code expects and adjust this test accordingly (the engine is the contract, the test adapts).
+VERIFIED FACT (checked against the CF source during plan review): the signature is `active_map( array $group, array $values )` where `$group = [ 'fields' => […] ]` — exactly as this test and Chunk 5's `Evaluation` call it. No adjustment expected; if the copy disagrees, you copied the wrong file.
 
 - [ ] **Step 7: Run + commit**
 
 ```bash
-vendor/bin/phpunit --filter ConditionalLogicTest
-git add includes/Logic/ConditionalLogic.php tests/fixtures/conditional-cases.json src/frontend/conditional-logic.js tests/Unit/Logic/ConditionalLogicTest.php
+vendor/bin/phpunit --filter ConditionalLogicTest && npm test -- conditional-logic
+git add includes/Logic/ConditionalLogic.php tests/fixtures/conditional-cases.json src/frontend/conditional-logic.js tests/Unit/Logic/ConditionalLogicTest.php tests/js/conditional-logic.test.js
 git commit -m "feat: import conditional-logic engine + fixtures from checkout-fields (verbatim)"
 ```
 
@@ -2097,6 +2111,8 @@ git commit -m "feat: import conditional-logic engine + fixtures from checkout-fi
 **Files:**
 - Create: `includes/Fields/FieldTypes.php`
 - Test: `tests/Unit/Fields/FieldTypesTest.php`
+
+Type-token conventions (canonical for the whole codebase): the spec's "heading/divider" is implemented as the single `heading` type (a divider is simply a heading with an empty label); the spec's "checkbox-group" is the token `checkbox_group` (underscore — valid as a PHP array key, JS identifier, and `sanitize_key` output).
 
 - [ ] **Step 1: Write the failing test**
 
@@ -2369,7 +2385,7 @@ final class FieldSchema {
 				foreach ( [ 'min', 'max', 'step', 'default' ] as $k ) {
 					$field[ $k ] = isset( $raw[ $k ] ) && is_numeric( $raw[ $k ] ) ? (float) $raw[ $k ] : null;
 				}
-				$field['price'] = isset( $raw['price'] ) && is_numeric( $raw['price'] ) ? (float) $raw['price'] : null; // optional per-unit price
+				// Deliberately NO price on numeric fields — formulas do the multiplying (keeps the §6 value maps unambiguous).
 				break;
 
 			case 'toggle':
@@ -2704,7 +2720,7 @@ class PresetsTest extends TestCase {
 				[ 'value' => 'opt_std', 'label' => __( 'Standard', 'alovio-calculator' ), 'price' => 2.5 ],
 				[ 'value' => 'opt_deep', 'label' => __( 'Deep clean', 'alovio-calculator' ), 'price' => 4 ],
 			] ],
-			[ 'id' => 'windows', 'type' => 'quantity', 'label' => __( 'Windows', 'alovio-calculator' ), 'min' => 0, 'max' => 50, 'default' => 0, 'price' => 6, 'showInSummary' => true ],
+			[ 'id' => 'windows', 'type' => 'quantity', 'label' => __( 'Windows', 'alovio-calculator' ), 'min' => 0, 'max' => 50, 'default' => 0, 'showInSummary' => true ],
 			[ 'id' => 'express', 'type' => 'toggle', 'label' => __( 'Express (24h)', 'alovio-calculator' ), 'price' => 30, 'showInSummary' => true ],
 			[ 'id' => 'express_note', 'type' => 'heading', 'label' => __( 'Express slots are limited on weekends.', 'alovio-calculator' ), 'conditions' => [
 				[ 'field' => 'express', 'operator' => 'is', 'value' => '1' ],
@@ -2718,8 +2734,8 @@ class PresetsTest extends TestCase {
 ```
 
 Vertical briefs for the other five (each ~5–7 fields):
-- **moving-cost**: rooms (quantity), distance km (number, per-km price via formula `{distance} * 1.2`), floor without elevator (select w/ 3 priced options), packing service (toggle), fragile-items note (heading shown when packing on), total formula.
-- **print-quote**: product (radio: flyer/poster/sticker w/ unit prices), quantity (number, min 50), double-sided (toggle, price 0 — used in formula `if({double}, {qty} * 0.05, 0)`), express production (toggle priced), total with `max(…, 25)` minimum-order clamp.
+- **moving-cost**: rooms (quantity), distance km (number, per-km price via formula `{distance} * 1.2`), floor without elevator (select w/ 3 priced options), packing service (toggle **priced** — a price-0 toggle evaluates to 0 in formulas and can never drive an `if`), fragile-items note (heading shown when packing on), total formula.
+- **print-quote**: product (radio: flyer/poster/sticker w/ unit prices), quantity (number, min 50), double-sided (toggle, **price 1** — boolean flag: a price-0 toggle is 0 whether on or off, so `if({double}, …)` would never fire; price 1 makes on ⇒ 1; it is referenced ONLY inside the `if` condition of `if({double} > 0, {qty} * 0.05, 0)`, never added to the total directly), express production (toggle priced), total with `max(…, 25)` minimum-order clamp.
 - **agency-estimate**: project type (radio priced), pages (slider), CMS setup (toggle priced), SEO package (select priced), care-plan note (heading conditional on SEO option via `contains`), total formula with `round(…, 0)`.
 - **salon-pricing**: treatment (radio priced), hair length (select priced), add-ons (checkbox_group, 3 priced options), weekend appointment (toggle priced), total formula.
 - **rental-cost**: unit type (radio priced/day), days (quantity min 1 default 1), insurance (toggle priced/day → formula `({unit} + if({insurance}, 12, 0)) * {days}`), delivery (toggle priced flat), total formula.
@@ -2787,7 +2803,7 @@ final class EntriesTable {
 			self::install();
 			return;
 		}
-		foreach ( get_sites( [ 'fields' => 'ids' ] ) as $site_id ) {
+		foreach ( get_sites( [ 'fields' => 'ids', 'number' => 0 ] ) as $site_id ) {
 			switch_to_blog( (int) $site_id );
 			self::install();
 			restore_current_blog();
@@ -2882,9 +2898,9 @@ final class EntriesRepository {
 	public static function row_from_submission( int $calculator_id, array $contact, array $result ): array {
 		return [
 			'calculator_id' => $calculator_id,
-			'name'          => substr( (string) ( $contact['name'] ?? '' ), 0, 190 ),
-			'email'         => substr( (string) ( $contact['email'] ?? '' ), 0, 190 ),
-			'phone'         => substr( (string) ( $contact['phone'] ?? '' ), 0, 64 ),
+			'name'          => mb_substr( (string) ( $contact['name'] ?? '' ), 0, 190 ),
+			'email'         => mb_substr( (string) ( $contact['email'] ?? '' ), 0, 190 ),
+			'phone'         => mb_substr( (string) ( $contact['phone'] ?? '' ), 0, 64 ),
 			'message'       => (string) ( $contact['message'] ?? '' ),
 			'snapshot'      => wp_json_encode( $result ),
 			'total'         => number_format( ( $result['totalScaled'] ?? 0 ) / DecimalMath::SCALE, 4, '.', '' ),
@@ -2918,6 +2934,22 @@ final class EntriesRepository {
 	public function delete( int $id ): void {
 		global $wpdb;
 		$wpdb->delete( EntriesTable::table_name(), [ 'id' => $id ] );
+	}
+
+	/** Used by the entries REST routes for 404 semantics. */
+	public function find( int $id ): ?array {
+		global $wpdb;
+		$table = EntriesTable::table_name();
+		$row   = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$table} WHERE id = %d", $id ), ARRAY_A ); // phpcs:ignore WordPress.DB.PreparedSQL
+		return $row ?: null;
+	}
+
+	/** Used by the CSV exporter — ALL rows, no pagination. */
+	public function all_for_export( int $calculator_id = 0 ): array {
+		global $wpdb;
+		$table = EntriesTable::table_name();
+		$where = $calculator_id > 0 ? $wpdb->prepare( 'WHERE calculator_id = %d', $calculator_id ) : '';
+		return $wpdb->get_results( "SELECT * FROM {$table} {$where} ORDER BY id ASC", ARRAY_A ) ?: []; // phpcs:ignore WordPress.DB.PreparedSQL
 	}
 
 	public function delete_by_email( string $email ): int {
@@ -3024,6 +3056,8 @@ class EvaluationTest extends TestCase {
 		$this->assertSame( 5000000, $r['values']['area'] );   // clamped to max 500
 		$this->assertSame( 0, $r['values']['service'] );      // unknown slug ⇒ no selection ⇒ 0
 		$this->assertSame( 500000, $r['values']['express'] ); // any truthy raw ⇒ on (price 50)
+		$r2 = Evaluation::run( $this->config(), [ 'express' => 0 ] );
+		$this->assertSame( 0, $r2['values']['express'] );      // JSON numeric zero ⇒ off (not the string-strict trap)
 	}
 
 	public function test_default_values_used_when_missing(): void {
@@ -3183,8 +3217,7 @@ final class Evaluation {
 					$out[ $id ] = implode( ',', self::valid_slugs( $field, is_array( $v ) ? $v : [] ) );
 					break;
 				case 'toggle':
-					$on = null === $v ? ! empty( $field['default'] ) : ! in_array( $v, [ '', '0', false, null ], true );
-					$out[ $id ] = $on ? '1' : '';
+					$out[ $id ] = self::toggle_on( $field, $v ) ? '1' : '';
 					break;
 				case 'text':
 					$out[ $id ] = is_string( $v ) ? trim( $v ) : '';
@@ -3220,8 +3253,7 @@ final class Evaluation {
 				}
 				return $sum;
 			case 'toggle':
-				$on = null === $v ? ! empty( $field['default'] ) : ! in_array( $v, [ '', '0', false, null ], true );
-				return $on ? DecimalMath::toScaled( $field['price'] ) : 0;
+				return self::toggle_on( $field, $v ) ? DecimalMath::toScaled( $field['price'] ) : 0;
 		}
 		return 0;
 	}
@@ -3251,11 +3283,21 @@ final class Evaluation {
 		return array_values( array_intersect( array_map( 'strval', $vs ), $valid ) );
 	}
 
+	/** Currency line items = choice/toggle (their amounts are money); numeric inputs display as plain counts. */
 	private static function is_priced( array $field ): bool {
-		if ( FieldTypes::is_choice( $field['type'] ) || 'toggle' === $field['type'] ) {
-			return true;
+		return FieldTypes::is_choice( $field['type'] ) || 'toggle' === $field['type'];
+	}
+
+	/** JSON-tolerant on/off: null ⇒ field default; 0, 0.0, '', '0', false, [] ⇒ off; anything else ⇒ on. Single source — used by BOTH value maps so they cannot drift. */
+	private static function toggle_on( array $field, $v ): bool {
+		if ( null === $v ) {
+			return ! empty( $field['default'] );
 		}
-		return isset( $field['price'] ) && null !== $field['price'];
+		if ( false === $v ) {
+			return false;
+		}
+		$s = is_scalar( $v ) ? (string) $v : '';
+		return '' !== $s && '0' !== $s;
 	}
 }
 ```
@@ -3282,7 +3324,7 @@ Read `/Users/tahir/woo-checkout-fields/includes/Admin/RestController.php` first 
 | Route | Handler behavior |
 |---|---|
 | `GET /alc/v1/calculators` | `get_posts` of `alc_calculator` (any status, `numberposts => -1`) → `[ { id, title, updated, shortcode: "[alovio_calculator id=\"N\"]" } ]` |
-| `POST /alc/v1/calculators` | params: `title` (string, required), `template` (string, optional preset key) → `wp_insert_post` (status `publish`) + `FieldRepository::save( $id, $config )` where config = preset config or `FieldSchema::defaults()`; invalid template key → `WP_Error` 400. Param `duplicateOf` (int, optional): copy title + config from that post instead. Returns `{ id }` |
+| `POST /alc/v1/calculators` | params: `title` (string, required), `template` (string, optional preset key) → `wp_insert_post` (status `publish`) + `FieldRepository::save( $id, $config )` where config = preset config or `FieldSchema::defaults()`; invalid template key → `WP_Error` 400. Param `duplicateOf` (int, optional): copy the CONFIG from that post (post-type-guarded like `{id}` routes) but use the supplied `title` as-is — the UI sends "Old title (copy)". Returns `{ id }` |
 | `GET /alc/v1/calculators/{id}` | 404 `WP_Error` unless post exists with our post type → `{ id, title, config: FieldRepository::get(id) }` |
 | `PUT /alc/v1/calculators/{id}` | params: `title?`, `config?` → `wp_update_post` title, `FieldRepository::save` config; returns saved `{ id, title, config }` (normalized — the builder re-hydrates from this) |
 | `DELETE /alc/v1/calculators/{id}` | `wp_delete_post( $id, true )` → `{ deleted: true }` |
@@ -3430,7 +3472,7 @@ final class QuoteController {
 		// Authoritative recompute — the client's total is ignored (spec §10).
 		$result = Evaluation::run( $config, $rawValues );
 		$snapshot = [
-			'values'      => $result['conditionValues'],
+			'values'      => array_map( 'sanitize_text_field', $result['conditionValues'] ), // §12: text fields carry raw visitor input — sanitize at the storage boundary (comparator semantics upstream stay untouched).
 			'lineItems'   => $result['lineItems'],
 			'totalScaled' => $result['totalScaled'] ?? 0,
 			'currency'    => $config['settings']['currency'],
@@ -3522,7 +3564,10 @@ final class EntryMailer {
 			$lines[] = $item['label'] . ': ' . DecimalMath::fromScaled( $item['amount'] );
 		}
 		$lines[] = __( 'Total', 'alovio-calculator' ) . ': ' . DecimalMath::fromScaled( $snapshot['totalScaled'] );
-		wp_mail( $to, sprintf( __( '[%s] New quote request', 'alovio-calculator' ), wp_specialchars_decode( get_bloginfo( 'name' ), ENT_QUOTES ) ), implode( "\n", $lines ) );
+		$sent = wp_mail( $to, sprintf( __( '[%s] New quote request', 'alovio-calculator' ), wp_specialchars_decode( get_bloginfo( 'name' ), ENT_QUOTES ) ), implode( "\n", $lines ) );
+		if ( ! $sent && defined( 'WP_DEBUG' ) && WP_DEBUG ) {
+			error_log( 'Alovio Calculator: quote notification email failed to send.' ); // §12: logged silently; the entry is already stored.
+		}
 	}
 }
 ```
@@ -3543,7 +3588,7 @@ git commit -m "feat: public quote endpoint (honeypot, rate limit, authoritative 
 - Modify: `includes/Plugin.php`
 - Test: `tests/Unit/Entries/CsvExporterTest.php`
 
-- [ ] **Step 1: `EntriesRestController`** — `manage_options` routes per spec §4 using `EntriesRepository`: `GET /alc/v1/entries` (params `calculator` absint, `page`, `per_page` ≤100 → `{ rows, total }` with `snapshot` JSON-decoded per row), `PUT /alc/v1/entries/{id}` (`{ status: new|read }`), `DELETE /alc/v1/entries/{id}`. Same permission-callback and `find`-guard idioms as Task 23.
+- [ ] **Step 1: `EntriesRestController`** — `manage_options` routes per spec §4 using `EntriesRepository`: `GET /alc/v1/entries` (params `calculator` absint, `page`, `per_page` ≤100 → `{ rows, total }` with `snapshot` JSON-decoded per row), `PUT /alc/v1/entries/{id}` (`{ status: new|read }`), `DELETE /alc/v1/entries/{id}`. Same permission-callback idiom as Task 23; 404 semantics for `{id}` routes via `EntriesRepository::find( $id )` (returns `WP_Error` `alc_not_found`, status 404, when null).
 
 - [ ] **Step 2: `CsvExporter`** — TDD the pure row formatter first (`tests/Unit/Entries/CsvExporterTest.php`):
 
@@ -3559,7 +3604,7 @@ public function test_csv_line_escapes_and_orders_columns(): void {
 }
 ```
 
-Implement `csv_row( array $row ): string` (RFC-4180 quoting, newlines flattened to spaces, fixed column order `id, calculator_id, created_at, name, email, phone, message, total, status, snapshot`) plus a `handle()` for `admin_post_alc_export_entries` that checks `current_user_can( 'manage_options' )` + `check_admin_referer( 'alc_export_entries' )`, streams `header( 'Content-Type: text/csv' )` with the header row then all rows for the requested `calculator` param, and `exit`s.
+Implement `csv_row( array $row ): string` (RFC-4180 quoting, newlines flattened to spaces, fixed column order `id, calculator_id, created_at, name, email, phone, message, total, status, snapshot`; guard Excel formula injection — prefix any cell starting with `=`, `+`, `-` or `@` with a single quote) plus a `handle()` for `admin_post_alc_export_entries` that checks `current_user_can( 'manage_options' )` + `check_admin_referer( 'alc_export_entries' )`, sends `header( 'Content-Type: text/csv; charset=utf-8' )` and `header( 'Content-Disposition: attachment; filename=alovio-calculator-entries.csv' )`, streams the header row then every row from `EntriesRepository::all_for_export( $calculator )`, and `exit`s. (Adjust the Step 2 test expectation if the injection guard changes a sample cell — the test fixture above contains no formula-leading cells, so it stands.)
 
 - [ ] **Step 3: `Privacy`** — register on `wp_privacy_personal_data_exporters` / `…_erasers` (id `alovio-calculator`): exporter maps `EntriesRepository::get_by_email( $email )` rows to WP's `[ group_id, group_label, item_id, data: [label,value][] ]` shape (name, email, phone, message, total, created_at); eraser calls `delete_by_email` and reports `items_removed`. Follow the structure documented at developer.wordpress.org/plugins/privacy/ — both callbacks return `'done' => true` (single page; our per-email volume is small).
 
@@ -3586,13 +3631,14 @@ The builder framework is copied from CF and kept structurally identical; new UI 
 - Create: `includes/Admin/AdminPage.php`, `includes/Admin/BuilderAssets.php`
 - Modify: `src/index.js`, `includes/Plugin.php`
 
-- [ ] **Step 1: Copy every file** from `/Users/tahir/woo-checkout-fields/src/builder/` into `src/builder/`, then sweep identifiers: `CLCF` → `ALC`, `clcf` → `alc`, store key `'corelabs/checkout-fields'` (check actual string in `store.js`) → `'alovio/calculator'`, textdomain in `__( …, 'corelabs-checkout-fields' )` → `'alovio-calculator'`. Command for the sweep audit: `grep -rn "clcf\|CLCF\|corelabs\|checkout" src/builder/` must return zero hits when done.
+- [ ] **Step 1: Copy every file** from `/Users/tahir/woo-checkout-fields/src/builder/` into `src/builder/`, **plus the builder stylesheet** — it lives OUTSIDE that directory: `cp /Users/tahir/woo-checkout-fields/assets/css/builder.css assets/css/builder.css` (create the dir). Then sweep identifiers: `CLCF` → `ALC`, `clcf` → `alc`, store key `'clcf/builder'` (verify the actual string in `store.js`) → `'alc/builder'`, textdomain → `'alovio-calculator'`. Sweep audit: `grep -rn "clcf\|CLCF\|corelabs\|checkout" src/builder/ assets/` must return zero hits when done.
 
 - [ ] **Step 2: Point `src/index.js` at the app:**
 
 ```js
 import { createRoot } from '@wordpress/element';
 import App from './builder/App';
+import '../assets/css/builder.css'; // CF imports this from its index.js — without it the builder renders unstyled (webpack emits it as build/index.css, which BuilderAssets enqueues behind a file_exists guard).
 
 const node = document.getElementById( 'alc-builder-root' );
 if ( node ) {
@@ -3653,8 +3699,8 @@ wp_localize_script( 'alc-builder', 'ALC_BUILDER', [
 - [ ] **Step 6: Build + commit**
 
 ```bash
-npm run build && php -l includes/Admin/AdminPage.php && php -l includes/Admin/BuilderAssets.php
-git add src/builder src/index.js includes/Admin/AdminPage.php includes/Admin/BuilderAssets.php includes/Plugin.php
+npm run build && ls build/index.css && php -l includes/Admin/AdminPage.php && php -l includes/Admin/BuilderAssets.php
+git add src/builder src/index.js assets/css/builder.css includes/Admin/AdminPage.php includes/Admin/BuilderAssets.php includes/Plugin.php
 git commit -m "feat: import builder framework from checkout-fields + admin mount"
 ```
 
@@ -3684,7 +3730,7 @@ export const deleteEntry = ( id ) => apiFetch( { path: `entries/${ id }`, method
 
 (`@wordpress/api-fetch` arrives via the build's extracted dependencies — no package.json change needed; verify `build/index.asset.php` lists `wp-api-fetch` after building.)
 
-- [ ] **Step 2: Rework `App.jsx` into a view switcher.** State: `view: 'list' | 'builder' | 'entries'`, `calculatorId: number|null`. `'list'` renders `CalculatorList`; `'builder'` renders the copied CF builder body (Canvas + FieldPalette + FieldSettings) hydrated from `getCalculator( calculatorId )` instead of CF's single-group endpoint, saving via `saveCalculator( calculatorId, { title, config } )` and re-hydrating the store from the normalized response (the server may rewrite option slugs); `'entries'` renders `EntriesList` (Task 30). Keep CF's dirty-state/save-button pattern intact.
+- [ ] **Step 2: Rework `App.jsx` into a view switcher.** State: `view: 'list' | 'builder' | 'entries'`, `calculatorId: number|null`. `'list'` renders `CalculatorList`; `'builder'` renders the copied CF builder body (Canvas + FieldPalette + FieldSettings) hydrated from `getCalculator( calculatorId )` instead of CF's single-group endpoint, saving via `saveCalculator( calculatorId, { title, config } )` and re-hydrating the store from the normalized response (the server may rewrite option slugs); `'entries'` renders a placeholder `<p>` in THIS task (EntriesList arrives in Task 30 — do not import it yet or the build breaks). Keep CF's dirty-state/save-button pattern intact.
 
 - [ ] **Step 3: Create `CalculatorList.jsx`** — table of calculators from `listCalculators()`: title, updated date, shortcode `<code>` with a copy button (`navigator.clipboard.writeText`), row actions Edit (→ builder view) / Duplicate (`createCalculator( { title: title + ' (copy)', duplicateOf: id } )`) / Delete (with `window.confirm`); top bar: "Add new" (opens `TemplatePicker`) and "Entries" button (→ entries view). Use `@wordpress/components` (`Button`, `Modal`, `Notice`) — no custom CSS beyond a wrapper class.
 
@@ -3705,9 +3751,9 @@ git commit -m "feat: builder app shell with calculator list and template picker"
 
 - [ ] **Step 1: Update the palette** to exactly the spec §6 free types (labels via `__()`): number, slider, select, radio, checkbox group, toggle, quantity, text, heading, html, formula. New-field defaults per type (e.g. slider `{ min: 0, max: 100, step: 1, default: 0 }`, toggle `{ price: 0 }`, formula `{ expression: '' }`).
 
-- [ ] **Step 2: Create `OptionsEditor.jsx`** — used by select/radio/checkbox_group settings. Rows of: label `TextControl`, price `TextControl` (`type="number"`, step `0.01`), image `MediaUpload` button (radio only; stores attachment id, shows 40px thumb, removable), remove button; "Add option" appends `{ label: '', price: 0 }`. **No slug input** — new options are sent without `value` and the server's FieldSchema assigns `opt_` slugs; the editor must preserve existing `value` keys untouched when editing (they are the stable identity conditions reference).
+- [ ] **Step 2: Create `OptionsEditor.jsx`** — used by select/radio/checkbox_group settings. Rows of: label `TextControl`, price `TextControl` (`type="number"`, step `0.01`), image picker (radio only; stores attachment id, shows 40px thumb, removable), remove button; "Add option" appends `{ label: '', price: 0 }`. **Image picker implementation** (this is a plain `add_menu_page` screen, NOT the block editor, so `@wordpress/block-editor`'s `MediaUpload` renders nothing here): add `wp_enqueue_media();` to `BuilderAssets::enqueue()`, then use `MediaUpload` from **`@wordpress/media-utils`** (works standalone) — or equivalently open a `wp.media` frame directly. Verify `build/index.asset.php` picks up the `wp-media-utils` dependency after building. **No slug input** — new options are sent without `value` and the server's FieldSchema assigns `opt_` slugs; the editor must preserve existing `value` keys untouched when editing (they are the stable identity conditions reference).
 
-- [ ] **Step 3: Extend `FieldSettings.jsx`** per type: number/slider/quantity → min/max/step/default + optional unit price; toggle → price + default on/off; choice types → `OptionsEditor`; text → placeholder; heading → label only; html → `TextareaControl`; ALL types → "Show in summary" `CheckboxControl` + the existing conditions section. Formula fields get the `FormulaPanel` (next task) instead of a price.
+- [ ] **Step 3: Extend `FieldSettings.jsx`** per type: number/slider/quantity → min/max/step/default (NO price input — formulas do the multiplying, matching FieldSchema); toggle → price + default on/off; choice types → `OptionsEditor`; text → placeholder; heading → label only; html → `TextareaControl`; ALL types → "Show in summary" `CheckboxControl` + the existing conditions section. Formula fields get the `FormulaPanel` (next task) instead of a price.
 
 - [ ] **Step 4: Build + commit**
 
@@ -3721,6 +3767,7 @@ git commit -m "feat: calculator field settings with per-option price editor"
 
 **Files:**
 - Create: `src/builder/FormulaPanel.jsx`, `src/builder/formula-validation.js`
+- Modify: `src/builder/FieldSettings.jsx` (mount the panel for formula fields)
 - Test: `src/builder/__tests__/formula-validation.test.js`
 
 - [ ] **Step 1: TDD the pure validation helper** — `src/builder/__tests__/formula-validation.test.js`:
@@ -3755,7 +3802,7 @@ describe( 'validateExpression', () => {
 
 - [ ] **Step 2: Implement `src/builder/formula-validation.js`** using the shared engine: `compile` (catch `FormulaError` → `{ ok: false, error: { code, message, pos } }`); check every `references()` id is in the referenceable set (number/slider/select/radio/checkbox_group/toggle/quantity/formula minus self); rebuild the formula graph with the draft expression substituted and report `cycle` if `orderFormulas` returns the field in `cycles`. Run `npm test -- formula-validation` → green.
 
-- [ ] **Step 3: Create `FormulaPanel.jsx`** — `TextareaControl` for the expression; on change (debounced 300ms) run `validateExpression` and render a red `Notice` with the message + a caret position hint, or a green "Formula OK" hint; a `SelectControl` "Insert field" listing referenceable sibling fields that inserts `{id}` at the cursor; helper text documenting the function set (`if, min, max, round, ceil, floor, abs`). Errors NEVER block saving (spec §7) — the panel is advisory.
+- [ ] **Step 3: Create `FormulaPanel.jsx`** — `TextareaControl` for the expression; on change (debounced 300ms) run `validateExpression` and render a red `Notice` with the message + a caret position hint, or a green "Formula OK" hint; a `SelectControl` "Insert field" listing referenceable sibling fields that inserts `{id}` at the cursor; helper text documenting the function set (`if, min, max, round, ceil, floor, abs` — min/max take 2–8 arguments; leading-dot literals like `.5` and unary `+` are not supported, write `0.5`). Errors NEVER block saving (spec §7) — the panel is advisory.
 
 - [ ] **Step 4: Build + test + commit**
 
@@ -3768,7 +3815,7 @@ git commit -m "feat: formula panel with live engine-backed validation"
 ### Task 30: ConditionEditor adaptation + EntriesList + SettingsTab
 
 **Files:**
-- Modify: `src/builder/ConditionEditor.jsx`
+- Modify: `src/builder/ConditionEditor.jsx`, `src/builder/App.jsx` (replace the entries placeholder; mount SettingsTab)
 - Create: `src/builder/EntriesList.jsx`, `src/builder/SettingsTab.jsx`
 
 - [ ] **Step 1: Adapt `ConditionEditor.jsx`** (CF copy) to the spec §6 contract:
@@ -3884,11 +3931,14 @@ Renders (spec §8): wrapper `.alc-calculator[data-alc-id]` with the accent CSS c
   - the `discount_note` field (condition `area > 100`, default 50) renders with the `hidden` attribute; the always-active fields don't;
   - the summary contains the initial total formatted via `CurrencyFormatter` for default values (compute the expected string by hand from the test config);
   - with `quoteForm.enabled = true` the output contains `name="alc_website"` (honeypot) and inputs for exactly the enabled contact fields; with it disabled, no `<form` at all;
-  - `aria-live="polite"` present on the total element.
+  - `aria-live="polite"` present on the total element;
+  - every summary row carries `data-alc-line="{field-id}"` (the hook Task 34's `summary.js` matches on);
+  - the decoded payload pins `calculatorId`, `settings.quoteForm.fields`, and a non-empty `successMessage` (the renderer resolves an empty stored `successMessage` to the translated default `__( "Thanks! We'll be in touch shortly.", 'alovio-calculator' )` — the frontend bundle has no wp-i18n, so the translated fallback MUST ship in the payload).
 
 - [ ] **Step 2: Implement** `CalculatorRenderer::render( int $id, array $config ): string`. Structure (keep each helper ≤40 lines; one `render_field` switch delegating to per-type private methods):
   - inputs: number/quantity → `<input type="number">` with min/max/step/value; slider → `<input type="range">` + live value `<output>`; select → `<select>`; radio/checkbox_group → fieldset/legend with labeled inputs (radio: image thumb via `wp_get_attachment_image` when `image` set); toggle → labeled checkbox; text → `<input type="text">`; heading → `<h3>`; html → `wp_kses_post` content (already normalized, re-kses anyway); formula → `.alc-line[data-alc-field]` showing its initial value (currency-formatted).
   - All initial visibility/values come from one `Evaluation::run( $config, [] )` call — the same authority the quote endpoint uses (no FOUC, JS-less static output, spec §8).
+  - Summary panel: `<aside class="alc-summary">` with a `<ul>` of rows `<li data-alc-line="{id}"><span class="alc-line-label">…</span><span class="alc-line-value">…</span></li>` for each initial line item, and the total element `<p class="alc-total" aria-live="polite" data-alc-total>` — these `data-alc-line`/`data-alc-total` attributes are the contract `summary.js` (Task 34) updates against.
   - Quote form: enabled contact inputs + honeypot `<input type="text" name="alc_website" class="alc-hp" tabindex="-1" autocomplete="off" aria-hidden="true">` + submit button + empty `.alc-quote-feedback` div.
 
 - [ ] **Step 3: Run** `vendor/bin/phpunit --filter CalculatorRendererTest` → green; full suite green.
@@ -3904,7 +3954,7 @@ git commit -m "feat: server-side calculator renderer (escaped, initial state via
 
 **Files:**
 - Create: `includes/Frontend/Shortcode.php`, `includes/Frontend/FrontendAssets.php`, `src/block/block.json`, `src/block/index.js`, `src/block/edit.js`
-- Modify: `webpack.config.js` (third entry `block: './src/block/index.js'`), `includes/Plugin.php`
+- Modify: `webpack.config.js` (third entry — named `'block/index'`, see Step 2), `includes/Plugin.php`
 
 - [ ] **Step 1: `Shortcode.php`** — `add_shortcode( 'alovio_calculator', … )`: `absint` the `id` attr, verify post type, `FieldRepository::get`, mark assets needed (`FrontendAssets::mark_needed()`), return `CalculatorRenderer::render`. Unknown/missing id → `''` (admins with `manage_options` get a visible `<p>` notice instead — debuggability without leaking to visitors).
 
@@ -3927,7 +3977,8 @@ git commit -m "feat: server-side calculator renderer (escaped, initial state via
 ```
 
 `edit.js`: `useBlockProps`, fetch the calculator list via `@wordpress/api-fetch` (admin context — REST nonce available), `SelectControl` in `InspectorControls` + `Placeholder` with the same select when `calculatorId` is 0, and `<ServerSideRender block="alovio/calculator" attributes={ attributes } />` once selected. `index.js`: `registerBlockType( metadata, { edit, save: () => null } )` (dynamic block).
-PHP registration in `Plugin::init()`: `register_block_type( ALC_DIR . 'build/block', [ 'render_callback' => …same as shortcode handler… ] );` — wp-scripts copies `block.json` into `build/block` when the entry is `src/block/index.js` with the block.json beside it; verify after build and adjust the path if your wp-scripts version emits `build/` flat (check `ls build/` output and point `register_block_type` at the directory actually containing the emitted `block.json`).
+**Webpack entry name matters:** add the entry as `'block/index': './src/block/index.js'` (NOT `block:`) so the bundle emits at `build/block/index.js` — `block.json`'s `"editorScript": "file:./index.js"` resolves relative to the copied json, and a flat `build/block.js` would silently make it load the wrong bundle (the admin-builder `index.js`). wp-scripts copies `src/block/block.json` to `build/block/block.json` automatically.
+PHP registration in `Plugin::init()`: `register_block_type( ALC_DIR . 'build/block', [ 'render_callback' => …same handler as the shortcode… ] );` — after building, verify `ls build/block/` shows both `block.json` and `index.js` side by side.
 
 - [ ] **Step 3: `FrontendAssets.php`** — registers `alc-frontend` script (`build/frontend.js` + asset deps) and `alc-frontend` style on `wp_enqueue_scripts` but **enqueues only when marked needed** (static flag set by shortcode/block render; plus a `has_block( 'alovio/calculator' )` / `has_shortcode` pre-check in `wp` action for footer-printed styles). Late marking is handled by calling `wp_enqueue_script` directly inside `mark_needed()` if `wp_enqueue_scripts` already fired.
 
@@ -3955,7 +4006,7 @@ git commit -m "feat: shortcode + dynamic block embedding with conditional assets
 // run( fields, prepared, rawValues )   → { active, values, lineItems, totalScaled }
 ```
 
-`src/frontend/__tests__/compute.test.js` ports these EvaluationTest cases 1:1 (same config literals, same expected numbers): happy-path total/line items, condition-value table row checks, invalid-input coercion (clamp/unknown slug/toggle truthiness), inactive-contributes-zero, checkbox sum+join, broken-formula→0. Parity with the PHP authority is the point — copy the expected values from the PHP test verbatim.
+`src/frontend/__tests__/compute.test.js` ports these EvaluationTest cases 1:1 (same expected numbers): happy-path total/line items, condition-value table row checks, invalid-input coercion (clamp/unknown slug/toggle truthiness incl. numeric 0 ⇒ off), inactive-contributes-zero, checkbox sum+join, broken-formula→0. IMPORTANT: the JS configs must be the **hand-normalized shape** (what the embedded payload actually carries after PHP's `FieldSchema::normalize` — explicit `conditions: []`, `conditionMatch`, `conditionAction`, numeric option prices), NOT the raw literals from the PHP test, since JS cannot call `normalize`. Copy the expected values from the PHP test verbatim — parity with the PHP authority is the point.
 
 - [ ] **Step 2: Implement `compute.js`** using `src/shared/formula` (compile/evaluate/orderFormulas/toScaled) and `src/frontend/conditional-logic.js`'s `activeMap`. Then run `npm test -- compute` → green.
 
@@ -4003,7 +4054,7 @@ git commit -m "feat: quote form submission with full response-contract UX"
 ### Task 36: Front-end stylesheet
 
 **Files:**
-- Create: `src/frontend/style.scss` (wp-scripts compiles imported SCSS; import it from `src/frontend.js`)
+- Create: `src/frontend/frontend-style.scss` — NOT named `style.*`: wp-scripts' default config extracts `style.*` imports into a separate `style-frontend.css`, while this name emits the expected `build/frontend.css` alongside the JS. Import it from `src/frontend.js`; `FrontendAssets` registers exactly `build/frontend.css` (verify with `ls build/` after building — if your wp-scripts version emits a different name, point the registration at the real file).
 
 - [ ] **Step 1: Implement the single theme (spec §8):** everything namespaced `.alc-`; design tokens as CSS custom properties on `.alc-calculator` (`--alc-accent` set inline by the renderer, `--alc-radius: 8px`, font inherited from the theme); two-column layout (fields | summary) via CSS grid collapsing to one column under 720px with `.alc-summary` becoming `position: sticky; bottom: 0` (mobile dock); visible focus states (`:focus-visible` outline using the accent); `.alc-hp` visually hidden (absolute, 1px, clip) — NOT `display:none` (bots skip those); logical properties (`margin-inline-start` etc.) for RTL safety; `.alc-field[hidden] { display: none !important; }` to beat theme resets; error/success message styles.
 
@@ -4017,7 +4068,7 @@ Expected: < 30720. If over: verify no `@wordpress/*` packages leaked into the fr
 - [ ] **Step 3: Commit**
 
 ```bash
-git add src/frontend/style.scss src/frontend.js
+git add src/frontend/frontend-style.scss src/frontend.js includes/Frontend/FrontendAssets.php
 git commit -m "feat: front-end theme (custom-prop tokens, sticky summary, RTL-safe)"
 ```
 
@@ -4061,9 +4112,9 @@ git commit -m "feat: pro gating filters + single contextual upsell tab"
 
 **Files:**
 - Create: `includes/Admin/ReviewNudge.php`, `uninstall.php`
-- Modify: `includes/Admin/RestController.php` (global settings route), `src/builder/CalculatorList.jsx`
+- Modify: `includes/Admin/RestController.php` (global settings route), `src/builder/CalculatorList.jsx`, `includes/Plugin.php` (wire ReviewNudge + the `admin_post_alc_dismiss_review` handler)
 
-- [ ] **Step 1: `ReviewNudge.php`** — `admin_notices` on our admin page only: when `(int) get_option( 'alc_entry_count', 0 ) >= 3` and `! get_option( 'alc_review_dismissed' )`, render a dismissible notice ("Your calculators have collected 3 quote requests — if Alovio Calculator is working for you, a review on WordPress.org helps a lot") with a wp.org review link and a dismiss link hitting `admin_post_alc_dismiss_review` (nonce-checked, sets the option). Shown once ever — the spec's §10 "dismissible, shown once": after first render set a `alc_review_shown` option and condition on it so even un-dismissed it doesn't reappear elsewhere... **No — keep exactly to spec:** dismissible, and once dismissed never again; "shown once" = the dismiss is permanent. Implement: show while count ≥ 3 until dismissed.
+- [ ] **Step 1: `ReviewNudge.php`** — `admin_notices` on our admin page only: when `(int) get_option( 'alc_entry_count', 0 ) >= 3` and `! get_option( 'alc_review_dismissed' )`, render a dismissible notice ("Your calculators have collected 3 quote requests — if Alovio Calculator is working for you, a review on WordPress.org helps a lot") with a wp.org review link and a dismiss link hitting `admin_post_alc_dismiss_review` (nonce-checked, sets the option). Behavior (unambiguous): show while entry count ≥ 3 AND not dismissed; dismissing is permanent. No other variants.
 
 - [ ] **Step 2: Global settings route + UI** — `GET/PUT /alc/v1/settings` (`manage_options`): `{ deleteOnUninstall: bool }` ↔ option `alc_delete_on_uninstall`. In `CalculatorList.jsx` footer add a "Plugin settings" disclosure with the single `ToggleControl` ("Delete all plugin data on uninstall").
 
@@ -4079,13 +4130,16 @@ function alc_uninstall_site(): void {
 	}
 	global $wpdb;
 	$wpdb->query( "DROP TABLE IF EXISTS {$wpdb->prefix}alc_entries" ); // phpcs:ignore WordPress.DB
-	$ids = get_posts( [ 'post_type' => 'alc_calculator', 'post_status' => 'any', 'numberposts' => -1, 'fields' => 'ids' ] );
+	// 'any' would skip trash/auto-draft (exclude_from_search statuses) — query ids directly by post_type.
+	$ids = $wpdb->get_col( $wpdb->prepare( "SELECT ID FROM {$wpdb->posts} WHERE post_type = %s", 'alc_calculator' ) );
 	foreach ( $ids as $id ) {
-		wp_delete_post( $id, true );
+		wp_delete_post( (int) $id, true );
 	}
 	foreach ( [ 'alc_version', 'alc_entry_count', 'alc_review_dismissed', 'alc_delete_on_uninstall' ] as $opt ) {
 		delete_option( $opt );
 	}
+	// Sweep any not-yet-expired rate-limiter transients.
+	$wpdb->query( "DELETE FROM {$wpdb->options} WHERE option_name LIKE '\_transient%alc\_rl\_%'" ); // phpcs:ignore WordPress.DB
 }
 
 if ( is_multisite() ) {
@@ -4116,10 +4170,11 @@ git commit -m "feat: review nudge, opt-in uninstall cleanup, global settings"
 - [ ] **Step 1: Install standards**
 
 ```bash
+composer config allow-plugins.dealerdirect/phpcodesniffer-composer-installer true
 composer require --dev wp-coding-standards/wpcs:"^3.0" dealerdirect/phpcodesniffer-composer-installer:"^1.0" phpcompatibility/phpcompatibility-wp:"^2.1"
 ```
 
-- [ ] **Step 2: Create `phpcs.xml.dist`** — ruleset `WordPress-Extra` + `PHPCompatibilityWP` (`testVersion 7.4-`), scanning `includes/`, `alovio-calculator.php`, `uninstall.php`; exclusions: `WordPress.Files.FileName` (PSR-4 naming), `Generic.Arrays.DisallowShortArraySyntax` if triggered, prefix rules configured for `alc`/`ALC`/`Alovio\Calculator` via `WordPress.NamingConventions.PrefixAllGlobals` properties; text domain check property set to `alovio-calculator`.
+- [ ] **Step 2: Create `phpcs.xml.dist`** — ruleset `WordPress-Extra` + `PHPCompatibilityWP` (`testVersion 7.4-`), scanning `includes/`, `alovio-calculator.php`, `uninstall.php`; exclusions: `WordPress.Files.FileName` (PSR-4 naming), `Universal.Arrays.DisallowShortArraySyntax` (the WPCS ^3.0 sniff name for short arrays — the codebase uses `[]` throughout), prefix rules configured for `alc`/`ALC`/`Alovio\Calculator` via `WordPress.NamingConventions.PrefixAllGlobals` properties; text domain check property set to `alovio-calculator`.
 
 - [ ] **Step 3: Run and fix everything**
 
@@ -4168,7 +4223,8 @@ Run: `npx wp-env start` → a WP sandbox at `http://localhost:8888` (admin/passw
   4. Insert the block in a second page, pick the calculator → ServerSideRender preview shows; front end works identically.
   5. Submit a quote (valid + invalid email + 6 rapid submissions) → 201/400/429 behaviors; entry visible in Entries view with correct snapshot/total; `npx wp-env run cli wp eval 'var_dump(get_option("alc_entry_count"));'` increments; review nudge appears at ≥3.
   6. CSV export downloads with correct columns; privacy export/erase by the test email works from Tools → Export/Erase Personal Data.
-  7. Uninstall toggle on → delete plugin via admin → table + CPT + options gone; toggle off → data retained.
+  7. Builder round-trip (the most-used path — the PUT route's only exercise): change the Express price 50→60 in the builder, Save, reload the builder AND the front page → both reflect 60 and FieldSchema re-normalization didn't mangle anything; mark an entry read, then delete it (Task 30's actions).
+  8. Uninstall toggle on → delete plugin via admin → table + CPT + options gone; toggle off → data retained.
 - [ ] **Step 3: Write `docs/qa-checklist.md`** capturing the matrix for every release (spec §13): the smoke above + caching plugins (LiteSpeed Cache, WP Rocket if licensed, Autoptimize: JS defer/minify on → calculator still computes, quote still submits) + themes (Astra, Kadence, GeneratePress, Twenty Twenty-Five, Hello) + `define('SCRIPT_DEBUG', true)` console-clean check + keyboard-only walkthrough (tab order, slider arrows, toggle space, submit) + a screen-reader pass on the total announcement (`aria-live`).
 
 - [ ] **Step 4: Commit**
