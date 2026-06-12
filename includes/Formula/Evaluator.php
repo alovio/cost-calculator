@@ -22,7 +22,7 @@ final class Evaluator {
 
 			case 'field':
 				if ( ! array_key_exists( $ast['id'], $values ) ) {
-					throw new FormulaError( 'unknown_field', 'Unknown field: ' . $ast['id'] );
+					throw new FormulaError( 'unknown_field', 'Unknown field' );
 				}
 				return $values[ $ast['id'] ];
 
@@ -79,7 +79,7 @@ final class Evaluator {
 
 	private function call( string $name, array $args, array $values ): int {
 		if ( ! isset( $this->functions[ $name ] ) ) {
-			throw new FormulaError( 'unknown_function', 'Unknown function: ' . $name );
+			throw new FormulaError( 'unknown_function', 'Unknown function' );
 		}
 
 		if ( 'if' === $name ) { // Lazy: only the taken branch is evaluated.
@@ -105,6 +105,6 @@ final class Evaluator {
 				return abs( $vals[0] );
 		}
 
-		throw new FormulaError( 'unknown_function', 'No evaluator for function: ' . $name );
+		throw new FormulaError( 'unknown_function', 'No evaluator for this function' );
 	}
 }

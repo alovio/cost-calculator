@@ -15,6 +15,14 @@ class FormulaError extends \RuntimeException {
 		$this->position  = $position;
 	}
 
+	/**
+	 * Positioned-throw factory. Exists so throw sites avoid `throw new` with a
+	 * variable argument, which WPCS's ExceptionNotEscaped flags even for ints.
+	 */
+	public static function at( string $errorCode, string $message, int $position ): self {
+		return new self( $errorCode, $message, $position );
+	}
+
 	public function getErrorCode(): string {
 		return $this->errorCode;
 	}

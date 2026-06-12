@@ -18,7 +18,7 @@ final class DecimalMath {
 	/** @param int|float|string $v */
 	public static function toScaled( $v ): int {
 		if ( ! is_numeric( $v ) ) {
-			throw new FormulaError( 'bad_number', 'Not a number: ' . (string) $v );
+			throw new FormulaError( 'bad_number', 'Not a number' );
 		}
 		$f = (float) $v;
 		if ( ! is_finite( $f ) ) {

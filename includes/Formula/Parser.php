@@ -28,7 +28,7 @@ final class Parser {
 		}
 		$ast = $this->expression( 0 );
 		if ( null !== $this->peek() ) {
-			throw new FormulaError( 'syntax', 'Unexpected token', $this->peek()['pos'] );
+			throw FormulaError::at( 'syntax', 'Unexpected token', $this->peek()['pos'] ); // phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped -- static message; position is an integer offset.
 		}
 		return $ast;
 	}
@@ -104,7 +104,7 @@ final class Parser {
 
 			case 'ident':
 				if ( ! isset( $this->functions[ $t['value'] ] ) ) {
-					throw new FormulaError( 'unknown_function', 'Unknown function: ' . $t['value'], $t['pos'] );
+					throw FormulaError::at( 'unknown_function', 'Unknown function', $t['pos'] ); // phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped -- static message; position is an integer offset.
 				}
 				$this->expect( 'lparen', $t['pos'] );
 				$args = [ $this->expression( 0 ) ];
@@ -115,7 +115,7 @@ final class Parser {
 				$this->expect( 'rparen', $t['pos'] );
 				[ $min, $max ] = $this->functions[ $t['value'] ];
 				if ( count( $args ) < $min || count( $args ) > $max ) {
-					throw new FormulaError( 'arity', sprintf( '%s() expects %d-%d arguments', $t['value'], $min, $max ), $t['pos'] );
+					throw FormulaError::at( 'arity', 'Wrong number of function arguments', $t['pos'] ); // phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped -- static message; position is an integer offset.
 				}
 				return [
 					'type' => 'call',
@@ -124,7 +124,7 @@ final class Parser {
 				];
 		}
 
-		throw new FormulaError( 'syntax', 'Unexpected token', $t['pos'] );
+		throw FormulaError::at( 'syntax', 'Unexpected token', $t['pos'] ); // phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped -- static message; position is an integer offset.
 	}
 
 	private function peek(): ?array {
@@ -142,7 +142,7 @@ final class Parser {
 	private function expect( string $type, int $contextPos ): void {
 		$t = $this->next();
 		if ( null === $t || $type !== $t['type'] ) {
-			throw new FormulaError( 'syntax', 'Expected ' . $type, null === $t ? $contextPos : $t['pos'] );
+			throw FormulaError::at( 'syntax', 'Unexpected token', null === $t ? $contextPos : $t['pos'] ); // phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped -- static message; position is an integer offset.
 		}
 	}
 }

@@ -19,7 +19,7 @@ final class Lexer {
 
 			if ( '{' === $c ) {
 				if ( ! preg_match( '/\{([a-z0-9_]+)\}/A', $expr, $m, 0, $i ) ) {
-					throw new FormulaError( 'syntax', 'Malformed field reference', $i );
+					throw FormulaError::at( 'syntax', 'Malformed field reference', $i ); // phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped -- static message; position is an integer offset.
 				}
 				$tokens[] = [
 					'type'  => 'field',
@@ -34,7 +34,7 @@ final class Lexer {
 				preg_match( '/[0-9]+(\.[0-9]+)?/A', $expr, $m, 0, $i );
 				$end = $i + strlen( $m[0] );
 				if ( $end < $len && ( '.' === $expr[ $end ] || preg_match( '/[0-9a-z_]/i', $expr[ $end ] ) ) ) {
-					throw new FormulaError( 'syntax', 'Malformed number', $i );
+					throw FormulaError::at( 'syntax', 'Malformed number', $i ); // phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped -- static message; position is an integer offset.
 				}
 				$tokens[] = [
 					'type'  => 'num',
@@ -112,7 +112,7 @@ final class Lexer {
 				continue;
 			}
 
-			throw new FormulaError( 'syntax', 'Unexpected character: ' . $c, $i );
+			throw FormulaError::at( 'syntax', 'Unexpected character', $i ); // phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped -- static message; position is an integer offset.
 		}
 
 		return $tokens;

@@ -39,13 +39,6 @@
 		</properties>
 	</rule>
 
-	<!-- The formula engine is deliberately WP-free (mirrors the JS twin; esc_html
-	     unavailable). Its exception messages surface only via React (auto-escaped)
-	     or esc_html()'d admin notices. -->
-	<rule ref="WordPress.Security.EscapeOutput.ExceptionNotEscaped">
-		<exclude-pattern>includes/Formula/*</exclude-pattern>
-	</rule>
-
 	<rule ref="PHPCompatibilityWP"/>
 	<config name="testVersion" value="7.4-"/>
 	<config name="minimum_wp_version" value="6.2"/>
