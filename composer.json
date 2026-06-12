@@ -1,0 +1,16 @@
+{
+    "name": "alovio/alovio-calculator",
+    "description": "Alovio Calculator WordPress plugin",
+    "license": "GPL-2.0-or-later",
+    "require": { "php": ">=7.4" },
+    "require-dev": {
+        "phpunit/phpunit": "^9.6",
+        "brain/monkey": "^2.6"
+    },
+    "autoload": {
+        "psr-4": { "Alovio\\Calculator\\": "includes/" }
+    },
+    "autoload-dev": {
+        "psr-4": { "Alovio\\Calculator\\Tests\\": "tests/" }
+    }
+}
