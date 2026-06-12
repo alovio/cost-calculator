@@ -32,7 +32,9 @@ final class FieldRepository {
 
 	public function save( int $post_id, array $config ): array {
 		$normalized = FieldSchema::normalize( $config );
-		update_post_meta( $post_id, self::META_KEY, wp_json_encode( $normalized ) );
+		// wp_slash is mandatory: update_post_meta unslashes its value, which would
+		// eat the backslashes of JSON unicode escapes (e.g. "m²" → ² → u00b2).
+		update_post_meta( $post_id, self::META_KEY, wp_slash( wp_json_encode( $normalized ) ) );
 		return $normalized;
 	}
 }

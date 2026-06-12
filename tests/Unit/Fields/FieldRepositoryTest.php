@@ -17,6 +17,7 @@ class FieldRepositoryTest extends TestCase {
 		Functions\when( 'sanitize_email' )->justReturn( '' );
 		Functions\when( 'wp_kses_post' )->returnArg();
 		Functions\when( 'wp_json_encode' )->alias( 'json_encode' );
+		Functions\when( 'wp_slash' )->returnArg();
 	}
 
 	public function test_get_normalizes_stored_json(): void {
