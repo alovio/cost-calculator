@@ -52,7 +52,7 @@ class CalculatorRendererTest extends TestCase {
 		$this->assertStringContainsString( 'data-alc-id="7"', $html );
 		$payload = $this->payload( $html );
 		$this->assertSame( 7, $payload['calculatorId'] );
-		$this->assertSame( 'https://example.test/wp-json/alc/v1/quote', $payload['quoteEndpoint'] );
+		$this->assertSame( 'https://example.test/wp-json/alovio-calc/v1/quote', $payload['quoteEndpoint'] );
 		$this->assertArrayHasKey( 'currency', $payload['settings'] );
 		$this->assertSame( [ 'name', 'email', 'phone' ], $payload['settings']['quoteForm']['fields'] );
 		$this->assertNotSame( '', $payload['settings']['quoteForm']['successMessage'] ); // default resolved (no wp-i18n in the frontend bundle)

@@ -5,7 +5,7 @@ final class EntriesTable {
 
 	public static function table_name(): string {
 		global $wpdb;
-		return $wpdb->prefix . 'alc_entries';
+		return $wpdb->prefix . 'alovio_calc_entries';
 	}
 
 	/** Spec §5 DDL. Idempotent via dbDelta. */

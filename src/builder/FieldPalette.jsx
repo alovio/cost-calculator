@@ -21,7 +21,7 @@ const LABELS = {
 
 export default function FieldPalette() {
 	const { addField } = useDispatch( STORE );
-	const types = ( window.ALC_BUILDER && window.ALC_BUILDER.fieldTypes ) || FALLBACK;
+	const types = ( window.ALOVIO_CALC_BUILDER && window.ALOVIO_CALC_BUILDER.fieldTypes ) || FALLBACK;
 
 	return (
 		<div className="alc-palette" aria-label={ __( 'Field types', 'alovio-calculator' ) }>

@@ -5,7 +5,7 @@ import { createCalculator } from './api';
 
 
 export default function TemplatePicker( { onClose, onCreated } ) {
-	const templates = ( window.ALC_BUILDER && window.ALC_BUILDER.templates ) || [];
+	const templates = ( window.ALOVIO_CALC_BUILDER && window.ALOVIO_CALC_BUILDER.templates ) || [];
 	const [ title, setTitle ] = useState( '' );
 	const [ selected, setSelected ] = useState( '' ); // '' = blank
 	const [ busy, setBusy ] = useState( false );

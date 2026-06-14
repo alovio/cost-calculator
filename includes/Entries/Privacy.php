@@ -59,7 +59,7 @@ final class Privacy {
 				),
 			);
 			$items[] = array(
-				'group_id'    => 'alc_entries',
+				'group_id'    => 'alovio_calc_entries',
 				'group_label' => __( 'Quote requests', 'alovio-calculator' ),
 				'item_id'     => 'alc-entry-' . $row['id'],
 				'data'        => $data,

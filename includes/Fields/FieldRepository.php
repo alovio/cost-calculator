@@ -3,8 +3,8 @@ namespace Alovio\Calculator\Fields;
 
 final class FieldRepository {
 
-	public const META_KEY  = '_alc_config';
-	public const POST_TYPE = 'alc_calculator';
+	public const META_KEY  = '_alovio_calc_config';
+	public const POST_TYPE = 'alovio_calculator';
 
 	public static function register_post_type(): void {
 		register_post_type(

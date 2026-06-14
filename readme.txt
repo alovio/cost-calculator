@@ -1,5 +1,5 @@
 === Alovio Calculator – Cost, Price & Quote Calculator Builder ===
-Contributors: alovio
+Contributors: 74h1r
 Tags: cost calculator, price calculator, quote calculator, calculator builder, estimation
 Requires at least: 6.2
 Tested up to: 7.0

@@ -28,7 +28,7 @@ final class RestController {
 
 	public function register_routes(): void {
 		register_rest_route(
-			'alc/v1',
+			'alovio-calc/v1',
 			'/calculators',
 			array(
 				array(
@@ -59,7 +59,7 @@ final class RestController {
 			)
 		);
 		register_rest_route(
-			'alc/v1',
+			'alovio-calc/v1',
 			'/calculators/(?P<id>\d+)',
 			array(
 				array(
@@ -87,7 +87,7 @@ final class RestController {
 			)
 		);
 		register_rest_route(
-			'alc/v1',
+			'alovio-calc/v1',
 			'/settings',
 			array(
 				array(
@@ -227,12 +227,12 @@ final class RestController {
 	}
 
 	public function get_settings() {
-		return rest_ensure_response( array( 'deleteOnUninstall' => (bool) get_option( 'alc_delete_on_uninstall' ) ) );
+		return rest_ensure_response( array( 'deleteOnUninstall' => (bool) get_option( 'alovio_calc_delete_on_uninstall' ) ) );
 	}
 
 	/** @param \WP_REST_Request $request */
 	public function update_settings( $request ) {
-		update_option( 'alc_delete_on_uninstall', (bool) $request->get_param( 'deleteOnUninstall' ) );
+		update_option( 'alovio_calc_delete_on_uninstall', (bool) $request->get_param( 'deleteOnUninstall' ) );
 		return $this->get_settings();
 	}
 

@@ -128,7 +128,7 @@ function Builder( { calculatorId, onBack } ) {
 				tabs={ [
 					{ name: 'fields', title: __( 'Fields', 'alovio-calculator' ) },
 					{ name: 'settings', title: __( 'Settings', 'alovio-calculator' ) },
-					...( window.ALC_BUILDER && window.ALC_BUILDER.isPro
+					...( window.ALOVIO_CALC_BUILDER && window.ALOVIO_CALC_BUILDER.isPro
 						? []
 						: [ { name: 'pro', title: __( 'Pro', 'alovio-calculator' ) } ] ),
 				] }

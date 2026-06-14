@@ -50,11 +50,11 @@ final class Plugin {
 
 	public function activate( bool $network_wide = false ): void {
 		Entries\EntriesTable::install_for_network( $network_wide );
-		update_option( 'alc_version', ALOVIO_CALC_VERSION );
+		update_option( 'alovio_calc_version', ALOVIO_CALC_VERSION );
 	}
 
 	public function init(): void {
-		load_plugin_textdomain( 'alovio-calculator' );
+		// No load_plugin_textdomain(): WordPress.org auto-loads translations since 4.6 (we require 6.2+).
 		Fields\FieldRepository::register_post_type();
 		if ( file_exists( ALOVIO_CALC_DIR . 'build/block/block.json' ) ) {
 			register_block_type(

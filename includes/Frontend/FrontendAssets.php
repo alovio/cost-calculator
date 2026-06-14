@@ -22,10 +22,10 @@ final class FrontendAssets {
 		}
 		$asset = require $asset_file;
 
-		wp_register_script( 'alc-frontend', ALOVIO_CALC_URL . 'build/frontend.js', $asset['dependencies'], $asset['version'], true );
+		wp_register_script( 'alovio-calc-frontend', ALOVIO_CALC_URL . 'build/frontend.js', $asset['dependencies'], $asset['version'], true );
 		if ( file_exists( ALOVIO_CALC_DIR . 'build/frontend.css' ) ) {
-			wp_register_style( 'alc-frontend', ALOVIO_CALC_URL . 'build/frontend.css', array(), $asset['version'] );
-			wp_style_add_data( 'alc-frontend', 'rtl', 'replace' );
+			wp_register_style( 'alovio-calc-frontend', ALOVIO_CALC_URL . 'build/frontend.css', array(), $asset['version'] );
+			wp_style_add_data( 'alovio-calc-frontend', 'rtl', 'replace' );
 		}
 		self::$registered = true;
 	}
@@ -37,7 +37,7 @@ final class FrontendAssets {
 			add_action( 'wp_enqueue_scripts', array( __CLASS__, 'mark_needed' ), 20 );
 			return;
 		}
-		wp_enqueue_script( 'alc-frontend' );
-		wp_enqueue_style( 'alc-frontend' );
+		wp_enqueue_script( 'alovio-calc-frontend' );
+		wp_enqueue_style( 'alovio-calc-frontend' );
 	}
 }

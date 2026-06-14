@@ -25,7 +25,7 @@ final class QuoteController {
 
 	public function register_routes(): void {
 		register_rest_route(
-			'alc/v1',
+			'alovio-calc/v1',
 			'/quote',
 			array(
 				'methods'             => 'POST',
@@ -100,7 +100,7 @@ final class QuoteController {
 		$repo = new EntriesRepository();
 		$repo->insert( EntriesRepository::row_from_submission( $calculator_id, $validated['contact'], $snapshot ) );
 
-		update_option( 'alc_entry_count', (int) get_option( 'alc_entry_count', 0 ) + 1 ); // Review nudge counter (§10).
+		update_option( 'alovio_calc_entry_count', (int) get_option( 'alovio_calc_entry_count', 0 ) + 1 ); // Review nudge counter (§10).
 		( new EntryMailer() )->notify( $post, $config, $validated['contact'], $snapshot );
 
 		return new \WP_REST_Response( array( 'ok' => true ), 201 );
@@ -146,7 +146,7 @@ final class QuoteController {
 
 	private function within_rate_limit(): bool {
 		$ip    = isset( $_SERVER['REMOTE_ADDR'] ) ? (string) $_SERVER['REMOTE_ADDR'] : ''; // REMOTE_ADDR only — spec §10 (X-Forwarded-For is spoofable).
-		$key   = 'alc_rl_' . md5( $ip );
+		$key   = 'alovio_calc_rl_' . md5( $ip );
 		$count = (int) get_transient( $key );
 		if ( $count >= self::RATE_LIMIT ) {
 			return false;

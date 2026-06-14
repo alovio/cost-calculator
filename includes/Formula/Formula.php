@@ -19,7 +19,7 @@ final class Formula {
 	}
 
 	/**
-	 * Filterable in WP context (spec §15: alc_formula_functions); plain default in unit tests.
+	 * Filterable in WP context (spec §15: alovio_calc_formula_functions); plain default in unit tests.
 	 * NOTE for the future Pro add-on: this filter extends what the PARSER accepts; the
 	 * Evaluator has no dispatch for unknown names (safe-0 via unknown_function) — Pro
 	 * will need an evaluation-callback mechanism, not just this filter.

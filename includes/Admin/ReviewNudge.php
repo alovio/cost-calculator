@@ -16,7 +16,7 @@ final class ReviewNudge {
 
 	public function register(): void {
 		add_action( 'admin_notices', array( $this, 'maybe_render' ) );
-		add_action( 'admin_post_alc_dismiss_review', array( $this, 'dismiss' ) );
+		add_action( 'admin_post_alovio_calc_dismiss_review', array( $this, 'dismiss' ) );
 	}
 
 	public function maybe_render(): void {
@@ -24,10 +24,10 @@ final class ReviewNudge {
 		if ( ! $screen || 'toplevel_page_' . AdminPage::SLUG !== $screen->id ) {
 			return;
 		}
-		if ( get_option( 'alc_review_dismissed' ) || (int) get_option( 'alc_entry_count', 0 ) < self::THRESHOLD ) {
+		if ( get_option( 'alovio_calc_review_dismissed' ) || (int) get_option( 'alovio_calc_entry_count', 0 ) < self::THRESHOLD ) {
 			return;
 		}
-		$dismiss_url = wp_nonce_url( admin_url( 'admin-post.php?action=alc_dismiss_review' ), 'alc_dismiss_review' );
+		$dismiss_url = wp_nonce_url( admin_url( 'admin-post.php?action=alovio_calc_dismiss_review' ), 'alovio_calc_dismiss_review' );
 		printf(
 			'<div class="notice notice-info"><p>%s</p><p><a class="button button-primary" href="%s" target="_blank" rel="noopener noreferrer">%s</a> <a href="%s">%s</a></p></div>',
 			esc_html__( 'Your calculators have collected 3 quote requests 🎉 If Alovio Calculator is working for you, a review on WordPress.org helps a lot.', 'alovio-calculator' ),
@@ -42,8 +42,8 @@ final class ReviewNudge {
 		if ( ! current_user_can( 'manage_options' ) ) {
 			wp_die( esc_html__( 'Insufficient permissions.', 'alovio-calculator' ) );
 		}
-		check_admin_referer( 'alc_dismiss_review' );
-		update_option( 'alc_review_dismissed', 1 );
+		check_admin_referer( 'alovio_calc_dismiss_review' );
+		update_option( 'alovio_calc_review_dismissed', 1 );
 		wp_safe_redirect( admin_url( 'admin.php?page=' . AdminPage::SLUG ) );
 		exit;
 	}

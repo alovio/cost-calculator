@@ -12,7 +12,7 @@ export default function Edit( { attributes, setAttributes } ) {
 	const [ calculators, setCalculators ] = useState( null );
 
 	useEffect( () => {
-		apiFetch( { path: 'alc/v1/calculators' } )
+		apiFetch( { path: 'alovio-calc/v1/calculators' } )
 			.then( setCalculators )
 			.catch( () => setCalculators( [] ) );
 	}, [] );

@@ -43,7 +43,7 @@ class FieldRepositoryTest extends TestCase {
 		} );
 		( new FieldRepository() )->save( 7, [ 'fields' => [ [ 'id' => 'a', 'type' => 'number', 'label' => 'A' ] ] ] );
 		$this->assertSame( 7, $captured[0] );
-		$this->assertSame( '_alc_config', $captured[1] );
+		$this->assertSame( '_alovio_calc_config', $captured[1] );
 		$decoded = json_decode( $captured[2], true );
 		$this->assertSame( 1, $decoded['schemaVersion'] );
 	}

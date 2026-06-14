@@ -41,7 +41,7 @@ export default function EntriesList( { onBack } ) {
 		}
 	};
 
-	const exportUrl = `${ window.ALC_BUILDER.adminPost }?action=alc_export_entries&calculator=${ calculator }&_wpnonce=${ window.ALC_BUILDER.exportNonce }`;
+	const exportUrl = `${ window.ALOVIO_CALC_BUILDER.adminPost }?action=alovio_calc_export_entries&calculator=${ calculator }&_wpnonce=${ window.ALOVIO_CALC_BUILDER.exportNonce }`;
 	const pages = data ? Math.max( 1, Math.ceil( data.total / PER_PAGE ) ) : 1;
 
 	return (

@@ -21,7 +21,7 @@ final class EntriesRestController {
 
 	public function register_routes(): void {
 		register_rest_route(
-			'alc/v1',
+			'alovio-calc/v1',
 			'/entries',
 			array(
 				'methods'             => 'GET',
@@ -47,7 +47,7 @@ final class EntriesRestController {
 			)
 		);
 		register_rest_route(
-			'alc/v1',
+			'alovio-calc/v1',
 			'/entries/(?P<id>\d+)',
 			array(
 				array(

@@ -10,7 +10,7 @@ final class CsvExporter {
 	private const COLUMNS = array( 'id', 'calculator_id', 'created_at', 'name', 'email', 'phone', 'message', 'total', 'status', 'snapshot' );
 
 	public function register(): void {
-		add_action( 'admin_post_alc_export_entries', array( $this, 'handle' ) );
+		add_action( 'admin_post_alovio_calc_export_entries', array( $this, 'handle' ) );
 	}
 
 	/** Pure, unit-tested: RFC-4180 quoting, newlines flattened, Excel formula-injection guarded. */
@@ -34,7 +34,7 @@ final class CsvExporter {
 		if ( ! current_user_can( 'manage_options' ) ) {
 			wp_die( esc_html__( 'Insufficient permissions.', 'alovio-calculator' ) );
 		}
-		check_admin_referer( 'alc_export_entries' );
+		check_admin_referer( 'alovio_calc_export_entries' );
 
 		$calculator = isset( $_GET['calculator'] ) ? absint( $_GET['calculator'] ) : 0;
 		$rows       = ( new EntriesRepository() )->all_for_export( $calculator );
