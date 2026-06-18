@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+  html, body { margin: 0; padding: 0; }
+  body {
+    width: 100vw; height: 100vh;
+    background: linear-gradient(135deg, #2f7bff 0%, #0a4fd6 100%);
+    display: grid; place-items: center; overflow: hidden;
+  }
+  .inner { display: flex; flex-direction: column; align-items: center; }
+  /* calculator display bar */
+  .disp { width: 48vmin; height: 13vmin; background: #fff; border-radius: 3vmin; margin-bottom: 8vmin;
+          box-shadow: 0 1.5vmin 4vmin rgba(0,0,0,.18); }
+  /* 3×2 keypad */
+  .keys { display: grid; grid-template-columns: repeat(3, 12vmin); gap: 5.5vmin; }
+  .keys i { width: 12vmin; height: 12vmin; background: rgba(255,255,255,.96); border-radius: 3vmin; }
+  .keys i.acc { background: #9cc4ff; }
+</style>
+</head>
+<body>
+  <div class="inner">
+    <div class="disp"></div>
+    <div class="keys">
+      <i></i><i></i><i class="acc"></i>
+      <i></i><i class="acc"></i><i></i>
+    </div>
+  </div>
+</body>
+</html>
