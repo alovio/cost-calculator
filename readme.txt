@@ -87,6 +87,7 @@ PHP 7.4 and newer, including PHP 8.4.
 
 = 1.1.2 =
 * Added a "Check for updates" link on the Plugins screen that asks WordPress to re-check WordPress.org for a new version right away.
+* The plugin's row on the Plugins screen now links to the Pro upgrade.
 
 = 1.1.1 =
 * The 6 themes are now full, distinct designs rather than colour variants: Classic (studio card), Minimal (editorial ledger), Midnight (dark glass), Soft (rounded pastel), Bold (neo-brutalist), Slate (compact dashboard) — each with its own layout, typography and components.
