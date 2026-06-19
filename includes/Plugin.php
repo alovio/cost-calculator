@@ -45,6 +45,7 @@ final class Plugin {
 		( new Frontend\Shortcode() )->register();
 		( new Frontend\FrontendAssets() )->register();
 		( new Admin\ReviewNudge() )->register();
+		( new Admin\UpdateCheck() )->register();
 		Pro\ProModule::register();
 	}
 
