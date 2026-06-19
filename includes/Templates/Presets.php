@@ -544,6 +544,438 @@ final class Presets {
 					],
 				],
 			],
+			'construction-estimate' => [
+				'title'       => __( 'Construction Cost Calculator', 'alovio-calculator' ),
+				'description' => __( 'Per-square-meter build estimate by project type, floors and permits.', 'alovio-calculator' ),
+				'config'      => [
+					'schemaVersion' => 1,
+					'fields'        => [
+						[
+							'id'            => 'area',
+							'type'          => 'slider',
+							'label'         => __( 'Floor area (m²)', 'alovio-calculator' ),
+							'min'           => 50,
+							'max'           => 1000,
+							'step'          => 10,
+							'default'       => 120,
+							'showInSummary' => true,
+						],
+						[
+							'id'            => 'project',
+							'type'          => 'radio',
+							'label'         => __( 'Project type', 'alovio-calculator' ),
+							'showInSummary' => true,
+							'options'       => [
+								[
+									'value' => 'opt_new',
+									'label' => __( 'New build', 'alovio-calculator' ),
+									'price' => 1200,
+								],
+								[
+									'value' => 'opt_reno',
+									'label' => __( 'Renovation', 'alovio-calculator' ),
+									'price' => 650,
+								],
+								[
+									'value' => 'opt_ext',
+									'label' => __( 'Extension', 'alovio-calculator' ),
+									'price' => 900,
+								],
+							],
+						],
+						[
+							'id'            => 'floors',
+							'type'          => 'quantity',
+							'label'         => __( 'Floors', 'alovio-calculator' ),
+							'min'           => 1,
+							'max'           => 4,
+							'default'       => 1,
+							'showInSummary' => true,
+						],
+						[
+							'id'            => 'permit',
+							'type'          => 'toggle',
+							'label'         => __( 'Permit handling', 'alovio-calculator' ),
+							'price'         => 2500,
+							'showInSummary' => true,
+						],
+						[
+							'id'              => 'permit_note',
+							'type'            => 'heading',
+							'label'           => __( 'Permit handling includes drawings and council submission.', 'alovio-calculator' ),
+							'conditions'      => [
+								[
+									'field'    => 'permit',
+									'operator' => 'is',
+									'value'    => '1',
+								],
+							],
+							'conditionMatch'  => 'all',
+							'conditionAction' => 'show',
+						],
+						[
+							'id'            => 'total',
+							'type'          => 'formula',
+							'label'         => __( 'Estimated cost', 'alovio-calculator' ),
+							'showInSummary' => true,
+							'expression'    => 'round({area} * {project} * {floors} + {permit}, 0)',
+						],
+					],
+					'settings'      => [
+						'quoteForm' => [
+							'enabled' => true,
+							'fields'  => [ 'name', 'email', 'phone' ],
+						],
+					],
+				],
+			],
+			'solar-quote' => [
+				'title'       => __( 'Solar Panel Quote Calculator', 'alovio-calculator' ),
+				'description' => __( 'System size, panel tier, battery and roof type — instant install quote.', 'alovio-calculator' ),
+				'config'      => [
+					'schemaVersion' => 1,
+					'fields'        => [
+						[
+							'id'            => 'size',
+							'type'          => 'slider',
+							'label'         => __( 'System size (kW)', 'alovio-calculator' ),
+							'min'           => 2,
+							'max'           => 20,
+							'step'          => 0.5,
+							'default'       => 6,
+							'showInSummary' => true,
+						],
+						[
+							'id'            => 'panel',
+							'type'          => 'radio',
+							'label'         => __( 'Panel tier', 'alovio-calculator' ),
+							'showInSummary' => true,
+							'options'       => [
+								[
+									'value' => 'opt_std',
+									'label' => __( 'Standard', 'alovio-calculator' ),
+									'price' => 900,
+								],
+								[
+									'value' => 'opt_prem',
+									'label' => __( 'Premium', 'alovio-calculator' ),
+									'price' => 1300,
+								],
+							],
+						],
+						[
+							'id'            => 'roof',
+							'type'          => 'radio',
+							'label'         => __( 'Roof type', 'alovio-calculator' ),
+							'showInSummary' => true,
+							'options'       => [
+								[
+									'value' => 'opt_tile',
+									'label' => __( 'Tile', 'alovio-calculator' ),
+									'price' => 0,
+								],
+								[
+									'value' => 'opt_metal',
+									'label' => __( 'Metal', 'alovio-calculator' ),
+									'price' => 300,
+								],
+								[
+									'value' => 'opt_flat',
+									'label' => __( 'Flat', 'alovio-calculator' ),
+									'price' => 600,
+								],
+							],
+						],
+						[
+							'id'            => 'battery',
+							'type'          => 'toggle',
+							'label'         => __( 'Battery storage', 'alovio-calculator' ),
+							'price'         => 4500,
+							'showInSummary' => true,
+						],
+						[
+							'id'              => 'battery_note',
+							'type'            => 'heading',
+							'label'           => __( 'Battery storage may qualify for additional local rebates.', 'alovio-calculator' ),
+							'conditions'      => [
+								[
+									'field'    => 'battery',
+									'operator' => 'is',
+									'value'    => '1',
+								],
+							],
+							'conditionMatch'  => 'all',
+							'conditionAction' => 'show',
+						],
+						[
+							'id'            => 'total',
+							'type'          => 'formula',
+							'label'         => __( 'Estimated install', 'alovio-calculator' ),
+							'showInSummary' => true,
+							'expression'    => 'round({size} * {panel} + {battery} + {roof}, 0)',
+						],
+					],
+					'settings'      => [
+						'quoteForm' => [
+							'enabled' => true,
+							'fields'  => [ 'name', 'email', 'phone' ],
+						],
+					],
+				],
+			],
+			'landscaping-quote' => [
+				'title'       => __( 'Landscaping Quote Calculator', 'alovio-calculator' ),
+				'description' => __( 'Garden area, service level, trees and irrigation — instant lawn-care quote.', 'alovio-calculator' ),
+				'config'      => [
+					'schemaVersion' => 1,
+					'fields'        => [
+						[
+							'id'            => 'area',
+							'type'          => 'slider',
+							'label'         => __( 'Garden area (m²)', 'alovio-calculator' ),
+							'min'           => 20,
+							'max'           => 2000,
+							'step'          => 10,
+							'default'       => 200,
+							'showInSummary' => true,
+						],
+						[
+							'id'            => 'service',
+							'type'          => 'radio',
+							'label'         => __( 'Service level', 'alovio-calculator' ),
+							'showInSummary' => true,
+							'options'       => [
+								[
+									'value' => 'opt_mow',
+									'label' => __( 'Mowing only', 'alovio-calculator' ),
+									'price' => 0.5,
+								],
+								[
+									'value' => 'opt_full',
+									'label' => __( 'Full maintenance', 'alovio-calculator' ),
+									'price' => 1.2,
+								],
+								[
+									'value' => 'opt_design',
+									'label' => __( 'Design & planting', 'alovio-calculator' ),
+									'price' => 3,
+								],
+							],
+						],
+						[
+							'id'            => 'trees',
+							'type'          => 'quantity',
+							'label'         => __( 'Trees to prune', 'alovio-calculator' ),
+							'min'           => 0,
+							'max'           => 50,
+							'default'       => 0,
+							'showInSummary' => true,
+						],
+						[
+							'id'            => 'irrigation',
+							'type'          => 'toggle',
+							'label'         => __( 'Install irrigation', 'alovio-calculator' ),
+							'price'         => 1200,
+							'showInSummary' => true,
+						],
+						[
+							'id'              => 'irrigation_note',
+							'type'            => 'heading',
+							'label'           => __( 'Irrigation install includes a timer and a 12-month warranty.', 'alovio-calculator' ),
+							'conditions'      => [
+								[
+									'field'    => 'irrigation',
+									'operator' => 'is',
+									'value'    => '1',
+								],
+							],
+							'conditionMatch'  => 'all',
+							'conditionAction' => 'show',
+						],
+						[
+							'id'            => 'total',
+							'type'          => 'formula',
+							'label'         => __( 'Estimated quote', 'alovio-calculator' ),
+							'showInSummary' => true,
+							'expression'    => 'round({area} * {service} + {trees} * 25 + {irrigation}, 0)',
+						],
+					],
+					'settings'      => [
+						'quoteForm' => [
+							'enabled' => true,
+							'fields'  => [ 'name', 'email', 'phone' ],
+						],
+					],
+				],
+			],
+			'catering-quote' => [
+				'title'       => __( 'Catering Quote Calculator', 'alovio-calculator' ),
+				'description' => __( 'Guests, menu tier, drinks and staff — instant catering quote per head.', 'alovio-calculator' ),
+				'config'      => [
+					'schemaVersion' => 1,
+					'fields'        => [
+						[
+							'id'            => 'guests',
+							'type'          => 'slider',
+							'label'         => __( 'Guests', 'alovio-calculator' ),
+							'min'           => 10,
+							'max'           => 500,
+							'step'          => 5,
+							'default'       => 50,
+							'showInSummary' => true,
+						],
+						[
+							'id'            => 'menu',
+							'type'          => 'radio',
+							'label'         => __( 'Menu', 'alovio-calculator' ),
+							'showInSummary' => true,
+							'options'       => [
+								[
+									'value' => 'opt_buffet',
+									'label' => __( 'Buffet', 'alovio-calculator' ),
+									'price' => 25,
+								],
+								[
+									'value' => 'opt_plated',
+									'label' => __( 'Plated', 'alovio-calculator' ),
+									'price' => 45,
+								],
+								[
+									'value' => 'opt_prem',
+									'label' => __( 'Premium', 'alovio-calculator' ),
+									'price' => 75,
+								],
+							],
+						],
+						[
+							'id'            => 'drinks',
+							'type'          => 'toggle',
+							'label'         => __( 'Open bar package', 'alovio-calculator' ),
+							'price'         => 800,
+							'showInSummary' => true,
+						],
+						[
+							'id'            => 'staff',
+							'type'          => 'quantity',
+							'label'         => __( 'Serving staff', 'alovio-calculator' ),
+							'min'           => 0,
+							'max'           => 20,
+							'default'       => 0,
+							'showInSummary' => true,
+						],
+						[
+							'id'              => 'drinks_note',
+							'type'            => 'heading',
+							'label'           => __( 'The open bar package covers a 4-hour service window.', 'alovio-calculator' ),
+							'conditions'      => [
+								[
+									'field'    => 'drinks',
+									'operator' => 'is',
+									'value'    => '1',
+								],
+							],
+							'conditionMatch'  => 'all',
+							'conditionAction' => 'show',
+						],
+						[
+							'id'            => 'total',
+							'type'          => 'formula',
+							'label'         => __( 'Estimated quote', 'alovio-calculator' ),
+							'showInSummary' => true,
+							'expression'    => 'round({guests} * {menu} + {drinks} + {staff} * 150, 0)',
+						],
+					],
+					'settings'      => [
+						'quoteForm' => [
+							'enabled' => true,
+							'fields'  => [ 'name', 'email', 'phone' ],
+						],
+					],
+				],
+			],
+			'flooring-cost' => [
+				'title'       => __( 'Flooring Cost Calculator', 'alovio-calculator' ),
+				'description' => __( 'Area, material, underlay and removal — instant flooring or tiling cost.', 'alovio-calculator' ),
+				'config'      => [
+					'schemaVersion' => 1,
+					'fields'        => [
+						[
+							'id'            => 'area',
+							'type'          => 'slider',
+							'label'         => __( 'Area (m²)', 'alovio-calculator' ),
+							'min'           => 5,
+							'max'           => 300,
+							'step'          => 1,
+							'default'       => 30,
+							'showInSummary' => true,
+						],
+						[
+							'id'            => 'material',
+							'type'          => 'radio',
+							'label'         => __( 'Material', 'alovio-calculator' ),
+							'showInSummary' => true,
+							'options'       => [
+								[
+									'value' => 'opt_lam',
+									'label' => __( 'Laminate', 'alovio-calculator' ),
+									'price' => 22,
+								],
+								[
+									'value' => 'opt_hard',
+									'label' => __( 'Hardwood', 'alovio-calculator' ),
+									'price' => 60,
+								],
+								[
+									'value' => 'opt_tile',
+									'label' => __( 'Tile', 'alovio-calculator' ),
+									'price' => 40,
+								],
+							],
+						],
+						[
+							'id'            => 'underlay',
+							'type'          => 'toggle',
+							'label'         => __( 'Premium underlay', 'alovio-calculator' ),
+							'price'         => 200,
+							'showInSummary' => true,
+						],
+						[
+							'id'            => 'removal',
+							'type'          => 'toggle',
+							'label'         => __( 'Remove old floor', 'alovio-calculator' ),
+							'price'         => 300,
+							'showInSummary' => true,
+						],
+						[
+							'id'              => 'removal_note',
+							'type'            => 'heading',
+							'label'           => __( 'Removal includes haul-away of the old floor and surface prep.', 'alovio-calculator' ),
+							'conditions'      => [
+								[
+									'field'    => 'removal',
+									'operator' => 'is',
+									'value'    => '1',
+								],
+							],
+							'conditionMatch'  => 'all',
+							'conditionAction' => 'show',
+						],
+						[
+							'id'            => 'total',
+							'type'          => 'formula',
+							'label'         => __( 'Estimated cost', 'alovio-calculator' ),
+							'showInSummary' => true,
+							'expression'    => 'round({area} * {material} + {underlay} + {removal}, 0)',
+						],
+					],
+					'settings'      => [
+						'quoteForm' => [
+							'enabled' => true,
+							'fields'  => [ 'name', 'email', 'phone' ],
+						],
+					],
+				],
+			],
 		];
 	}
 }

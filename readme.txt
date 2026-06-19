@@ -4,7 +4,7 @@ Tags: cost calculator, price calculator, quote calculator, calculator builder, e
 Requires at least: 6.2
 Tested up to: 7.0
 Requires PHP: 7.4
-Stable tag: 1.0.0
+Stable tag: 1.1.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -12,7 +12,7 @@ Cost, price and quote calculators with live totals. Conditional logic free, deci
 
 == Description ==
 
-**Alovio Calculator** is a calculator-first form builder: give visitors an instant, accurate price while you collect the lead. Build a moving cost calculator, a cleaning price calculator, a print quote, an agency estimate, salon pricing or a rental cost calculator in minutes — start from a template, tweak the prices, paste a shortcode.
+**Alovio Calculator** is a calculator-first form builder: give visitors an instant, accurate price while you collect the lead. Build a cost calculator, a price estimate or an instant quote for almost any service — cleaning, moving, construction and renovation, solar panels, landscaping, catering, flooring and tiling, print, agencies, salons or equipment rental — in minutes. Start from a ready template, tweak the prices, and paste a shortcode.
 
 **Conditional logic is free.** Show or hide any field based on another field — sliders, dropdowns, toggles, quantities — with AND/OR rules. No upgrade wall in front of the feature a quote calculator actually needs.
 
@@ -25,7 +25,7 @@ Cost, price and quote calculators with live totals. Conditional logic free, deci
 * Formula fields with `+ − × ÷`, `if()`, `min`, `max`, `round`, `ceil`, `floor`, `abs` — validated live as you type
 * Conditional logic (show/hide, AND/OR, all operators) — free
 * Quote requests: name/email/phone/message form, entries stored in your dashboard, email notification, CSV export
-* 6 ready templates: cleaning price, moving cost, print quote, agency estimate, salon pricing, rental cost
+* 11 ready templates: cleaning price, moving cost, construction cost, solar panel quote, landscaping quote, catering quote, flooring cost, print quote, agency estimate, salon pricing, rental cost
 * Gutenberg block and `[alovio_calculator id="…"]` shortcode
 * Currency formatting you control (symbol, position, separators, decimals)
 * GDPR-friendly: no external requests, no IP storage, personal-data export/erase integration
@@ -53,6 +53,10 @@ No, by design. Alovio Calculator generates quotes and collects leads. Connect th
 
 Yes. Calculations use exact fixed-point decimal arithmetic (no floating-point drift), and the same engine runs in the browser preview and on the server — verified against a shared parity test suite on every release. The server independently recomputes every submitted quote.
 
+= Is this a free alternative to Cost Calculator Builder? =
+
+Yes — and the feature most calculators paywall, conditional logic, is free here. If you are comparing against Cost Calculator Builder, Calculated Fields Form or a similar plugin, Alovio Calculator gives you show/hide rules with AND/OR matching, a decimal-safe formula engine and lead capture in the free version. Start from one of the 11 templates and you will usually have a working calculator in about ten minutes.
+
 = Can I migrate from another calculator plugin? =
 
 There is no automated importer yet, but the template gallery plus drag-and-drop builder makes rebuilding a typical calculator a 10-minute job. An importer is on the roadmap.
@@ -74,11 +78,15 @@ PHP 7.4 and newer, including PHP 8.4.
 1. Drag-and-drop builder with live formula validation
 2. Cleaning price calculator on the front end with sticky quote summary
 3. Conditional logic editor — show/hide any field with AND/OR rules
-4. Template gallery: six ready-made calculators
+4. Template gallery: eleven ready-made calculators
 5. Quote entries dashboard with CSV export
 6. Per-calculator settings: currency, accent color, quote form
 
 == Changelog ==
+
+= 1.1.0 =
+* Added 5 new starter templates: construction cost, solar panel quote, landscaping quote, catering quote, and flooring/tiling cost — 11 in total, each demonstrating conditional logic.
+* Documentation and readme refinements.
 
 = 1.0.0 =
 * Initial release: drag-and-drop calculator builder, decimal-safe formula engine (PHP+JS parity), free conditional logic, quote entries with CSV export and privacy tools, 6 templates, block + shortcode.

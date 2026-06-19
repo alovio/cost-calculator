@@ -20,9 +20,9 @@ class PresetsTest extends TestCase {
 		Functions\when( 'wp_kses_post' )->returnArg();
 	}
 
-	public function test_six_presets_exist(): void {
+	public function test_all_presets_exist(): void {
 		$this->assertSame(
-			[ 'cleaning-price', 'moving-cost', 'print-quote', 'agency-estimate', 'salon-pricing', 'rental-cost' ],
+			[ 'cleaning-price', 'moving-cost', 'print-quote', 'agency-estimate', 'salon-pricing', 'rental-cost', 'construction-estimate', 'solar-quote', 'landscaping-quote', 'catering-quote', 'flooring-cost' ],
 			array_keys( Presets::all() )
 		);
 	}
