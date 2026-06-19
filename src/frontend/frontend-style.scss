@@ -18,6 +18,7 @@
 	--alc-button-text: #ffffff;
 	--alc-shadow: none;
 
+	box-sizing: border-box; /* the element itself (the * rule below only covers descendants) — keeps inline-size:100% + padding within the container */
 	display: grid;
 	grid-template-columns: 1fr 280px;
 	gap: 24px;
@@ -31,58 +32,6 @@
 		box-sizing: border-box;
 	}
 
-	/* ── Theme presets ───────────────────────────────────────────────────── */
-	&.alc-theme--minimal {
-		--alc-radius: 4px;
-		--alc-field-bg: transparent;
-		--alc-border: #d6d6dc;
-		--alc-surface: transparent;
-		--alc-surface-border: #ececef;
-		--alc-divider: #ececef;
-	}
-
-	&.alc-theme--midnight {
-		--alc-text: #e6e8eb;
-		--alc-muted: #9aa0a6;
-		--alc-field-bg: #1c1f24;
-		--alc-border: #343a40;
-		--alc-surface: #16181c;
-		--alc-surface-border: #2a2f36;
-		--alc-divider: #2a2f36;
-		--alc-button-text: #0c0a09;
-		color-scheme: dark; /* dark-aware native checkbox/radio/range */
-	}
-
-	&.alc-theme--soft {
-		--alc-radius: 14px;
-		--alc-field-bg: #ffffff;
-		--alc-border: #e7e7ee;
-		--alc-surface: #f6f7fb;
-		--alc-surface-border: #ebecf3;
-		--alc-divider: #ebecf3;
-		--alc-shadow: 0 6px 22px rgba(20, 20, 50, 0.07);
-	}
-
-	&.alc-theme--bold {
-		--alc-radius: 6px;
-		--alc-text: #0f172a;
-		--alc-muted: #475569;
-		--alc-field-bg: #ffffff;
-		--alc-border: #0f172a;
-		--alc-surface: #ffffff;
-		--alc-surface-border: #0f172a;
-		--alc-divider: #cbd5e1;
-	}
-
-	&.alc-theme--slate {
-		--alc-text: #334155;
-		--alc-muted: #64748b;
-		--alc-field-bg: #ffffff;
-		--alc-border: #cbd5e1;
-		--alc-surface: #f8fafc;
-		--alc-surface-border: #e2e8f0;
-		--alc-divider: #e2e8f0;
-	}
 }
 
 .alc-field {
@@ -308,4 +257,2911 @@
 .alc-field--required legend::after {
 	content: ' *';
 	color: var(--alc-accent);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   Theme redesigns — each is a full, self-contained design (not a recolor).
+   Scoped to .alc-calculator.alc-theme--<id>. Base block above is the floor.
+   ═══════════════════════════════════════════════════════════════════════ */
+
+/* ============================================================
+   THEME: classic — "Studio Card"
+   A polished SaaS product card. One elevated white card holds a
+   clean form (left) and a soft accent-tinted summary panel (right),
+   separated by a header rule. Premium-default, trustworthy.
+   Every selector scoped to .alc-calculator.alc-theme--classic
+   ============================================================ */
+
+.alc-calculator.alc-theme--classic {
+	--alc-accent: #f97316; /* fallback if inline var absent */
+	--clc-ink: #0f172a;
+	--clc-muted: #64748b;
+	--clc-faint: #94a3b8;
+	--clc-line: #e7eaf0;
+	--clc-line-soft: #eef1f6;
+	--clc-card: #ffffff;
+	--clc-field-bg: #f8fafc;
+	--clc-field-bg-focus: #ffffff;
+	--clc-panel: color-mix(in srgb, var(--alc-accent) 7%, #ffffff);
+	--clc-panel-edge: color-mix(in srgb, var(--alc-accent) 22%, #ffffff);
+	--clc-radius: 16px;
+	--clc-radius-sm: 10px;
+
+	box-sizing: border-box;
+	display: grid;
+	grid-template-columns: minmax(0, 1.55fr) minmax(260px, 0.95fr);
+	grid-template-areas:
+		"fields summary"
+		"quote  summary";
+	align-items: start;
+	gap: clamp(20px, 3vw, 40px);
+
+	inline-size: 100%;
+	max-inline-size: 920px;
+	margin-inline: auto;
+	padding: clamp(22px, 3vw, 38px);
+
+	background: var(--clc-card);
+	border: 1px solid var(--clc-line);
+	border-radius: calc(var(--clc-radius) + 6px);
+	box-shadow:
+		0 1px 2px rgba(15, 23, 42, 0.04),
+		0 18px 40px -24px rgba(15, 23, 42, 0.28);
+
+	color: var(--clc-ink);
+	font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+	font-size: 15px;
+	line-height: 1.5;
+	-webkit-font-smoothing: antialiased;
+}
+
+.alc-calculator.alc-theme--classic *,
+.alc-calculator.alc-theme--classic *::before,
+.alc-calculator.alc-theme--classic *::after {
+	box-sizing: border-box;
+}
+
+/* ---- FIELDS column: the clean form ---- */
+.alc-calculator.alc-theme--classic .alc-fields {
+	grid-area: fields;
+	display: flex;
+	flex-direction: column;
+	gap: 18px;
+	/* header rule under the form region */
+	border-block-end: 1px solid var(--clc-line-soft);
+	padding-block-end: clamp(20px, 2.5vw, 28px);
+}
+
+.alc-calculator.alc-theme--classic .alc-field {
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+	margin: 0;
+}
+
+.alc-calculator.alc-theme--classic .alc-field > label,
+.alc-calculator.alc-theme--classic .alc-field legend {
+	font-size: 12.5px;
+	font-weight: 600;
+	letter-spacing: 0.01em;
+	color: var(--clc-muted);
+	padding: 0;
+}
+
+/* text + number inputs */
+.alc-calculator.alc-theme--classic .alc-field--text input[type="text"],
+.alc-calculator.alc-theme--classic .alc-field--quantity input[type="number"] {
+	inline-size: 100%;
+	font: inherit;
+	color: var(--clc-ink);
+	padding: 11px 13px;
+	background: var(--clc-field-bg);
+	border: 1px solid var(--clc-line);
+	border-radius: var(--clc-radius-sm);
+	transition: border-color 0.15s ease, background 0.15s ease, box-shadow 0.15s ease;
+}
+.alc-calculator.alc-theme--classic .alc-field--quantity input[type="number"] {
+	max-inline-size: 140px;
+}
+.alc-calculator.alc-theme--classic .alc-field--text input::placeholder {
+	color: var(--clc-faint);
+}
+.alc-calculator.alc-theme--classic .alc-field--text input:focus,
+.alc-calculator.alc-theme--classic .alc-field--quantity input:focus {
+	outline: none;
+	background: var(--clc-field-bg-focus);
+	border-color: var(--alc-accent);
+	box-shadow: 0 0 0 3px color-mix(in srgb, var(--alc-accent) 18%, transparent);
+}
+
+/* ---- SLIDER ---- */
+.alc-calculator.alc-theme--classic .alc-slider {
+	display: flex;
+	align-items: center;
+	gap: 14px;
+}
+.alc-calculator.alc-theme--classic .alc-slider input[type="range"] {
+	flex: 1;
+	min-inline-size: 0;
+	accent-color: var(--alc-accent);
+	block-size: 22px;
+	cursor: pointer;
+}
+.alc-calculator.alc-theme--classic .alc-slider output {
+	flex: none;
+	min-inline-size: 58px;
+	text-align: center;
+	font-variant-numeric: tabular-nums;
+	font-weight: 700;
+	font-size: 14px;
+	color: var(--clc-ink);
+	padding: 6px 10px;
+	background: var(--clc-panel);
+	border: 1px solid var(--clc-panel-edge);
+	border-radius: 999px;
+}
+
+/* ---- RADIO group as pill choices ---- */
+.alc-calculator.alc-theme--classic .alc-field--radio fieldset {
+	border: 0;
+	margin: 0;
+	padding: 0;
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+}
+.alc-calculator.alc-theme--classic .alc-field--radio legend {
+	margin-block-end: 4px;
+}
+.alc-calculator.alc-theme--classic .alc-choice {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	padding: 11px 14px;
+	background: var(--clc-field-bg);
+	border: 1px solid var(--clc-line);
+	border-radius: var(--clc-radius-sm);
+	cursor: pointer;
+	font-weight: 500;
+	transition: border-color 0.15s ease, background 0.15s ease;
+}
+.alc-calculator.alc-theme--classic .alc-choice input[type="radio"] {
+	accent-color: var(--alc-accent);
+	inline-size: 17px;
+	block-size: 17px;
+	flex: none;
+	margin: 0;
+	cursor: pointer;
+}
+.alc-calculator.alc-theme--classic .alc-choice:hover {
+	border-color: var(--clc-faint);
+}
+.alc-calculator.alc-theme--classic .alc-choice:has(input:checked) {
+	border-color: var(--alc-accent);
+	background: var(--clc-panel);
+}
+
+/* ---- TOGGLE switch ---- */
+.alc-calculator.alc-theme--classic .alc-toggle {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	cursor: pointer;
+	font-weight: 500;
+	color: var(--clc-ink);
+}
+.alc-calculator.alc-theme--classic .alc-toggle input[type="checkbox"] {
+	position: absolute;
+	opacity: 0;
+	pointer-events: none;
+}
+.alc-calculator.alc-theme--classic .alc-toggle__track {
+	inline-size: 44px;
+	block-size: 26px;
+	flex: none;
+	border-radius: 999px;
+	background: #cbd5e1;
+	position: relative;
+	transition: background 0.18s ease;
+}
+.alc-calculator.alc-theme--classic .alc-toggle__track::after {
+	content: "";
+	position: absolute;
+	inset-block-start: 3px;
+	inset-inline-start: 3px;
+	inline-size: 20px;
+	block-size: 20px;
+	border-radius: 50%;
+	background: #fff;
+	box-shadow: 0 1px 3px rgba(15, 23, 42, 0.3);
+	transition: transform 0.18s ease;
+}
+.alc-calculator.alc-theme--classic .alc-toggle input:checked + .alc-toggle__track {
+	background: var(--alc-accent);
+}
+.alc-calculator.alc-theme--classic .alc-toggle input:checked + .alc-toggle__track::after {
+	transform: translateX(18px);
+}
+.alc-calculator.alc-theme--classic .alc-toggle input:focus-visible + .alc-toggle__track {
+	outline: 2px solid var(--alc-accent);
+	outline-offset: 2px;
+}
+
+/* ---- HEADING divider ---- */
+.alc-calculator.alc-theme--classic .alc-field--heading {
+	gap: 0;
+	margin-block-start: 6px;
+}
+.alc-calculator.alc-theme--classic .alc-heading {
+	margin: 0;
+	font-size: 12px;
+	font-weight: 700;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+	color: var(--clc-faint);
+	padding-block-end: 8px;
+	border-block-end: 1px solid var(--clc-line-soft);
+}
+
+/* ---- FORMULA inline line: highlighted estimate strip ---- */
+.alc-calculator.alc-theme--classic .alc-field--formula {
+	margin-block-start: 4px;
+}
+.alc-calculator.alc-theme--classic .alc-line {
+	display: flex;
+	align-items: baseline;
+	justify-content: space-between;
+	gap: 12px;
+	padding: 13px 16px;
+	background: var(--clc-panel);
+	border: 1px solid var(--clc-panel-edge);
+	border-radius: var(--clc-radius-sm);
+	font-weight: 600;
+	color: var(--clc-muted);
+}
+.alc-calculator.alc-theme--classic .alc-line__value {
+	flex: none;
+	font-variant-numeric: tabular-nums;
+	font-size: 18px;
+	font-weight: 800;
+	color: var(--clc-ink);
+}
+
+/* ============================================================
+   SUMMARY — soft tinted panel pinned to the right
+   ============================================================ */
+.alc-calculator.alc-theme--classic .alc-summary {
+	grid-area: summary;
+	position: sticky;
+	inset-block-start: 16px;
+	display: flex;
+	flex-direction: column;
+	padding: clamp(20px, 2vw, 26px);
+	background: var(--clc-panel);
+	border: 1px solid var(--clc-panel-edge);
+	border-radius: var(--clc-radius);
+	box-shadow: 0 10px 30px -22px color-mix(in srgb, var(--alc-accent) 60%, #0f172a);
+}
+.alc-calculator.alc-theme--classic .alc-summary::before {
+	content: "Summary";
+	display: block;
+	font-size: 11px;
+	font-weight: 700;
+	letter-spacing: 0.1em;
+	text-transform: uppercase;
+	color: color-mix(in srgb, var(--alc-accent) 75%, #475569);
+	margin-block-end: 14px;
+}
+.alc-calculator.alc-theme--classic .alc-summary__lines {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+	display: flex;
+	flex-direction: column;
+	gap: 11px;
+}
+/* dotted-leader ledger rows: label .... value */
+.alc-calculator.alc-theme--classic .alc-summary__lines li {
+	display: flex;
+	align-items: baseline;
+	gap: 6px;
+	font-size: 13.5px;
+}
+.alc-calculator.alc-theme--classic .alc-line-label {
+	flex: 0 1 auto;
+	min-inline-size: 0; /* allow ellipsis to engage instead of overflowing the panel */
+	color: var(--clc-muted);
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+.alc-calculator.alc-theme--classic .alc-summary__lines li::after {
+	content: "";
+	flex: 1 1 auto;
+	min-inline-size: 12px;
+	align-self: flex-end;
+	margin-block-end: 4px;
+	border-block-end: 1px dotted color-mix(in srgb, var(--alc-accent) 35%, #cbd5e1);
+}
+.alc-calculator.alc-theme--classic .alc-line-value {
+	flex: 0 0 auto;
+	font-variant-numeric: tabular-nums;
+	font-weight: 700;
+	color: var(--clc-ink);
+	white-space: nowrap;
+}
+
+/* ---- TOTAL: confident and prominent ---- */
+.alc-calculator.alc-theme--classic .alc-total {
+	display: flex;
+	align-items: baseline;
+	justify-content: space-between;
+	gap: 10px;
+	margin: 18px 0 0;
+	padding-block-start: 16px;
+	border-block-start: 2px solid var(--clc-panel-edge);
+}
+.alc-calculator.alc-theme--classic .alc-total__label {
+	font-size: 13px;
+	font-weight: 700;
+	letter-spacing: 0.04em;
+	text-transform: uppercase;
+	color: var(--clc-muted);
+}
+.alc-calculator.alc-theme--classic .alc-total__value {
+	font-variant-numeric: tabular-nums;
+	font-size: clamp(26px, 4vw, 32px);
+	font-weight: 800;
+	line-height: 1;
+	letter-spacing: -0.02em;
+	color: var(--alc-accent);
+}
+
+/* ============================================================
+   QUOTE form — sits under the fields
+   ============================================================ */
+.alc-calculator.alc-theme--classic .alc-quote {
+	grid-area: quote;
+	display: flex;
+	flex-direction: column;
+	gap: 14px;
+	margin: 0;
+}
+.alc-calculator.alc-theme--classic .alc-quote h3 {
+	margin: 0;
+	font-size: 17px;
+	font-weight: 700;
+	letter-spacing: -0.01em;
+	color: var(--clc-ink);
+}
+.alc-calculator.alc-theme--classic .alc-quote__field {
+	display: flex;
+	flex-direction: column;
+	gap: 7px;
+	font-size: 12.5px;
+	font-weight: 600;
+	color: var(--clc-muted);
+}
+.alc-calculator.alc-theme--classic .alc-quote__field input {
+	inline-size: 100%;
+	font: inherit;
+	font-weight: 400;
+	color: var(--clc-ink);
+	padding: 11px 13px;
+	background: var(--clc-field-bg);
+	border: 1px solid var(--clc-line);
+	border-radius: var(--clc-radius-sm);
+	transition: border-color 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+}
+.alc-calculator.alc-theme--classic .alc-quote__field input:focus {
+	outline: none;
+	background: var(--clc-field-bg-focus);
+	border-color: var(--alc-accent);
+	box-shadow: 0 0 0 3px color-mix(in srgb, var(--alc-accent) 18%, transparent);
+}
+.alc-calculator.alc-theme--classic .alc-quote__submit {
+	align-self: flex-start;
+	margin-block-start: 4px;
+	font: inherit;
+	font-weight: 700;
+	font-size: 14px;
+	color: #fff;
+	padding: 12px 24px;
+	background: var(--alc-accent);
+	border: 0;
+	border-radius: var(--clc-radius-sm);
+	cursor: pointer;
+	box-shadow: 0 8px 18px -8px color-mix(in srgb, var(--alc-accent) 80%, #0f172a);
+	transition: filter 0.15s ease, transform 0.05s ease;
+}
+.alc-calculator.alc-theme--classic .alc-quote__submit:hover {
+	filter: brightness(1.06);
+}
+.alc-calculator.alc-theme--classic .alc-quote__submit:active {
+	transform: translateY(1px);
+}
+.alc-calculator.alc-theme--classic .alc-quote-feedback {
+	font-size: 13px;
+	color: var(--clc-muted);
+}
+.alc-calculator.alc-theme--classic .alc-quote-feedback:not(:empty) {
+	padding: 10px 13px;
+	background: var(--clc-field-bg);
+	border: 1px solid var(--clc-line);
+	border-radius: var(--clc-radius-sm);
+}
+
+/* ---- shared focus ring ---- */
+.alc-calculator.alc-theme--classic :focus-visible {
+	outline: 2px solid var(--alc-accent);
+	outline-offset: 2px;
+}
+
+/* ============================================================
+   MOBILE — single clean column
+   ============================================================ */
+@media (max-width: 720px) {
+	.alc-calculator.alc-theme--classic {
+		grid-template-columns: 1fr;
+		grid-template-areas:
+			"fields"
+			"summary"
+			"quote";
+		gap: 24px;
+		padding: 20px;
+	}
+	.alc-calculator.alc-theme--classic .alc-summary {
+		position: static; /* no sticky clipping on small screens */
+		inset-block-start: auto;
+	}
+	.alc-calculator.alc-theme--classic .alc-fields {
+		border-block-end: 0;
+		padding-block-end: 0;
+	}
+	.alc-calculator.alc-theme--classic .alc-quote__submit {
+		align-self: stretch;
+		text-align: center;
+	}
+}
+/* ============================================================================
+   THEME: minimal — "Gallery Ledger"  (Airy Editorial)
+   Extreme whitespace · hairline rules only · large light serif typography.
+   No filled panels, no boxes, no shadows. The summary is a quiet
+   right-aligned ledger; the total is a confident oversized numeral.
+   ============================================================================ */
+
+.alc-calculator.alc-theme--minimal {
+	/* hairline + ink tokens, re-declared so this theme is self-contained */
+	--alc-rule: rgba(17, 17, 17, 0.14);          /* hairline colour            */
+	--alc-rule-strong: rgba(17, 17, 17, 0.55);   /* total/keyline rule         */
+	--alc-ink: #1a1a1a;                           /* near-black editorial ink   */
+	--alc-muted: #8a8a8a;                         /* captions / labels          */
+	--alc-serif: ui-serif, Georgia, "Times New Roman", "Times", serif;
+	/* NOTE: --alc-accent is provided inline on the container (default #f97316);
+	   do NOT re-declare it self-referentially here — that makes the property
+	   guaranteed-invalid and breaks every var(--alc-accent) when the inline
+	   value is absent. */
+
+	display: grid;
+	grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr);
+	grid-template-areas:
+		"fields  summary"
+		"quote   quote";
+	column-gap: clamp(40px, 7vw, 110px);
+	row-gap: clamp(48px, 7vw, 88px);
+	align-items: start;
+
+	inline-size: 100%;
+	max-inline-size: 1080px;
+	margin-inline: auto;
+	padding-block: clamp(24px, 4vw, 48px);
+	padding-inline: clamp(4px, 2vw, 16px);
+
+	color: var(--alc-ink);
+	font-family: var(--alc-serif);
+	font-weight: 400;
+	line-height: 1.5;
+	letter-spacing: 0.005em;
+	background: transparent;
+
+	*,
+	*::before,
+	*::after {
+		box-sizing: border-box;
+	}
+
+	/* ── Column placement ───────────────────────────────────────────────── */
+	.alc-fields  { grid-area: fields; min-inline-size: 0; }
+	.alc-summary { grid-area: summary; min-inline-size: 0; }
+	.alc-quote   { grid-area: quote;   min-inline-size: 0; }
+
+	/* ── Fields: each a row separated only by a hairline ────────────────── */
+	.alc-fields {
+		border-block-start: 1px solid var(--alc-rule);
+	}
+
+	.alc-field {
+		margin: 0;
+		padding-block: clamp(20px, 2.6vw, 30px);
+		border-block-end: 1px solid var(--alc-rule);
+		display: grid;
+		grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.4fr); /* shrinkable label col — no fixed floor that overflows mid-width */
+		column-gap: clamp(16px, 4vw, 56px);
+		align-items: baseline;
+	}
+
+	/* The two "structural" fields (heading, formula) span the full width */
+	.alc-field.alc-field--heading,
+	.alc-field.alc-field--formula {
+		grid-template-columns: 1fr;
+	}
+
+	.alc-field > label,
+	.alc-field legend {
+		display: block;
+		margin: 0;
+		padding: 0;
+		font-family: var(--alc-serif);
+		font-weight: 400;
+		font-size: 0.74rem;
+		letter-spacing: 0.16em;
+		text-transform: uppercase;
+		color: var(--alc-muted);
+		line-height: 1.35;
+	}
+
+	.alc-field fieldset {
+		border: 0;
+		margin: 0;
+		padding: 0;
+		min-inline-size: 0;
+	}
+
+	.alc-field legend {
+		margin-block-end: 14px;
+		float: none;
+	}
+
+	/* Inputs: no boxes — an underlined editorial blank ──────────────────── */
+	.alc-field input[type="text"],
+	.alc-field input[type="number"] {
+		inline-size: 100%;
+		max-inline-size: none;
+		margin: 0;
+		padding: 4px 0 8px;
+		border: 0;
+		border-block-end: 1px solid var(--alc-rule-strong);
+		border-radius: 0;
+		background: transparent;
+		color: var(--alc-ink);
+		font-family: var(--alc-serif);
+		font-size: 1.12rem;
+		line-height: 1.4;
+		transition: border-color 0.18s ease;
+		appearance: none;
+		-webkit-appearance: none;
+	}
+
+	.alc-field input[type="text"]::placeholder {
+		color: #bdbdbd;
+		font-style: italic;
+	}
+
+	.alc-field input[type="text"]:focus,
+	.alc-field input[type="number"]:focus {
+		outline: none;
+		border-block-end-color: var(--alc-accent);
+		border-block-end-width: 2px;
+		padding-block-end: 7px; /* keep baseline steady when rule thickens */
+	}
+
+	/* ── Slider: thin ruled track, value set as a figure ────────────────── */
+	.alc-slider {
+		display: flex;
+		align-items: center;
+		gap: clamp(14px, 2vw, 22px);
+		inline-size: 100%;
+	}
+
+	.alc-slider input[type="range"] {
+		flex: 1;
+		min-inline-size: 0;
+		accent-color: var(--alc-accent);
+		block-size: 1.4rem;
+		cursor: pointer;
+	}
+
+	.alc-slider output {
+		min-inline-size: 4ch;
+		text-align: end;
+		font-variant-numeric: tabular-nums;
+		font-size: 1.5rem;
+		font-weight: 400;
+		line-height: 1;
+		color: var(--alc-ink);
+	}
+
+	/* ── Radio choices: open list, accent dot, no chips ─────────────────── */
+	.alc-choice {
+		display: flex;
+		align-items: baseline;
+		gap: 12px;
+		padding-block: 7px;
+		cursor: pointer;
+		color: var(--alc-ink);
+	}
+
+	.alc-choice input[type="radio"] {
+		accent-color: var(--alc-accent);
+		inline-size: 15px;
+		block-size: 15px;
+		margin: 0;
+		flex: 0 0 auto;
+		translate: 0 2px;
+		cursor: pointer;
+	}
+
+	.alc-choice__label {
+		font-size: 1.06rem;
+		letter-spacing: 0.01em;
+	}
+
+	.alc-choice:has(input:checked) .alc-choice__label {
+		color: var(--alc-ink);
+		font-style: italic;
+	}
+
+	/* ── Toggle: minimal pill, no fill until on ─────────────────────────── */
+	.alc-toggle {
+		display: inline-flex;
+		align-items: center;
+		gap: 14px;
+		cursor: pointer;
+		font-size: 1.06rem;
+		color: var(--alc-ink);
+		grid-column: 1 / -1;
+	}
+
+	.alc-toggle input {
+		position: absolute;
+		opacity: 0;
+		pointer-events: none;
+		inline-size: 1px;
+		block-size: 1px;
+	}
+
+	.alc-toggle__track {
+		position: relative;
+		flex: 0 0 auto;
+		inline-size: 46px;
+		block-size: 20px;
+		border: 1px solid var(--alc-rule-strong);
+		border-radius: 999px;
+		background: transparent;
+		transition: border-color 0.2s ease, background 0.2s ease;
+	}
+
+	.alc-toggle__track::after {
+		content: "";
+		position: absolute;
+		inset-block-start: 50%;
+		inset-inline-start: 3px;
+		inline-size: 12px;
+		block-size: 12px;
+		border-radius: 50%;
+		background: var(--alc-rule-strong);
+		translate: 0 -50%;
+		transition: inset-inline-start 0.2s ease, background 0.2s ease;
+	}
+
+	.alc-toggle input:checked + .alc-toggle__track {
+		border-color: var(--alc-accent);
+	}
+
+	.alc-toggle input:checked + .alc-toggle__track::after {
+		inset-inline-start: 27px;
+		background: var(--alc-accent);
+	}
+
+	.alc-toggle input:focus-visible + .alc-toggle__track {
+		outline: 2px solid var(--alc-accent);
+		outline-offset: 3px;
+	}
+
+	/* ── Section heading: a quiet editorial keyline ─────────────────────── */
+	.alc-field--heading {
+		padding-block: clamp(30px, 3.5vw, 44px) 6px;
+		border-block-end: 0;
+	}
+
+	.alc-heading {
+		margin: 0;
+		font-family: var(--alc-serif);
+		font-weight: 400;
+		font-style: italic;
+		font-size: clamp(1.35rem, 1rem + 1.4vw, 1.9rem);
+		letter-spacing: 0.01em;
+		line-height: 1.15;
+		color: var(--alc-ink);
+	}
+
+	/* ── Inline formula line: italic label, large figure ────────────────── */
+	.alc-field--formula {
+		padding-block: clamp(26px, 3vw, 36px);
+		border-block-end: 1px solid var(--alc-rule);
+	}
+
+	.alc-line {
+		display: flex;
+		align-items: baseline;
+		justify-content: space-between;
+		gap: 20px;
+		font-weight: 400;
+	}
+
+	.alc-line > span:first-child {
+		font-style: italic;
+		font-size: 1.05rem;
+		color: var(--alc-muted);
+	}
+
+	.alc-line__value {
+		font-variant-numeric: tabular-nums;
+		font-size: 1.7rem;
+		line-height: 1;
+		color: var(--alc-ink);
+	}
+
+	/* ── Summary: a right-aligned typographic ledger ────────────────────── */
+	.alc-summary {
+		position: sticky;
+		inset-block-start: clamp(16px, 4vw, 40px);
+		padding: 0;
+		border: 0;
+		border-radius: 0;
+		background: transparent;
+		box-shadow: none;
+		text-align: end;
+	}
+
+	.alc-summary__lines {
+		list-style: none;
+		margin: 0;
+		padding: 0;
+	}
+
+	.alc-summary__lines li {
+		display: flex;
+		align-items: baseline;
+		justify-content: space-between;
+		gap: clamp(16px, 3vw, 40px);
+		margin: 0;
+		padding-block: clamp(13px, 1.6vw, 18px);
+		border-block-end: 1px solid var(--alc-rule);
+		font-size: 0.98rem;
+	}
+
+	.alc-summary__lines li:first-child {
+		border-block-start: 1px solid var(--alc-rule);
+	}
+
+	.alc-line-label {
+		font-style: italic;
+		text-align: start;
+		color: var(--alc-muted);
+		letter-spacing: 0.01em;
+	}
+
+	.alc-line-value {
+		font-variant-numeric: tabular-nums;
+		text-align: end;
+		color: var(--alc-ink);
+		white-space: nowrap;
+	}
+
+	/* ── Total: the confident wall-label numeral ────────────────────────── */
+	.alc-total {
+		display: block;
+		margin: 0;
+		padding-block-start: clamp(22px, 3vw, 34px);
+		text-align: end;
+		border: 0;
+	}
+
+	.alc-total__label {
+		display: block;
+		margin-block-end: 6px;
+		font-size: 0.72rem;
+		letter-spacing: 0.24em;
+		text-transform: uppercase;
+		color: var(--alc-muted);
+	}
+
+	.alc-total__value {
+		display: block;
+		font-family: var(--alc-serif);
+		font-weight: 400;
+		font-size: clamp(2rem, 4.5vw, 2.9rem); /* capped so the serif total can't overflow the narrow summary column */
+		line-height: 0.95;
+		letter-spacing: -0.015em;
+		font-variant-numeric: tabular-nums lining-nums;
+		color: var(--alc-accent); /* total reads in the accent — the one loud note */
+	}
+
+	/* the accent lives in a single hairline under the total — restrained */
+	.alc-total__value::after {
+		content: "";
+		display: block;
+		inline-size: 2.2rem;
+		block-size: 2px;
+		margin-block-start: 18px;
+		margin-inline-start: auto;
+		background: var(--alc-accent);
+	}
+
+	/* ── Quote form: full-width, ruled, airy ────────────────────────────── */
+	.alc-quote {
+		margin: 0;
+		padding: clamp(36px, 5vw, 56px) 0 0;
+		border: 0;
+		border-block-start: 1px solid var(--alc-rule-strong);
+		border-radius: 0;
+		background: transparent;
+		box-shadow: none;
+
+		display: grid;
+		grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+		column-gap: clamp(40px, 7vw, 110px);
+		row-gap: clamp(18px, 2.4vw, 28px);
+		align-items: end;
+	}
+
+	.alc-quote h3 {
+		grid-column: 1;
+		grid-row: 1 / span 3;
+		margin: 0;
+		align-self: start;
+		font-family: var(--alc-serif);
+		font-weight: 400;
+		font-style: italic;
+		font-size: clamp(1.5rem, 1.1rem + 1.8vw, 2.2rem);
+		line-height: 1.15;
+		letter-spacing: 0.01em;
+		color: var(--alc-ink);
+	}
+
+	.alc-quote__field {
+		grid-column: 2;
+		display: block;
+		margin: 0;
+		font-size: 0.74rem;
+		letter-spacing: 0.16em;
+		text-transform: uppercase;
+		color: var(--alc-muted);
+	}
+
+	.alc-quote__field input {
+		display: block;
+		inline-size: 100%;
+		max-inline-size: none;
+		margin-block-start: 8px;
+		padding: 4px 0 9px;
+		border: 0;
+		border-block-end: 1px solid var(--alc-rule-strong);
+		border-radius: 0;
+		background: transparent;
+		color: var(--alc-ink);
+		font-family: var(--alc-serif);
+		font-size: 1.12rem;
+		transition: border-color 0.18s ease;
+		appearance: none;
+		-webkit-appearance: none;
+	}
+
+	.alc-quote__field input:focus {
+		outline: none;
+		border-block-end-color: var(--alc-accent);
+		border-block-end-width: 2px;
+		padding-block-end: 8px;
+	}
+
+	/* Submit: a text-forward editorial button, underline-driven ─────────── */
+	.alc-quote__submit {
+		grid-column: 2;
+		justify-self: start;
+		margin-block-start: 8px;
+		padding: 11px 0 7px;
+		border: 0;
+		border-block-end: 2px solid var(--alc-ink);
+		border-radius: 0;
+		background: transparent;
+		color: var(--alc-ink);
+		font-family: var(--alc-serif);
+		font-style: italic;
+		font-size: 1.18rem;
+		letter-spacing: 0.01em;
+		cursor: pointer;
+		transition: color 0.18s ease, border-color 0.18s ease, padding-inline 0.2s ease;
+	}
+
+	.alc-quote__submit:hover,
+	.alc-quote__submit:focus-visible {
+		color: var(--alc-accent);
+		border-block-end-color: var(--alc-accent);
+		padding-inline: 6px;
+		outline: none;
+	}
+
+	.alc-quote__submit:disabled {
+		opacity: 0.45;
+		cursor: default;
+		color: var(--alc-muted);
+		border-block-end-color: var(--alc-rule);
+	}
+
+	.alc-quote-feedback {
+		grid-column: 2;
+	}
+
+	/* ── Feedback states (JS toggles classes on the existing
+	   .alc-quote-feedback container) ────────────────────────────────────── */
+	.alc-quote-feedback.is-error {
+		color: #b4332a;
+		font-style: italic;
+		font-size: 0.9rem;
+		letter-spacing: 0.01em;
+		margin-block-start: 6px;
+		text-transform: none;
+	}
+
+	.alc-quote-feedback.is-success {
+		font-style: italic;
+		font-weight: 400;
+		font-size: 0.95rem;
+		margin-block-start: 6px;
+		color: var(--alc-ink);
+	}
+
+	/* focus ring, editorial-thin */
+	:focus-visible {
+		outline: 2px solid var(--alc-accent);
+		outline-offset: 3px;
+	}
+}
+
+/* ── Mobile: collapse to one clean column, ledger stays full & legible ── */
+@media (max-width: 720px) {
+	.alc-calculator.alc-theme--minimal {
+		grid-template-columns: 1fr;
+		grid-template-areas:
+			"fields"
+			"summary"
+			"quote";
+		column-gap: 0;
+		row-gap: clamp(40px, 9vw, 56px);
+		padding-inline: 2px;
+	}
+
+	.alc-calculator.alc-theme--minimal .alc-field {
+		grid-template-columns: 1fr;
+		row-gap: 12px;
+	}
+
+	.alc-calculator.alc-theme--minimal .alc-summary {
+		position: static;
+		inset-block-start: auto;
+	}
+
+	.alc-calculator.alc-theme--minimal .alc-quote {
+		grid-template-columns: 1fr;
+		row-gap: 22px;
+	}
+
+	.alc-calculator.alc-theme--minimal .alc-quote h3 {
+		grid-column: 1;
+		grid-row: auto;
+		margin-block-end: 6px;
+	}
+
+	.alc-calculator.alc-theme--minimal .alc-quote__field,
+	.alc-calculator.alc-theme--minimal .alc-quote__submit,
+	.alc-calculator.alc-theme--minimal .alc-quote-feedback {
+		grid-column: 1;
+	}
+}
+/* ============================================================
+   THEME: midnight — "Obsidian Vault" (Dark Glass Premium)
+   Dark, glassy translucent surfaces, hairline borders,
+   soft accent glow, luminous standout total.
+   ============================================================ */
+
+.alc-calculator.alc-theme--midnight {
+  --mid-bg-0: #0a0c12;
+  --mid-bg-1: #0e1119;
+  --mid-glass: rgba(255, 255, 255, 0.045);
+  --mid-glass-2: rgba(255, 255, 255, 0.07);
+  --mid-hair: rgba(255, 255, 255, 0.10);
+  --mid-hair-bright: rgba(255, 255, 255, 0.16);
+  --mid-text: #eef1f8;
+  --mid-muted: #9aa3b8;
+  --mid-faint: #6b7488;
+  /* accent halo derived from inline --alc-accent */
+  --mid-glow: color-mix(in srgb, var(--alc-accent) 55%, transparent);
+  --mid-glow-soft: color-mix(in srgb, var(--alc-accent) 22%, transparent);
+
+  color-scheme: dark;
+  box-sizing: border-box;
+  display: grid;
+  grid-template-columns: minmax(0, 1.55fr) minmax(280px, 1fr);
+  grid-template-areas:
+    "fields summary"
+    "quote  quote";
+  gap: clamp(16px, 2.4vw, 28px);
+  align-items: start;
+
+  inline-size: 100%;
+  max-inline-size: 940px;
+  margin-inline: auto;
+  padding: clamp(18px, 2.6vw, 30px);
+
+  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  color: var(--mid-text);
+  line-height: 1.5;
+
+  background:
+    radial-gradient(120% 90% at 85% -10%, var(--mid-glow-soft) 0%, transparent 45%),
+    radial-gradient(90% 70% at -5% 110%, rgba(80, 110, 200, 0.10) 0%, transparent 50%),
+    linear-gradient(160deg, var(--mid-bg-1) 0%, var(--mid-bg-0) 100%);
+  border: 1px solid var(--mid-hair);
+  border-radius: 22px;
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.05) inset,
+    0 30px 70px -30px rgba(0, 0, 0, 0.85);
+}
+
+.alc-calculator.alc-theme--midnight *,
+.alc-calculator.alc-theme--midnight *::before,
+.alc-calculator.alc-theme--midnight *::after {
+  box-sizing: border-box;
+}
+
+/* ---------- FIELDS COLUMN ---------- */
+.alc-calculator.alc-theme--midnight .alc-fields {
+  grid-area: fields;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  min-inline-size: 0;
+}
+
+.alc-calculator.alc-theme--midnight .alc-field {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  min-inline-size: 0;
+}
+
+.alc-calculator.alc-theme--midnight .alc-field > label,
+.alc-calculator.alc-theme--midnight .alc-field legend {
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--mid-muted);
+  padding: 0;
+}
+
+/* shared dark glass input surface */
+.alc-calculator.alc-theme--midnight input[type="number"],
+.alc-calculator.alc-theme--midnight input[type="text"] {
+  inline-size: 100%;
+  appearance: none;
+  font: inherit;
+  font-size: 0.96rem;
+  color: var(--mid-text);
+  background: var(--mid-glass);
+  border: 1px solid var(--mid-hair);
+  border-radius: 12px;
+  padding: 12px 14px;
+  transition: border-color 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
+}
+.alc-calculator.alc-theme--midnight input::placeholder {
+  color: var(--mid-faint);
+}
+.alc-calculator.alc-theme--midnight input[type="number"]:focus-visible,
+.alc-calculator.alc-theme--midnight input[type="text"]:focus-visible {
+  outline: none;
+  border-color: var(--alc-accent);
+  background: var(--mid-glass-2);
+  box-shadow:
+    0 0 0 3px var(--mid-glow-soft),
+    0 0 18px -2px var(--mid-glow);
+}
+
+/* ---------- SLIDER ---------- */
+.alc-calculator.alc-theme--midnight .alc-slider {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.alc-calculator.alc-theme--midnight .alc-slider input[type="range"] {
+  flex: 1 1 auto;
+  min-inline-size: 0;
+  accent-color: var(--alc-accent);
+  block-size: 26px;
+  cursor: pointer;
+}
+.alc-calculator.alc-theme--midnight .alc-slider output {
+  flex: 0 0 auto;
+  min-inline-size: 62px;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: var(--mid-text);
+  padding: 7px 10px;
+  background: var(--mid-glass-2);
+  border: 1px solid var(--mid-hair-bright);
+  border-radius: 10px;
+  box-shadow: 0 0 16px -6px var(--mid-glow);
+}
+
+/* ---------- RADIO (segmented glass) ---------- */
+.alc-calculator.alc-theme--midnight .alc-field--radio fieldset {
+  border: 0;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+.alc-calculator.alc-theme--midnight .alc-field--radio .alc-choice {
+  margin: 0;
+}
+.alc-calculator.alc-theme--midnight .alc-field--radio legend {
+  margin-block-end: 4px;
+}
+.alc-calculator.alc-theme--midnight .alc-choice {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 11px 14px;
+  background: var(--mid-glass);
+  border: 1px solid var(--mid-hair);
+  border-radius: 12px;
+  cursor: pointer;
+  font-size: 0.92rem;
+  transition: border-color 0.18s ease, background 0.18s ease, box-shadow 0.18s ease;
+}
+.alc-calculator.alc-theme--midnight .alc-choice input[type="radio"] {
+  accent-color: var(--alc-accent);
+  inline-size: 17px;
+  block-size: 17px;
+  margin: 0;
+  cursor: pointer;
+}
+.alc-calculator.alc-theme--midnight .alc-choice:hover {
+  border-color: var(--mid-hair-bright);
+  background: var(--mid-glass-2);
+}
+.alc-calculator.alc-theme--midnight .alc-choice:has(input:checked) {
+  border-color: var(--alc-accent);
+  background: color-mix(in srgb, var(--alc-accent) 12%, var(--mid-glass-2));
+  box-shadow: 0 0 20px -8px var(--mid-glow);
+}
+
+/* radios side by side on wide screens */
+@media (min-width: 560px) {
+  .alc-calculator.alc-theme--midnight .alc-field--radio fieldset {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+  .alc-calculator.alc-theme--midnight .alc-choice {
+    flex: 1 1 0;
+    justify-content: flex-start;
+  }
+}
+
+/* ---------- TOGGLE ---------- */
+.alc-calculator.alc-theme--midnight .alc-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: var(--mid-text);
+  user-select: none;
+}
+.alc-calculator.alc-theme--midnight .alc-toggle input {
+  position: absolute;
+  opacity: 0;
+  inline-size: 1px;
+  block-size: 1px;
+}
+.alc-calculator.alc-theme--midnight .alc-toggle__track {
+  position: relative;
+  flex: 0 0 auto;
+  inline-size: 48px;
+  block-size: 27px;
+  border-radius: 999px;
+  background: var(--mid-glass-2);
+  border: 1px solid var(--mid-hair-bright);
+  transition: background 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+.alc-calculator.alc-theme--midnight .alc-toggle__track::after {
+  content: "";
+  position: absolute;
+  inset-block-start: 3px;
+  inset-inline-start: 3px;
+  inline-size: 19px;
+  block-size: 19px;
+  border-radius: 50%;
+  background: #e9edf6;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
+  transition: transform 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.alc-calculator.alc-theme--midnight .alc-toggle input:checked + .alc-toggle__track {
+  background: var(--alc-accent);
+  border-color: var(--alc-accent);
+  box-shadow: 0 0 18px -4px var(--mid-glow);
+}
+.alc-calculator.alc-theme--midnight .alc-toggle input:checked + .alc-toggle__track::after {
+  transform: translateX(21px);
+}
+.alc-calculator.alc-theme--midnight .alc-toggle input:focus-visible + .alc-toggle__track {
+  box-shadow: 0 0 0 3px var(--mid-glow-soft);
+}
+
+/* ---------- HEADING ---------- */
+.alc-calculator.alc-theme--midnight .alc-field--heading {
+  margin-block-start: 6px;
+}
+.alc-calculator.alc-theme--midnight .alc-heading {
+  margin: 0;
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--mid-faint);
+  padding-block-end: 10px;
+  border-block-end: 1px solid var(--mid-hair);
+}
+
+/* ---------- INLINE FORMULA LINE (glass chip in fields) ---------- */
+.alc-calculator.alc-theme--midnight .alc-field--formula {
+  margin-block-start: 4px;
+}
+.alc-calculator.alc-theme--midnight .alc-line {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 14px 16px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.015));
+  border: 1px solid var(--mid-hair);
+  border-radius: 14px;
+}
+.alc-calculator.alc-theme--midnight .alc-line > span:first-child {
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--mid-muted);
+}
+.alc-calculator.alc-theme--midnight .alc-line__value {
+  font-variant-numeric: tabular-nums;
+  font-weight: 800;
+  font-size: 1.15rem;
+  color: var(--alc-accent);
+  text-shadow: 0 0 18px var(--mid-glow);
+}
+
+/* ---------- SUMMARY (sticky frosted receipt) ---------- */
+.alc-calculator.alc-theme--midnight .alc-summary {
+  grid-area: summary;
+  position: sticky;
+  inset-block-start: 16px;
+  padding: 20px 20px 22px;
+  background: rgba(16, 19, 28, 0.55);
+  -webkit-backdrop-filter: blur(16px) saturate(140%);
+  backdrop-filter: blur(16px) saturate(140%);
+  border: 1px solid var(--mid-hair-bright);
+  border-radius: 18px;
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.06) inset,
+    0 24px 50px -28px rgba(0, 0, 0, 0.9);
+  overflow: hidden;
+}
+/* faint accent rule along the top edge of the receipt */
+.alc-calculator.alc-theme--midnight .alc-summary::before {
+  content: "";
+  position: absolute;
+  inset-block-start: 0;
+  inset-inline: 0;
+  block-size: 2px;
+  background: linear-gradient(90deg, transparent, var(--mid-glow), transparent);
+}
+.alc-calculator.alc-theme--midnight .alc-summary__lines {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+.alc-calculator.alc-theme--midnight .alc-summary__lines li {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  padding-block: 11px;
+  border-block-end: 1px dashed var(--mid-hair);
+}
+.alc-calculator.alc-theme--midnight .alc-summary__lines li:first-child {
+  padding-block-start: 2px;
+}
+.alc-calculator.alc-theme--midnight .alc-line-label {
+  font-size: 0.86rem;
+  color: var(--mid-muted);
+}
+.alc-calculator.alc-theme--midnight .alc-line-value {
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  font-size: 0.92rem;
+  color: var(--mid-text);
+  text-align: end;
+}
+
+/* ---------- TOTAL (luminous standout chip) ---------- */
+.alc-calculator.alc-theme--midnight .alc-total {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  margin: 18px 0 0;
+  padding: 16px 18px;
+  border-radius: 14px;
+  background:
+    radial-gradient(140% 120% at 100% 0%, var(--mid-glow-soft) 0%, transparent 60%),
+    color-mix(in srgb, var(--alc-accent) 9%, rgba(255, 255, 255, 0.03));
+  border: 1px solid color-mix(in srgb, var(--alc-accent) 45%, var(--mid-hair-bright));
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, var(--alc-accent) 18%, transparent) inset,
+    0 14px 40px -16px var(--mid-glow);
+}
+.alc-calculator.alc-theme--midnight .alc-total__label {
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--mid-muted);
+}
+.alc-calculator.alc-theme--midnight .alc-total__value {
+  font-variant-numeric: tabular-nums;
+  font-weight: 800;
+  font-size: 1.85rem;
+  line-height: 1;
+  color: #fff;
+  text-shadow:
+    0 0 24px var(--mid-glow),
+    0 0 6px color-mix(in srgb, var(--alc-accent) 70%, transparent);
+}
+
+/* ---------- QUOTE FORM (full-width glass footer) ---------- */
+.alc-calculator.alc-theme--midnight .alc-quote {
+  grid-area: quote;
+  margin-block-start: 4px;
+  padding: 22px clamp(18px, 2.4vw, 26px);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.012));
+  border: 1px solid var(--mid-hair);
+  border-radius: 18px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px 18px;
+  align-items: end;
+}
+.alc-calculator.alc-theme--midnight .alc-quote h3 {
+  grid-column: 1 / -1;
+  margin: 0 0 2px;
+  font-size: 1.05rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--mid-text);
+}
+.alc-calculator.alc-theme--midnight .alc-quote__field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--mid-muted);
+}
+.alc-calculator.alc-theme--midnight .alc-quote__submit {
+  grid-column: 1 / -1;
+  justify-self: stretch;
+  margin-block-start: 4px;
+  appearance: none;
+  cursor: pointer;
+  font: inherit;
+  font-weight: 700;
+  font-size: 0.96rem;
+  letter-spacing: 0.02em;
+  color: #1a1206;
+  padding: 14px 20px;
+  border: 0;
+  border-radius: 13px;
+  background:
+    linear-gradient(180deg,
+      color-mix(in srgb, var(--alc-accent) 92%, white) 0%,
+      var(--alc-accent) 100%);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.35) inset,
+    0 10px 30px -10px var(--mid-glow),
+    0 0 0 1px color-mix(in srgb, var(--alc-accent) 40%, transparent);
+  transition: transform 0.12s ease, box-shadow 0.2s ease, filter 0.2s ease;
+}
+.alc-calculator.alc-theme--midnight .alc-quote__submit:hover {
+  filter: brightness(1.06);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.4) inset,
+    0 16px 40px -12px var(--mid-glow),
+    0 0 0 1px color-mix(in srgb, var(--alc-accent) 55%, transparent);
+}
+.alc-calculator.alc-theme--midnight .alc-quote__submit:active {
+  transform: translateY(1px);
+}
+.alc-calculator.alc-theme--midnight .alc-quote__submit:focus-visible {
+  outline: 3px solid var(--mid-glow-soft);
+  outline-offset: 2px;
+}
+.alc-calculator.alc-theme--midnight .alc-quote-feedback {
+  grid-column: 1 / -1;
+  font-size: 0.86rem;
+  color: var(--mid-muted);
+}
+.alc-calculator.alc-theme--midnight .alc-quote-feedback:empty {
+  display: none;
+}
+
+/* ---------- GLOBAL FOCUS FALLBACK ---------- */
+.alc-calculator.alc-theme--midnight :focus-visible {
+  outline-color: var(--alc-accent);
+}
+
+/* ---------- MOBILE: single clean column ---------- */
+@media (max-width: 720px) {
+  .alc-calculator.alc-theme--midnight {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "fields"
+      "summary"
+      "quote";
+    padding: 16px;
+    border-radius: 18px;
+  }
+  .alc-calculator.alc-theme--midnight .alc-summary {
+    position: static;
+    inset-block-start: auto;
+  }
+  .alc-calculator.alc-theme--midnight .alc-quote {
+    grid-template-columns: 1fr;
+  }
+  .alc-calculator.alc-theme--midnight .alc-total__value {
+    font-size: 1.7rem;
+  }
+}
+/* ════════════════════════════════════════════════════════════════════════
+   THEME: soft — "Marshmallow"  (Rounded & Friendly)
+   Self-contained block. Every selector scoped under
+   .alc-calculator.alc-theme--soft so nothing leaks to sibling themes.
+   Big rounded corners, pastel tinted surfaces, soft layered shadows,
+   generous spacing, large tappable targets. Pure CSS, system fonts.
+   ════════════════════════════════════════════════════════════════════════ */
+
+.alc-calculator.alc-theme--soft {
+	/* warm pastel token set, derived around the inline --alc-accent */
+	--soft-ink: #3b3550;
+	--soft-muted: #8a8398;
+	--soft-pillow: #ffffff;
+	--soft-canvas: #fbf7f4;          /* warm off-white page tint */
+	--soft-tint: #f4eef9;            /* lilac pastel surface       */
+	--soft-tint-2: #fdf1ec;          /* peach pastel surface       */
+	--soft-line: #efe7f1;            /* hairline on pastel         */
+	--soft-radius: 30px;             /* the big friendly corner    */
+	--soft-radius-sm: 18px;
+	--soft-pad: clamp(18px, 3.4vw, 30px);
+	/* layered, low-contrast pillow shadows (warm, not grey) */
+	--soft-lift: 0 1px 2px rgba(74, 47, 90, 0.05),
+		0 10px 24px -10px rgba(120, 80, 140, 0.18),
+		0 30px 60px -34px rgba(120, 80, 140, 0.22);
+	--soft-press: inset 0 2px 5px rgba(74, 47, 90, 0.08);
+
+	font-family: ui-rounded, "SF Pro Rounded", "Segoe UI", system-ui, sans-serif;
+	color: var(--soft-ink);
+	line-height: 1.5;
+	letter-spacing: 0.1px;
+
+	/* Layout: fields pillow on the left, summary bubble floats top-right and
+	   sticks; the quote form spans full width as its own pillow row.        */
+	display: grid;
+	grid-template-columns: minmax(0, 1fr) 300px;
+	grid-template-areas:
+		"fields summary"
+		"quote  quote";
+	gap: clamp(18px, 2.6vw, 30px);
+	align-items: start;
+	padding: var(--soft-pad);
+	background:
+		radial-gradient(120% 90% at 100% 0%,
+			color-mix(in srgb, var(--alc-accent) 9%, transparent), transparent 60%),
+		var(--soft-canvas);
+	border-radius: calc(var(--soft-radius) + 8px);
+}
+
+.alc-calculator.alc-theme--soft *,
+.alc-calculator.alc-theme--soft *::before,
+.alc-calculator.alc-theme--soft *::after {
+	box-sizing: border-box;
+}
+
+/* ── Fields pillow ─────────────────────────────────────────────────────── */
+.alc-calculator.alc-theme--soft .alc-fields {
+	grid-area: fields;
+	background: var(--soft-pillow);
+	border-radius: var(--soft-radius);
+	padding: clamp(20px, 3vw, 34px);
+	box-shadow: var(--soft-lift);
+}
+
+.alc-calculator.alc-theme--soft .alc-field {
+	margin-block-end: 22px;
+}
+.alc-calculator.alc-theme--soft .alc-field:last-child {
+	margin-block-end: 0;
+}
+
+.alc-calculator.alc-theme--soft .alc-field > label,
+.alc-calculator.alc-theme--soft .alc-field legend {
+	display: block;
+	font-weight: 700;
+	font-size: 0.96em;
+	margin-block-end: 10px;
+	color: var(--soft-ink);
+}
+
+.alc-calculator.alc-theme--soft .alc-field fieldset {
+	border: 0;
+	padding: 0;
+	margin: 0;
+}
+
+/* Rounded, pill-ish inputs with a pastel inner fill and soft inset */
+.alc-calculator.alc-theme--soft input[type="number"],
+.alc-calculator.alc-theme--soft input[type="text"],
+.alc-calculator.alc-theme--soft select {
+	inline-size: 100%;
+	max-inline-size: 360px;
+	padding: 13px 18px;
+	font: inherit;
+	color: var(--soft-ink);
+	background: var(--soft-tint);
+	border: 2px solid transparent;
+	border-radius: var(--soft-radius-sm);
+	box-shadow: var(--soft-press);
+	transition: border-color 0.18s ease, background 0.18s ease, box-shadow 0.18s ease;
+}
+.alc-calculator.alc-theme--soft input[type="number"]::placeholder,
+.alc-calculator.alc-theme--soft input[type="text"]::placeholder {
+	color: var(--soft-muted);
+}
+.alc-calculator.alc-theme--soft input[type="number"]:focus,
+.alc-calculator.alc-theme--soft input[type="text"]:focus,
+.alc-calculator.alc-theme--soft select:focus {
+	outline: none;
+	background: var(--soft-pillow);
+	border-color: var(--alc-accent);
+	box-shadow: 0 0 0 4px color-mix(in srgb, var(--alc-accent) 18%, transparent);
+}
+
+/* The number field reads as a little rounded stepper chip */
+.alc-calculator.alc-theme--soft .alc-field--quantity input[type="number"] {
+	max-inline-size: 150px;
+	text-align: center;
+	font-weight: 700;
+	font-variant-numeric: tabular-nums;
+}
+
+/* ── Slider: custom candy track + knob ─────────────────────────────────── */
+.alc-calculator.alc-theme--soft .alc-slider {
+	display: flex;
+	align-items: center;
+	gap: 16px;
+}
+.alc-calculator.alc-theme--soft .alc-slider input[type="range"] {
+	flex: 1;
+	min-inline-size: 0;
+	block-size: 14px;
+	-webkit-appearance: none;
+	appearance: none;
+	background: linear-gradient(90deg,
+		var(--alc-accent) 0 var(--_p, 46%),
+		var(--soft-tint) var(--_p, 46%) 100%);
+	border-radius: 999px;
+	box-shadow: var(--soft-press);
+	cursor: pointer;
+	accent-color: var(--alc-accent); /* fallback for non-styled UAs */
+}
+.alc-calculator.alc-theme--soft .alc-slider input[type="range"]::-webkit-slider-thumb {
+	-webkit-appearance: none;
+	appearance: none;
+	inline-size: 28px;
+	block-size: 28px;
+	border-radius: 999px;
+	background: var(--soft-pillow);
+	border: 5px solid var(--alc-accent);
+	box-shadow: 0 4px 10px -2px rgba(120, 80, 140, 0.4);
+	cursor: grab;
+}
+.alc-calculator.alc-theme--soft .alc-slider input[type="range"]::-moz-range-thumb {
+	inline-size: 28px;
+	block-size: 28px;
+	border-radius: 999px;
+	background: var(--soft-pillow);
+	border: 5px solid var(--alc-accent);
+	box-shadow: 0 4px 10px -2px rgba(120, 80, 140, 0.4);
+	cursor: grab;
+}
+.alc-calculator.alc-theme--soft .alc-slider output {
+	min-inline-size: 4ch;
+	padding: 7px 14px;
+	border-radius: 999px;
+	background: color-mix(in srgb, var(--alc-accent) 14%, var(--soft-pillow));
+	color: color-mix(in srgb, var(--alc-accent) 60%, var(--soft-ink));
+	font-weight: 800;
+	font-variant-numeric: tabular-nums;
+	text-align: center;
+}
+
+/* ── Radio choices: one rounded segmented pill bar ─────────────────────── */
+.alc-calculator.alc-theme--soft .alc-field--radio fieldset {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px;
+	padding: 6px;
+	background: var(--soft-tint);
+	border-radius: 999px;
+	box-shadow: var(--soft-press);
+}
+.alc-calculator.alc-theme--soft .alc-field--radio legend {
+	float: none;
+	/* legend sits above the pill bar; give it breathing room */
+}
+.alc-calculator.alc-theme--soft .alc-choice {
+	display: inline-flex;
+	align-items: center;
+	gap: 8px;
+	flex: 1 1 auto;
+	justify-content: center;
+	padding: 11px 18px;
+	border-radius: 999px;
+	cursor: pointer;
+	color: var(--soft-muted);
+	font-weight: 700;
+	transition: background 0.18s ease, color 0.18s ease, box-shadow 0.18s ease;
+}
+/* hide the native dot; the whole segment is the control */
+.alc-calculator.alc-theme--soft .alc-choice input {
+	position: absolute;
+	opacity: 0;
+	pointer-events: none;
+}
+.alc-calculator.alc-theme--soft .alc-choice:has(input:checked) {
+	background: var(--soft-pillow);
+	color: color-mix(in srgb, var(--alc-accent) 55%, var(--soft-ink));
+	box-shadow: 0 4px 12px -4px rgba(120, 80, 140, 0.35);
+}
+.alc-calculator.alc-theme--soft .alc-choice:has(input:focus-visible) {
+	outline: 3px solid color-mix(in srgb, var(--alc-accent) 45%, transparent);
+	outline-offset: 1px;
+}
+
+/* ── Toggle: candy pill switch ─────────────────────────────────────────── */
+.alc-calculator.alc-theme--soft .alc-toggle {
+	display: inline-flex;
+	align-items: center;
+	gap: 12px;
+	cursor: pointer;
+	font-weight: 700;
+	padding: 8px 14px 8px 8px;
+	border-radius: 999px;
+	background: var(--soft-tint-2);
+}
+.alc-calculator.alc-theme--soft .alc-toggle input {
+	position: absolute;
+	opacity: 0;
+	inline-size: 1px;
+	block-size: 1px;
+}
+.alc-calculator.alc-theme--soft .alc-toggle__track {
+	position: relative;
+	inline-size: 56px;
+	block-size: 32px;
+	border-radius: 999px;
+	background: #e2d6e9;
+	box-shadow: var(--soft-press);
+	transition: background 0.2s ease;
+	flex: none;
+}
+.alc-calculator.alc-theme--soft .alc-toggle__track::after {
+	content: "";
+	position: absolute;
+	inset-block-start: 4px;
+	inset-inline-start: 4px;
+	inline-size: 24px;
+	block-size: 24px;
+	border-radius: 999px;
+	background: var(--soft-pillow);
+	box-shadow: 0 2px 6px rgba(74, 47, 90, 0.3);
+	transition: inset-inline-start 0.2s ease;
+}
+.alc-calculator.alc-theme--soft .alc-toggle input:checked + .alc-toggle__track {
+	background: var(--alc-accent);
+}
+.alc-calculator.alc-theme--soft .alc-toggle input:checked + .alc-toggle__track::after {
+	inset-inline-start: 28px;
+}
+.alc-calculator.alc-theme--soft .alc-toggle input:focus-visible + .alc-toggle__track {
+	outline: 3px solid color-mix(in srgb, var(--alc-accent) 45%, transparent);
+	outline-offset: 2px;
+}
+
+/* ── Section heading: a soft pastel chip ───────────────────────────────── */
+.alc-calculator.alc-theme--soft .alc-field--heading {
+	margin-block: 26px 18px;
+}
+.alc-calculator.alc-theme--soft .alc-heading {
+	display: inline-block;
+	margin: 0;
+	padding: 8px 18px;
+	font-size: 0.82em;
+	font-weight: 800;
+	text-transform: uppercase;
+	letter-spacing: 1.2px;
+	color: color-mix(in srgb, var(--alc-accent) 60%, var(--soft-ink));
+	background: color-mix(in srgb, var(--alc-accent) 12%, var(--soft-pillow));
+	border-radius: 999px;
+}
+
+/* ── Inline formula line: a highlighted rounded callout ────────────────── */
+.alc-calculator.alc-theme--soft .alc-field--formula {
+	margin-block-start: 22px;
+}
+.alc-calculator.alc-theme--soft .alc-line {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	gap: 14px;
+	padding: 16px 20px;
+	border-radius: var(--soft-radius-sm);
+	background: linear-gradient(135deg, var(--soft-tint), var(--soft-tint-2));
+	font-weight: 700;
+}
+.alc-calculator.alc-theme--soft .alc-line__value {
+	font-size: 1.25em;
+	font-weight: 800;
+	color: color-mix(in srgb, var(--alc-accent) 65%, var(--soft-ink));
+	font-variant-numeric: tabular-nums;
+}
+
+/* ── Summary: floating cream "receipt bubble" ──────────────────────────── */
+.alc-calculator.alc-theme--soft .alc-summary {
+	grid-area: summary;
+	position: sticky;
+	inset-block-start: 20px;
+	padding: clamp(20px, 2.6vw, 28px);
+	background:
+		radial-gradient(140% 60% at 50% 0%,
+			color-mix(in srgb, var(--alc-accent) 8%, var(--soft-pillow)), var(--soft-pillow) 70%);
+	border-radius: var(--soft-radius);
+	box-shadow: var(--soft-lift);
+}
+.alc-calculator.alc-theme--soft .alc-summary__lines {
+	list-style: none;
+	margin: 0 0 18px;
+	padding: 0;
+}
+.alc-calculator.alc-theme--soft .alc-summary__lines li {
+	display: flex;
+	justify-content: space-between;
+	gap: 14px;
+	padding-block: 12px;
+	font-size: 0.94em;
+	color: var(--soft-ink);
+}
+.alc-calculator.alc-theme--soft .alc-summary__lines li + li {
+	border-block-start: 2px dotted var(--soft-line);
+}
+.alc-calculator.alc-theme--soft .alc-line-label {
+	color: var(--soft-muted);
+	font-weight: 600;
+}
+.alc-calculator.alc-theme--soft .alc-line-value {
+	font-weight: 700;
+	font-variant-numeric: tabular-nums;
+}
+
+/* dashed "tear-off" divider above the total */
+.alc-calculator.alc-theme--soft .alc-total {
+	position: relative;
+	display: flex;
+	justify-content: space-between;
+	align-items: baseline;
+	gap: 12px;
+	margin: 0;
+	padding-block-start: 22px;
+	border-block-start: 3px dashed color-mix(in srgb, var(--alc-accent) 35%, var(--soft-line));
+}
+/* little notch "ears" where the receipt tears */
+.alc-calculator.alc-theme--soft .alc-total::before,
+.alc-calculator.alc-theme--soft .alc-total::after {
+	content: "";
+	position: absolute;
+	inset-block-start: -10px;
+	inline-size: 20px;
+	block-size: 20px;
+	border-radius: 999px;
+	background: var(--soft-canvas);
+}
+.alc-calculator.alc-theme--soft .alc-total::before {
+	inset-inline-start: calc(var(--soft-pad) * -1 - 10px);
+}
+.alc-calculator.alc-theme--soft .alc-total::after {
+	inset-inline-end: calc(var(--soft-pad) * -1 - 10px);
+}
+.alc-calculator.alc-theme--soft .alc-total__label {
+	font-weight: 700;
+	color: var(--soft-muted);
+	text-transform: uppercase;
+	letter-spacing: 1px;
+	font-size: 0.82em;
+}
+.alc-calculator.alc-theme--soft .alc-total__value {
+	font-size: 2em;
+	font-weight: 800;
+	line-height: 1;
+	color: var(--alc-accent);
+	font-variant-numeric: tabular-nums;
+}
+
+/* ── Quote form pillow ─────────────────────────────────────────────────── */
+.alc-calculator.alc-theme--soft .alc-quote {
+	grid-area: quote;
+	padding: clamp(22px, 3vw, 36px);
+	background:
+		linear-gradient(135deg,
+			color-mix(in srgb, var(--alc-accent) 6%, var(--soft-tint)),
+			color-mix(in srgb, var(--alc-accent) 3%, var(--soft-tint-2)));
+	border-radius: var(--soft-radius);
+	box-shadow: var(--soft-lift);
+}
+.alc-calculator.alc-theme--soft .alc-quote h3 {
+	margin-block: 0 18px;
+	font-size: 1.2em;
+	font-weight: 800;
+	color: var(--soft-ink);
+}
+.alc-calculator.alc-theme--soft .alc-quote__field {
+	display: block;
+	margin-block-end: 14px;
+	font-weight: 700;
+	font-size: 0.92em;
+	color: var(--soft-ink);
+}
+.alc-calculator.alc-theme--soft .alc-quote__field input {
+	display: block;
+	inline-size: 100%;
+	max-inline-size: 440px;
+	margin-block-start: 8px;
+	padding: 13px 18px;
+	font: inherit;
+	color: var(--soft-ink);
+	background: var(--soft-pillow);
+	border: 2px solid transparent;
+	border-radius: var(--soft-radius-sm);
+	box-shadow: var(--soft-press);
+	transition: border-color 0.18s ease, box-shadow 0.18s ease;
+}
+.alc-calculator.alc-theme--soft .alc-quote__field input:focus {
+	outline: none;
+	border-color: var(--alc-accent);
+	box-shadow: 0 0 0 4px color-mix(in srgb, var(--alc-accent) 18%, transparent);
+}
+
+/* Big friendly pill submit button */
+.alc-calculator.alc-theme--soft .alc-quote__submit {
+	margin-block-start: 6px;
+	padding: 15px 34px;
+	min-block-size: 52px;
+	font: inherit;
+	font-weight: 800;
+	font-size: 1.02em;
+	color: #fff;
+	background: var(--alc-accent);
+	border: 0;
+	border-radius: 999px;
+	cursor: pointer;
+	box-shadow:
+		0 8px 18px -6px color-mix(in srgb, var(--alc-accent) 65%, transparent),
+		inset 0 1px 0 rgba(255, 255, 255, 0.3);
+	transition: transform 0.15s ease, box-shadow 0.15s ease, filter 0.15s ease;
+}
+.alc-calculator.alc-theme--soft .alc-quote__submit:hover {
+	transform: translateY(-2px);
+	filter: brightness(1.04);
+	box-shadow:
+		0 12px 24px -6px color-mix(in srgb, var(--alc-accent) 70%, transparent),
+		inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+.alc-calculator.alc-theme--soft .alc-quote__submit:active {
+	transform: translateY(0);
+}
+.alc-calculator.alc-theme--soft .alc-quote__submit:disabled {
+	opacity: 0.55;
+	cursor: default;
+	transform: none;
+	filter: none;
+}
+
+/* ── Feedback (the empty .alc-quote-feedback div that exists in markup) ── */
+.alc-calculator.alc-theme--soft .alc-quote-feedback {
+	margin-block-start: 12px;
+	font-weight: 600;
+}
+
+/* hide a field flagged hidden by the engine */
+.alc-calculator.alc-theme--soft .alc-field[hidden] {
+	display: none !important; /* beat host-theme display resets */
+}
+
+/* keyboard focus ring (rounded, accent) */
+.alc-calculator.alc-theme--soft :focus-visible {
+	outline: 3px solid color-mix(in srgb, var(--alc-accent) 50%, transparent);
+	outline-offset: 2px;
+	border-radius: 6px;
+}
+
+/* ── Mobile: clean single column, nothing clipped ──────────────────────── */
+@media (max-width: 720px) {
+	.alc-calculator.alc-theme--soft {
+		grid-template-columns: 1fr;
+		grid-template-areas:
+			"fields"
+			"summary"
+			"quote";
+		padding: clamp(14px, 4vw, 20px);
+		border-radius: var(--soft-radius);
+	}
+	.alc-calculator.alc-theme--soft .alc-summary {
+		position: static; /* don't pin/clip on small screens */
+	}
+	/* keep the receipt "ears" tucked to the bubble edge on mobile */
+	.alc-calculator.alc-theme--soft .alc-total::before {
+		inset-inline-start: calc(clamp(20px, 2.6vw, 28px) * -1 - 10px);
+	}
+	.alc-calculator.alc-theme--soft .alc-total::after {
+		inset-inline-end: calc(clamp(20px, 2.6vw, 28px) * -1 - 10px);
+	}
+	.alc-calculator.alc-theme--soft input[type="number"],
+	.alc-calculator.alc-theme--soft input[type="text"],
+	.alc-calculator.alc-theme--soft select,
+	.alc-calculator.alc-theme--soft .alc-quote__field input {
+		max-inline-size: 100%;
+	}
+	.alc-calculator.alc-theme--soft .alc-quote__submit {
+		inline-size: 100%;
+	}
+}
+
+/* reduced-motion: drop the lift/press transitions */
+@media (prefers-reduced-motion: reduce) {
+	.alc-calculator.alc-theme--soft * {
+		transition: none !important; /* honor user motion preference */
+	}
+}
+/* ============================================================
+   THEME: bold — "CONCRETE RECEIPT" (Neo-Brutalist)
+   Thick solid black borders, hard offset shadows, flat blocky
+   fills, monospace UPPERCASE labels, accent as a bold flat fill.
+   Self-contained: overrides the generic base where needed.
+   ============================================================ */
+
+.alc-calculator.alc-theme--bold {
+	--alc-ink: #111111;
+	--alc-paper: #faf6ea;          /* warm off-white "newsprint" */
+	--alc-paper-2: #ffffff;
+	--alc-shadow-col: #111111;
+	--alc-off: 6px;                /* hard-shadow offset */
+	--alc-border-w: 3px;
+
+	display: grid;
+	grid-template-columns: minmax(0, 1.4fr) minmax(260px, 0.9fr);
+	grid-template-areas:
+		"fields  summary"
+		"quote   summary";
+	align-items: start;
+	gap: 22px;
+	padding: 26px;
+	background-color: var(--alc-paper);
+	color: var(--alc-ink);
+	/* hairline grid texture so the paper reads as a worksheet */
+	background-image:
+		repeating-linear-gradient(0deg, transparent 0 27px, rgba(17, 17, 17, 0.05) 27px 28px);
+	border: var(--alc-border-w) solid var(--alc-ink);
+	box-shadow: 10px 10px 0 var(--alc-shadow-col);
+	font-family: ui-sans-serif, system-ui, "Segoe UI", Roboto, sans-serif;
+	line-height: 1.4;
+}
+
+/* Monospace receipt font for all the "machine" type */
+.alc-calculator.alc-theme--bold .alc-field > label,
+.alc-calculator.alc-theme--bold .alc-field legend,
+.alc-calculator.alc-theme--bold .alc-summary,
+.alc-calculator.alc-theme--bold .alc-total,
+.alc-calculator.alc-theme--bold .alc-quote__field,
+.alc-calculator.alc-theme--bold output,
+.alc-calculator.alc-theme--bold .alc-line {
+	font-family: ui-monospace, "SFMono-Regular", "Cascadia Mono", Menlo, Consolas, monospace;
+}
+
+/* ── Regions ─────────────────────────────────────────────── */
+.alc-calculator.alc-theme--bold .alc-fields { grid-area: fields; }
+.alc-calculator.alc-theme--bold .alc-quote  { grid-area: quote; }
+.alc-calculator.alc-theme--bold .alc-summary { grid-area: summary; }
+
+/* ── Field tiles ─────────────────────────────────────────── */
+.alc-calculator.alc-theme--bold .alc-field {
+	margin-block-end: 16px;
+	padding: 14px 14px 16px;
+	background: var(--alc-paper-2);
+	border: var(--alc-border-w) solid var(--alc-ink);
+	box-shadow: var(--alc-off) var(--alc-off) 0 var(--alc-shadow-col);
+	border-radius: 0;
+}
+
+.alc-calculator.alc-theme--bold .alc-field > label,
+.alc-calculator.alc-theme--bold .alc-field legend {
+	display: block;
+	margin-block-end: 8px;
+	font-size: 0.74rem;
+	font-weight: 700;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+	color: var(--alc-ink);
+}
+
+/* Text / number / select inputs → flat boxed cells */
+.alc-calculator.alc-theme--bold .alc-field input[type='number'],
+.alc-calculator.alc-theme--bold .alc-field input[type='text'],
+.alc-calculator.alc-theme--bold .alc-field select {
+	inline-size: 100%;
+	max-inline-size: none;
+	box-sizing: border-box;
+	padding: 10px 12px;
+	font: inherit;
+	font-family: ui-monospace, Menlo, Consolas, monospace;
+	color: var(--alc-ink);
+	background: var(--alc-paper);
+	border: var(--alc-border-w) solid var(--alc-ink);
+	border-radius: 0;
+	box-shadow: inset 2px 2px 0 rgba(17, 17, 17, 0.12);
+}
+
+.alc-calculator.alc-theme--bold .alc-field input::placeholder {
+	color: #8a8270;
+	text-transform: uppercase;
+	font-size: 0.82em;
+	letter-spacing: 0.04em;
+}
+
+/* ── Slider: thick accent track ──────────────────────────── */
+.alc-calculator.alc-theme--bold .alc-slider {
+	display: flex;
+	align-items: center;
+	gap: 14px;
+}
+
+.alc-calculator.alc-theme--bold .alc-slider input[type='range'] {
+	flex: 1;
+	min-inline-size: 0;
+	/* accent-color drives the native track/thumb fill — required.
+	   No border/background/forced height here: a bordered, filled
+	   range box clips the thumb on WebKit/Blink and hurts usability. */
+	accent-color: var(--alc-accent);
+	cursor: pointer;
+}
+
+.alc-calculator.alc-theme--bold .alc-slider output {
+	min-inline-size: 4ch;
+	padding: 4px 8px;
+	font-weight: 700;
+	color: #fff;
+	background: var(--alc-ink);
+	border: var(--alc-border-w) solid var(--alc-ink);
+	text-align: center;
+}
+
+/* ── Radio choices: chunky selectable bars ───────────────── */
+.alc-calculator.alc-theme--bold .alc-field--radio fieldset {
+	display: grid;
+	gap: 10px;
+	margin: 0;
+	padding: 0;
+	border: 0;
+}
+
+.alc-calculator.alc-theme--bold .alc-choice {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	margin: 0;
+	padding: 10px 12px;
+	background: var(--alc-paper);
+	border: var(--alc-border-w) solid var(--alc-ink);
+	box-shadow: 3px 3px 0 var(--alc-shadow-col);
+	cursor: pointer;
+	font-weight: 600;
+	transition: transform 0.05s linear, box-shadow 0.05s linear, background 0.05s linear;
+}
+
+.alc-calculator.alc-theme--bold .alc-choice input {
+	accent-color: var(--alc-accent);
+	inline-size: 18px;
+	block-size: 18px;
+	margin: 0;
+	flex: none;
+}
+
+/* the currently-checked choice flips to a filled accent bar */
+.alc-calculator.alc-theme--bold .alc-choice:has(input:checked) {
+	background: var(--alc-accent);
+	color: var(--alc-ink);
+	box-shadow: 3px 3px 0 var(--alc-shadow-col);
+}
+
+.alc-calculator.alc-theme--bold .alc-choice:active {
+	transform: translate(3px, 3px);
+	box-shadow: 0 0 0 var(--alc-shadow-col);
+}
+
+.alc-calculator.alc-theme--bold .alc-choice__label {
+	text-transform: uppercase;
+	letter-spacing: 0.04em;
+	font-size: 0.82rem;
+}
+
+/* ── Toggle: hard-edged switch in a boxed row ────────────── */
+.alc-calculator.alc-theme--bold .alc-toggle {
+	display: inline-flex;
+	align-items: center;
+	gap: 12px;
+	font-family: ui-monospace, Menlo, Consolas, monospace;
+	font-size: 0.78rem;
+	font-weight: 700;
+	letter-spacing: 0.06em;
+	text-transform: uppercase;
+	cursor: pointer;
+}
+
+.alc-calculator.alc-theme--bold .alc-toggle input {
+	/* keep it a real, reliable native checkbox — borders/forced
+	   stretch are ignored or distort the control on WebKit. */
+	accent-color: var(--alc-accent);
+	inline-size: 22px;
+	block-size: 22px;
+	margin: 0;
+	flex: none;
+	cursor: pointer;
+}
+
+/* ── Heading: stamped label bar ──────────────────────────── */
+.alc-calculator.alc-theme--bold .alc-field--heading {
+	padding: 0;
+	background: transparent;
+	border: 0;
+	box-shadow: none;
+	margin-block: 22px 14px;
+}
+
+.alc-calculator.alc-theme--bold .alc-heading {
+	display: inline-block;
+	margin: 0;
+	padding: 6px 14px;
+	font-family: ui-monospace, Menlo, Consolas, monospace;
+	font-size: 0.82rem;
+	font-weight: 800;
+	letter-spacing: 0.12em;
+	text-transform: uppercase;
+	color: var(--alc-paper);
+	background: var(--alc-ink);
+	box-shadow: var(--alc-off) var(--alc-off) 0 var(--alc-accent);
+}
+
+/* ── Inline formula line (inside fields) ─────────────────── */
+.alc-calculator.alc-theme--bold .alc-field--formula {
+	background: var(--alc-ink);
+	border-color: var(--alc-ink);
+}
+
+.alc-calculator.alc-theme--bold .alc-line {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	gap: 12px;
+	font-weight: 700;
+	text-transform: uppercase;
+	letter-spacing: 0.06em;
+	color: var(--alc-paper);
+}
+
+.alc-calculator.alc-theme--bold .alc-line__value {
+	padding: 2px 10px;
+	color: var(--alc-ink);
+	background: var(--alc-accent);
+	font-size: 1.05em;
+}
+
+/* ── Summary: the printed receipt slab ───────────────────── */
+.alc-calculator.alc-theme--bold .alc-summary {
+	position: sticky;
+	inset-block-start: 18px;
+	padding: 0;
+	background: var(--alc-paper-2);
+	border: var(--alc-border-w) solid var(--alc-ink);
+	border-radius: 0;
+	box-shadow: var(--alc-off) var(--alc-off) 0 var(--alc-shadow-col);
+	overflow: hidden;
+}
+
+/* receipt header strip */
+.alc-calculator.alc-theme--bold .alc-summary::before {
+	content: "QUOTE // SUMMARY";
+	display: block;
+	padding: 10px 16px;
+	font-family: ui-monospace, Menlo, Consolas, monospace;
+	font-size: 0.74rem;
+	font-weight: 800;
+	letter-spacing: 0.16em;
+	color: var(--alc-paper);
+	background: var(--alc-ink);
+}
+
+.alc-calculator.alc-theme--bold .alc-summary__lines {
+	list-style: none;
+	margin: 0;
+	padding: 14px 16px 6px;
+}
+
+.alc-calculator.alc-theme--bold .alc-summary__lines li {
+	display: flex;
+	justify-content: space-between;
+	align-items: baseline;
+	gap: 12px;
+	padding-block: 9px;
+	font-size: 0.82rem;
+	border-block-end: 2px dashed var(--alc-ink);
+}
+
+.alc-calculator.alc-theme--bold .alc-summary__lines li:last-child {
+	border-block-end: 0;
+}
+
+.alc-calculator.alc-theme--bold .alc-line-label {
+	text-transform: uppercase;
+	letter-spacing: 0.04em;
+	color: #4a4434;
+}
+
+.alc-calculator.alc-theme--bold .alc-line-value {
+	font-weight: 700;
+	font-variant-numeric: tabular-nums;
+}
+
+/* ── Total: the bold flat-accent punch bar ───────────────── */
+.alc-calculator.alc-theme--bold .alc-total {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	margin: 12px 14px 16px;
+	padding: 14px 16px;
+	background: var(--alc-accent);
+	border: var(--alc-border-w) solid var(--alc-ink);
+	box-shadow: 5px 5px 0 var(--alc-shadow-col);
+}
+
+.alc-calculator.alc-theme--bold .alc-total__label {
+	font-size: 0.84rem;
+	font-weight: 800;
+	letter-spacing: 0.12em;
+	text-transform: uppercase;
+	color: var(--alc-ink);
+}
+
+.alc-calculator.alc-theme--bold .alc-total__value {
+	font-family: ui-monospace, Menlo, Consolas, monospace;
+	font-size: 1.5rem;
+	font-weight: 800;
+	color: var(--alc-ink);            /* accent is the FILL, ink is the text */
+	font-variant-numeric: tabular-nums;
+}
+
+/* ── Quote form: boxed work-order card ───────────────────── */
+.alc-calculator.alc-theme--bold .alc-quote {
+	margin-block-start: 0;
+	padding: 18px;
+	background: var(--alc-paper-2);
+	border: var(--alc-border-w) solid var(--alc-ink);
+	border-radius: 0;
+	box-shadow: var(--alc-off) var(--alc-off) 0 var(--alc-shadow-col);
+}
+
+.alc-calculator.alc-theme--bold .alc-quote h3 {
+	margin: 0 0 14px;
+	font-family: ui-monospace, Menlo, Consolas, monospace;
+	font-size: 0.92rem;
+	font-weight: 800;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+}
+
+.alc-calculator.alc-theme--bold .alc-quote__field {
+	display: block;
+	margin-block-end: 14px;
+	font-size: 0.72rem;
+	font-weight: 700;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+}
+
+.alc-calculator.alc-theme--bold .alc-quote__field input {
+	display: block;
+	inline-size: 100%;
+	max-inline-size: none;
+	box-sizing: border-box;
+	margin-block-start: 6px;
+	padding: 10px 12px;
+	font: inherit;
+	font-family: ui-monospace, Menlo, Consolas, monospace;
+	letter-spacing: normal;
+	text-transform: none;
+	color: var(--alc-ink);
+	background: var(--alc-paper);
+	border: var(--alc-border-w) solid var(--alc-ink);
+	border-radius: 0;
+	box-shadow: inset 2px 2px 0 rgba(17, 17, 17, 0.12);
+}
+
+/* ── Submit: filled accent button with hard shadow ───────── */
+.alc-calculator.alc-theme--bold .alc-quote__submit {
+	margin-block-start: 4px;
+	padding: 14px 26px;
+	font-family: ui-monospace, Menlo, Consolas, monospace;
+	font-size: 0.86rem;
+	font-weight: 800;
+	letter-spacing: 0.1em;
+	text-transform: uppercase;
+	color: var(--alc-ink);
+	background: var(--alc-accent);
+	border: var(--alc-border-w) solid var(--alc-ink);
+	border-radius: 0;
+	box-shadow: var(--alc-off) var(--alc-off) 0 var(--alc-shadow-col);
+	cursor: pointer;
+	transition: transform 0.06s linear, box-shadow 0.06s linear;
+}
+
+.alc-calculator.alc-theme--bold .alc-quote__submit:hover {
+	transform: translate(-1px, -1px);
+	box-shadow: 8px 8px 0 var(--alc-shadow-col);
+}
+
+/* press = the block "stamps" down onto its shadow */
+.alc-calculator.alc-theme--bold .alc-quote__submit:active {
+	transform: translate(var(--alc-off), var(--alc-off));
+	box-shadow: 0 0 0 var(--alc-shadow-col);
+}
+
+.alc-calculator.alc-theme--bold .alc-quote__submit:disabled {
+	background: #d8d2c2;
+	color: #6c6553;
+	box-shadow: var(--alc-off) var(--alc-off) 0 #b8b2a2;
+	cursor: default;
+}
+
+/* ── Quote feedback (real element in markup) ─────────────── */
+.alc-calculator.alc-theme--bold .alc-quote-feedback:not(:empty) {
+	margin-block-start: 10px;
+	padding: 8px 12px;
+	font-family: ui-monospace, Menlo, Consolas, monospace;
+	font-size: 0.74rem;
+	font-weight: 700;
+	text-transform: uppercase;
+	letter-spacing: 0.04em;
+	color: var(--alc-ink);
+	background: var(--alc-accent);
+	border: var(--alc-border-w) solid var(--alc-ink);
+}
+
+/* ── Focus: thick offset ring, no rounding ───────────────── */
+.alc-calculator.alc-theme--bold :focus-visible {
+	outline: var(--alc-border-w) solid var(--alc-ink);
+	outline-offset: 3px;
+}
+
+/* ── Mobile: single clean column ─────────────────────────── */
+@media (max-width: 720px) {
+	.alc-calculator.alc-theme--bold {
+		grid-template-columns: 1fr;
+		grid-template-areas:
+			"fields"
+			"summary"
+			"quote";
+		padding: 18px;
+		gap: 18px;
+		box-shadow: 6px 6px 0 var(--alc-shadow-col);
+	}
+
+	.alc-calculator.alc-theme--bold .alc-summary {
+		position: static;          /* never clipped on mobile */
+		inset-block-start: auto;
+	}
+
+	/* trim oversized offsets so nothing overflows the narrow column */
+	.alc-calculator.alc-theme--bold .alc-field,
+	.alc-calculator.alc-theme--bold .alc-quote {
+		box-shadow: 4px 4px 0 var(--alc-shadow-col);
+	}
+}
+/* ============================================================
+   THEME: slate — "Console Strip"
+   Compact Dashboard: dense, operational, monospace figures,
+   condensed panels sized for sidebars & dashboards.
+   ============================================================ */
+
+.alc-calculator.alc-theme--slate {
+  --slate-bg:        #f1f5f9;
+  --slate-panel:     #ffffff;
+  --slate-ink:       #1e293b;
+  --slate-ink-soft:  #475569;
+  --slate-ink-faint: #94a3b8;
+  --slate-line:      #e2e8f0;
+  --slate-line-2:    #cbd5e1;
+  --slate-rail:      #0f172a;
+  --slate-radius:    7px;
+  --slate-mono: ui-monospace, "SF Mono", "Cascadia Mono", "Roboto Mono", Menlo, Consolas, monospace;
+
+  box-sizing: border-box;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 10px;
+  inline-size: 100%;
+  max-inline-size: 460px;
+  padding: 12px;
+  background: var(--slate-bg);
+  border: 1px solid var(--slate-line-2);
+  border-radius: var(--slate-radius);
+  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  font-size: 13px;
+  line-height: 1.35;
+  color: var(--slate-ink);
+  -webkit-font-smoothing: antialiased;
+}
+
+.alc-calculator.alc-theme--slate *,
+.alc-calculator.alc-theme--slate *::before,
+.alc-calculator.alc-theme--slate *::after {
+  box-sizing: border-box;
+}
+
+/* ---- shared figure styling: tabular monospace numerals ---- */
+.alc-calculator.alc-theme--slate .alc-line__value,
+.alc-calculator.alc-theme--slate .alc-line-value,
+.alc-calculator.alc-theme--slate .alc-total__value,
+.alc-calculator.alc-theme--slate .alc-slider output,
+.alc-calculator.alc-theme--slate input[type="number"],
+.alc-calculator.alc-theme--slate input[type="text"] {
+  font-family: var(--slate-mono);
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1;
+}
+
+/* ============================================================
+   FIELDS — condensed stacked control panel
+   ============================================================ */
+.alc-calculator.alc-theme--slate .alc-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  padding: 4px 12px;
+  background: var(--slate-panel);
+  border: 1px solid var(--slate-line);
+  border-radius: var(--slate-radius);
+}
+
+.alc-calculator.alc-theme--slate .alc-field {
+  padding-block: 9px;
+  border-block-end: 1px solid var(--slate-line);
+}
+.alc-calculator.alc-theme--slate .alc-field:last-child {
+  border-block-end: none;
+}
+
+/* compact labels: uppercase micro-caps like a control panel */
+.alc-calculator.alc-theme--slate .alc-field > label,
+.alc-calculator.alc-theme--slate .alc-field legend {
+  display: block;
+  margin-block-end: 6px;
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--slate-ink-soft);
+}
+
+/* ---- inputs: tight slate-bordered fields ---- */
+.alc-calculator.alc-theme--slate input[type="text"],
+.alc-calculator.alc-theme--slate input[type="number"] {
+  inline-size: 100%;
+  padding: 6px 9px;
+  font-size: 13px;
+  color: var(--slate-ink);
+  background: var(--slate-bg);
+  border: 1px solid var(--slate-line-2);
+  border-radius: 5px;
+  transition: border-color .12s, box-shadow .12s;
+  appearance: none;
+}
+.alc-calculator.alc-theme--slate input[type="number"] {
+  inline-size: 88px;
+}
+.alc-calculator.alc-theme--slate input[type="text"]::placeholder {
+  color: var(--slate-ink-faint);
+  font-family: ui-sans-serif, system-ui, sans-serif;
+}
+.alc-calculator.alc-theme--slate input[type="text"]:focus,
+.alc-calculator.alc-theme--slate input[type="number"]:focus {
+  outline: none;
+  border-color: var(--alc-accent);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--alc-accent) 22%, transparent);
+}
+
+/* ---- slider: thin rail with mono readout chip on the right ---- */
+.alc-calculator.alc-theme--slate .alc-slider {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.alc-calculator.alc-theme--slate .alc-slider input[type="range"] {
+  flex: 1 1 auto;
+  inline-size: auto;
+  min-inline-size: 0;
+  block-size: 4px;
+  margin: 0;
+  accent-color: var(--alc-accent);
+  cursor: pointer;
+}
+.alc-calculator.alc-theme--slate .alc-slider output {
+  flex: 0 0 auto;
+  min-inline-size: 48px;
+  padding: 3px 8px;
+  font-size: 12px;
+  font-weight: 600;
+  text-align: end;
+  color: var(--slate-ink);
+  background: var(--slate-bg);
+  border: 1px solid var(--slate-line-2);
+  border-radius: 4px;
+}
+
+/* ---- radio: segmented inline chips ---- */
+.alc-calculator.alc-theme--slate .alc-field--radio fieldset {
+  display: block;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+.alc-calculator.alc-theme--slate .alc-choice {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-inline-end: 6px;
+  padding: 5px 10px;
+  font-size: 12px;
+  color: var(--slate-ink-soft);
+  background: var(--slate-bg);
+  border: 1px solid var(--slate-line-2);
+  border-radius: 5px;
+  cursor: pointer;
+  transition: border-color .12s, color .12s, background .12s;
+}
+.alc-calculator.alc-theme--slate .alc-choice input[type="radio"] {
+  margin: 0;
+  accent-color: var(--alc-accent);
+  cursor: pointer;
+}
+.alc-calculator.alc-theme--slate .alc-choice:has(input:checked) {
+  color: var(--slate-ink);
+  border-color: var(--alc-accent);
+  background: color-mix(in srgb, var(--alc-accent) 8%, var(--slate-panel));
+}
+
+/* ---- toggle: compact dashboard switch ---- */
+.alc-calculator.alc-theme--slate .alc-toggle {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  font-size: 12.5px;
+  font-weight: 500;
+  color: var(--slate-ink);
+  cursor: pointer;
+}
+.alc-calculator.alc-theme--slate .alc-toggle input[type="checkbox"] {
+  position: absolute;
+  opacity: 0;
+  inline-size: 1px;
+  block-size: 1px;
+}
+.alc-calculator.alc-theme--slate .alc-toggle__track {
+  position: relative;
+  flex: 0 0 auto;
+  inline-size: 34px;
+  block-size: 18px;
+  background: var(--slate-line-2);
+  border-radius: 999px;
+  transition: background .15s;
+}
+.alc-calculator.alc-theme--slate .alc-toggle__track::after {
+  content: "";
+  position: absolute;
+  inset-block-start: 2px;
+  inset-inline-start: 2px;
+  inline-size: 14px;
+  block-size: 14px;
+  background: #fff;
+  border-radius: 50%;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, .35);
+  transition: inset-inline-start .15s;
+}
+.alc-calculator.alc-theme--slate .alc-toggle input:checked + .alc-toggle__track {
+  background: var(--alc-accent);
+}
+.alc-calculator.alc-theme--slate .alc-toggle input:checked + .alc-toggle__track::after {
+  inset-inline-start: 18px;
+}
+.alc-calculator.alc-theme--slate .alc-toggle input:focus-visible + .alc-toggle__track {
+  outline: 2px solid var(--alc-accent);
+  outline-offset: 2px;
+}
+
+/* ---- heading: section divider bar ---- */
+.alc-calculator.alc-theme--slate .alc-field--heading {
+  padding-block: 11px 7px;
+}
+.alc-calculator.alc-theme--slate .alc-heading {
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--slate-ink-faint);
+}
+.alc-calculator.alc-theme--slate .alc-heading::after {
+  content: "";
+  flex: 1 1 auto;
+  block-size: 1px;
+  background: var(--slate-line);
+}
+
+/* ---- formula line: subtotal row inside fields ---- */
+.alc-calculator.alc-theme--slate .alc-field--formula {
+  padding-block: 10px;
+  border-block-start: 1px dashed var(--slate-line-2);
+}
+.alc-calculator.alc-theme--slate .alc-line {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  font-size: 12px;
+}
+.alc-calculator.alc-theme--slate .alc-line > span:first-child {
+  font-weight: 600;
+  color: var(--slate-ink-soft);
+}
+.alc-calculator.alc-theme--slate .alc-line__value {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--slate-ink);
+}
+
+/* ============================================================
+   SUMMARY — condensed "register strip" / receipt console
+   ============================================================ */
+.alc-calculator.alc-theme--slate .alc-summary {
+  padding: 0;
+  background: var(--slate-rail);
+  border-radius: var(--slate-radius);
+  overflow: hidden;
+  color: #cbd5e1;
+}
+
+.alc-calculator.alc-theme--slate .alc-summary__lines {
+  list-style: none;
+  margin: 0;
+  padding: 10px 13px 8px;
+}
+.alc-calculator.alc-theme--slate .alc-summary__lines li {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  padding-block: 4px;
+  font-size: 12px;
+}
+/* dotted leader between label and value — receipt feel */
+.alc-calculator.alc-theme--slate .alc-line-label {
+  color: #94a3b8;
+  white-space: nowrap;
+}
+.alc-calculator.alc-theme--slate .alc-summary__lines li::after {
+  content: "";
+  flex: 1 1 auto;
+  align-self: end;
+  margin-block-end: 3px;
+  border-block-end: 1px dotted #475569;
+}
+.alc-calculator.alc-theme--slate .alc-line-value {
+  flex: 0 0 auto;
+  font-family: var(--slate-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: #f1f5f9;
+}
+
+/* ---- total: accent register bar across the strip ---- */
+.alc-calculator.alc-theme--slate .alc-total {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin: 0;
+  padding: 11px 13px;
+  background: color-mix(in srgb, var(--alc-accent) 16%, #0b1220);
+  border-block-start: 1px solid color-mix(in srgb, var(--alc-accent) 35%, transparent);
+}
+.alc-calculator.alc-theme--slate .alc-total__label {
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #cbd5e1;
+}
+.alc-calculator.alc-theme--slate .alc-total__value {
+  font-family: var(--slate-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1;
+  color: #fff;
+  /* accent glow keeps the total prominent on the dark rail */
+  text-shadow: 0 0 14px color-mix(in srgb, var(--alc-accent) 65%, transparent);
+}
+
+/* ============================================================
+   QUOTE — compact request form panel
+   ============================================================ */
+.alc-calculator.alc-theme--slate .alc-quote {
+  padding: 12px 13px 13px;
+  background: var(--slate-panel);
+  border: 1px solid var(--slate-line);
+  border-radius: var(--slate-radius);
+}
+.alc-calculator.alc-theme--slate .alc-quote h3 {
+  margin: 0 0 9px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--slate-ink-soft);
+}
+.alc-calculator.alc-theme--slate .alc-quote__field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-block-end: 8px;
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--slate-ink-faint);
+}
+.alc-calculator.alc-theme--slate .alc-quote__field input {
+  inline-size: 100%;
+}
+
+.alc-calculator.alc-theme--slate .alc-quote__submit {
+  inline-size: 100%;
+  margin-block-start: 4px;
+  padding: 9px 14px;
+  font-family: inherit;
+  font-size: 12.5px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #fff;
+  background: var(--alc-accent);
+  border: 1px solid color-mix(in srgb, var(--alc-accent) 70%, #000);
+  border-radius: 5px;
+  cursor: pointer;
+  transition: filter .12s, transform .06s;
+}
+.alc-calculator.alc-theme--slate .alc-quote__submit:hover {
+  filter: brightness(1.07);
+}
+.alc-calculator.alc-theme--slate .alc-quote__submit:active {
+  transform: translateY(1px);
+}
+.alc-calculator.alc-theme--slate .alc-quote__submit:focus-visible {
+  outline: 2px solid var(--alc-accent);
+  outline-offset: 2px;
+}
+.alc-calculator.alc-theme--slate .alc-quote-feedback {
+  margin-block-start: 8px;
+  font-family: var(--slate-mono);
+  font-size: 11.5px;
+  color: var(--slate-ink-soft);
+}
+.alc-calculator.alc-theme--slate .alc-quote-feedback:empty {
+  margin-block-start: 0;
+}
+
+/* ============================================================
+   MOBILE — single clean column (already stacked; tighten only)
+   ============================================================ */
+@media (max-width: 720px) {
+  .alc-calculator.alc-theme--slate {
+    max-inline-size: 100%;
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .alc-calculator.alc-theme--slate .alc-choice {
+    margin-block-end: 4px;
+  }
+  .alc-calculator.alc-theme--slate input[type="number"] {
+    inline-size: 100%;
+  }
+}
+/* ── Redesign QA fixes (post-render) ──────────────────────────────────────
+   minimal/soft/slate style `.alc-field > label` (and minimal grids the field),
+   which clobbered the toggle's own inline-flex layout and squashed the switch.
+   Restore it at higher specificity. */
+.alc-calculator.alc-theme--minimal .alc-field--toggle,
+.alc-calculator.alc-theme--soft .alc-field--toggle,
+.alc-calculator.alc-theme--slate .alc-field--toggle {
+	display: block;
+}
+.alc-calculator.alc-theme--minimal .alc-field--toggle > .alc-toggle,
+.alc-calculator.alc-theme--soft .alc-field--toggle > .alc-toggle,
+.alc-calculator.alc-theme--slate .alc-field--toggle > .alc-toggle {
+	display: inline-flex;
+	align-items: center;
+}
+.alc-calculator.alc-theme--minimal .alc-toggle__track,
+.alc-calculator.alc-theme--soft .alc-toggle__track,
+.alc-calculator.alc-theme--slate .alc-toggle__track {
+	flex: 0 0 auto;
 }

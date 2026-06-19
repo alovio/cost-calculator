@@ -54,12 +54,12 @@ export default function SettingsTab() {
 					help={ __( 'A ready-made look — pick one and tweak the accent below. No CSS needed.', 'alovio-calculator' ) }
 					value={ theme.preset || 'classic' }
 					options={ [
-						{ label: __( 'Classic — clean & neutral', 'alovio-calculator' ), value: 'classic' },
-						{ label: __( 'Minimal — flat & airy', 'alovio-calculator' ), value: 'minimal' },
-						{ label: __( 'Midnight — dark', 'alovio-calculator' ), value: 'midnight' },
-						{ label: __( 'Soft — rounded & gentle', 'alovio-calculator' ), value: 'soft' },
-						{ label: __( 'Bold — high contrast', 'alovio-calculator' ), value: 'bold' },
-						{ label: __( 'Slate — professional', 'alovio-calculator' ), value: 'slate' },
+						{ label: __( 'Classic — studio card', 'alovio-calculator' ), value: 'classic' },
+						{ label: __( 'Minimal — editorial', 'alovio-calculator' ), value: 'minimal' },
+						{ label: __( 'Midnight — dark glass', 'alovio-calculator' ), value: 'midnight' },
+						{ label: __( 'Soft — rounded pastel', 'alovio-calculator' ), value: 'soft' },
+						{ label: __( 'Bold — neo-brutalist', 'alovio-calculator' ), value: 'bold' },
+						{ label: __( 'Slate — compact dashboard', 'alovio-calculator' ), value: 'slate' },
 					] }
 					onChange={ ( preset ) => updateSettings( { theme: { ...theme, preset } } ) }
 				/>

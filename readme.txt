@@ -4,7 +4,7 @@ Tags: cost calculator, price calculator, quote calculator, calculator builder, e
 Requires at least: 6.2
 Tested up to: 7.0
 Requires PHP: 7.4
-Stable tag: 1.1.0
+Stable tag: 1.1.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -27,7 +27,7 @@ Cost, price and quote calculators with live totals. Conditional logic free, deci
 * Quote requests: name/email/phone/message form, entries stored in your dashboard, email notification, CSV export
 * 11 ready templates: cleaning price, moving cost, construction cost, solar panel quote, landscaping quote, catering quote, flooring cost, print quote, agency estimate, salon pricing, rental cost
 * Gutenberg block and `[alovio_calculator id="…"]` shortcode
-* 6 ready themes — Classic, Minimal, Midnight (dark), Soft, Bold, Slate — pick one, no CSS needed, plus a custom accent color
+* 6 ready themes, each a distinct design — Classic (studio card), Minimal (editorial), Midnight (dark glass), Soft (rounded pastel), Bold (neo-brutalist), Slate (compact dashboard) — pick one, no CSS needed, plus a custom accent color
 * Currency formatting you control (symbol, position, separators, decimals)
 * GDPR-friendly: no external requests, no IP storage, personal-data export/erase integration
 * Accessible front end: keyboard-friendly controls, screen-reader announced totals
@@ -84,6 +84,10 @@ PHP 7.4 and newer, including PHP 8.4.
 6. Per-calculator settings: currency, accent color, quote form
 
 == Changelog ==
+
+= 1.1.1 =
+* The 6 themes are now full, distinct designs rather than colour variants: Classic (studio card), Minimal (editorial ledger), Midnight (dark glass), Soft (rounded pastel), Bold (neo-brutalist), Slate (compact dashboard) — each with its own layout, typography and components.
+* Fixed the calculator container to honour its width on every theme (no horizontal overflow), and the toggle switch now renders consistently across themes.
 
 = 1.1.0 =
 * Added 5 new starter templates: construction cost, solar panel quote, landscaping quote, catering quote, and flooring/tiling cost — 11 in total, each demonstrating conditional logic.
