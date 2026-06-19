@@ -600,6 +600,22 @@ final class Presets {
 							'showInSummary' => true,
 						],
 						[
+							'id'            => 'asbestos',
+							'type'          => 'toggle',
+							'label'         => __( 'Asbestos survey (pre-1990 renovation)', 'alovio-calculator' ),
+							'price'         => 800,
+							'showInSummary' => true,
+							'conditions'      => [
+								[
+									'field'    => 'project',
+									'operator' => 'is',
+									'value'    => 'opt_reno',
+								],
+							],
+							'conditionMatch'  => 'all',
+							'conditionAction' => 'show',
+						],
+						[
 							'id'              => 'permit_note',
 							'type'            => 'heading',
 							'label'           => __( 'Permit handling includes drawings and council submission.', 'alovio-calculator' ),
@@ -618,7 +634,7 @@ final class Presets {
 							'type'          => 'formula',
 							'label'         => __( 'Estimated cost', 'alovio-calculator' ),
 							'showInSummary' => true,
-							'expression'    => 'round({area} * {project} * {floors} + {permit}, 0)',
+							'expression'    => 'round({area} * {project} * {floors} + {permit} + {asbestos}, 0)',
 						],
 					],
 					'settings'      => [
@@ -694,6 +710,24 @@ final class Presets {
 							'showInSummary' => true,
 						],
 						[
+							'id'            => 'backup',
+							'type'          => 'quantity',
+							'label'         => __( 'Backup circuits', 'alovio-calculator' ),
+							'min'           => 0,
+							'max'           => 10,
+							'default'       => 0,
+							'showInSummary' => true,
+							'conditions'      => [
+								[
+									'field'    => 'battery',
+									'operator' => 'is',
+									'value'    => '1',
+								],
+							],
+							'conditionMatch'  => 'all',
+							'conditionAction' => 'show',
+						],
+						[
 							'id'              => 'battery_note',
 							'type'            => 'heading',
 							'label'           => __( 'Battery storage may qualify for additional local rebates.', 'alovio-calculator' ),
@@ -712,7 +746,7 @@ final class Presets {
 							'type'          => 'formula',
 							'label'         => __( 'Estimated install', 'alovio-calculator' ),
 							'showInSummary' => true,
-							'expression'    => 'round({size} * {panel} + {battery} + {roof}, 0)',
+							'expression'    => 'round({size} * {panel} + {battery} + {roof} + {backup} * 120, 0)',
 						],
 					],
 					'settings'      => [
@@ -779,6 +813,24 @@ final class Presets {
 							'showInSummary' => true,
 						],
 						[
+							'id'            => 'beds',
+							'type'          => 'quantity',
+							'label'         => __( 'Flower beds to plant', 'alovio-calculator' ),
+							'min'           => 0,
+							'max'           => 20,
+							'default'       => 0,
+							'showInSummary' => true,
+							'conditions'      => [
+								[
+									'field'    => 'service',
+									'operator' => 'is',
+									'value'    => 'opt_design',
+								],
+							],
+							'conditionMatch'  => 'all',
+							'conditionAction' => 'show',
+						],
+						[
 							'id'              => 'irrigation_note',
 							'type'            => 'heading',
 							'label'           => __( 'Irrigation install includes a timer and a 12-month warranty.', 'alovio-calculator' ),
@@ -797,7 +849,7 @@ final class Presets {
 							'type'          => 'formula',
 							'label'         => __( 'Estimated quote', 'alovio-calculator' ),
 							'showInSummary' => true,
-							'expression'    => 'round({area} * {service} + {trees} * 25 + {irrigation}, 0)',
+							'expression'    => 'round({area} * {service} + {trees} * 25 + {irrigation} + {beds} * 60, 0)',
 						],
 					],
 					'settings'      => [
@@ -864,6 +916,22 @@ final class Presets {
 							'showInSummary' => true,
 						],
 						[
+							'id'            => 'sommelier',
+							'type'          => 'toggle',
+							'label'         => __( 'Sommelier service', 'alovio-calculator' ),
+							'price'         => 400,
+							'showInSummary' => true,
+							'conditions'      => [
+								[
+									'field'    => 'menu',
+									'operator' => 'is',
+									'value'    => 'opt_prem',
+								],
+							],
+							'conditionMatch'  => 'all',
+							'conditionAction' => 'show',
+						],
+						[
 							'id'              => 'drinks_note',
 							'type'            => 'heading',
 							'label'           => __( 'The open bar package covers a 4-hour service window.', 'alovio-calculator' ),
@@ -882,7 +950,7 @@ final class Presets {
 							'type'          => 'formula',
 							'label'         => __( 'Estimated quote', 'alovio-calculator' ),
 							'showInSummary' => true,
-							'expression'    => 'round({guests} * {menu} + {drinks} + {staff} * 150, 0)',
+							'expression'    => 'round({guests} * {menu} + {drinks} + {staff} * 150 + {sommelier}, 0)',
 						],
 					],
 					'settings'      => [
@@ -947,6 +1015,22 @@ final class Presets {
 							'showInSummary' => true,
 						],
 						[
+							'id'            => 'waterproof',
+							'type'          => 'toggle',
+							'label'         => __( 'Wet-area waterproofing', 'alovio-calculator' ),
+							'price'         => 350,
+							'showInSummary' => true,
+							'conditions'      => [
+								[
+									'field'    => 'material',
+									'operator' => 'is',
+									'value'    => 'opt_tile',
+								],
+							],
+							'conditionMatch'  => 'all',
+							'conditionAction' => 'show',
+						],
+						[
 							'id'              => 'removal_note',
 							'type'            => 'heading',
 							'label'           => __( 'Removal includes haul-away of the old floor and surface prep.', 'alovio-calculator' ),
@@ -965,7 +1049,7 @@ final class Presets {
 							'type'          => 'formula',
 							'label'         => __( 'Estimated cost', 'alovio-calculator' ),
 							'showInSummary' => true,
-							'expression'    => 'round({area} * {material} + {underlay} + {removal}, 0)',
+							'expression'    => 'round({area} * {material} + {underlay} + {removal} + {waterproof}, 0)',
 						],
 					],
 					'settings'      => [
