@@ -1,5 +1,5 @@
 /** Quote form submission per the spec §10 response contract. */
-export function wireQuoteForm( root, config, getRawValues ) {
+export function wireQuoteForm( root, config, getRawValues, validateRequired ) {
 	const form = root.querySelector( '.alc-quote' );
 	if ( ! form ) {
 		return;
@@ -12,8 +12,23 @@ export function wireQuoteForm( root, config, getRawValues ) {
 		feedback.className = 'alc-quote-feedback' + ( kind ? ` is-${ kind }` : '' );
 	};
 
+	// Errors can land on a contact field ([name="alc_contact_*"]) or, for THEN=require,
+	// on a calculator field ([data-alc-field]).
+	const showFieldError = ( key, message ) => {
+		const target =
+			form.querySelector( `[name="alc_contact_${ key }"]` )?.closest( '.alc-quote__field' ) ||
+			root.querySelector( `[data-alc-field="${ key }"]` );
+		if ( ! target ) {
+			return;
+		}
+		const note = document.createElement( 'span' );
+		note.className = 'alc-field-error';
+		note.textContent = message;
+		target.appendChild( note );
+	};
+
 	const clearFieldErrors = () => {
-		form.querySelectorAll( '.alc-field-error' ).forEach( ( el ) => el.remove() );
+		root.querySelectorAll( '.alc-field-error' ).forEach( ( el ) => el.remove() );
 	};
 
 	form.addEventListener( 'submit', async ( e ) => {
@@ -21,6 +36,15 @@ export function wireQuoteForm( root, config, getRawValues ) {
 		button.disabled = true;
 		clearFieldErrors();
 		setFeedback( '', null );
+
+		// Client-side require pre-check (the server re-validates authoritatively).
+		const reqErrors = validateRequired ? validateRequired() : {};
+		if ( Object.keys( reqErrors ).length ) {
+			Object.entries( reqErrors ).forEach( ( [ key, message ] ) => showFieldError( key, message ) );
+			setFeedback( config.i18n.requiredError || 'Please fill in the required fields.', 'error' );
+			button.disabled = false;
+			return;
+		}
 
 		const contact = {};
 		form.querySelectorAll( '[name^="alc_contact_"]' ).forEach( ( input ) => {
@@ -54,15 +78,7 @@ export function wireQuoteForm( root, config, getRawValues ) {
 		}
 
 		if ( response.status === 400 && body.fieldErrors ) {
-			Object.entries( body.fieldErrors ).forEach( ( [ key, message ] ) => {
-				const input = form.querySelector( `[name="alc_contact_${ key }"]` );
-				if ( input ) {
-					const note = document.createElement( 'span' );
-					note.className = 'alc-field-error';
-					note.textContent = message;
-					input.closest( '.alc-quote__field' ).appendChild( note );
-				}
-			} );
+			Object.entries( body.fieldErrors ).forEach( ( [ key, message ] ) => showFieldError( key, message ) );
 		}
 		setFeedback( body.message || config.i18n.networkError, 'error' );
 		button.disabled = false;

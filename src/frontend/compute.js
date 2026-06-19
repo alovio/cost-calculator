@@ -3,8 +3,11 @@
  * Pure functions, no DOM — unit-tested against the same expected values as the
  * PHP EvaluationTest. The server stays authoritative on submission.
  */
-import { compile, evaluate, references, orderFormulas, toScaled, FormulaError } from '../shared/formula';
-import { activeMap } from './conditional-logic';
+import { compile, evaluate, references, orderFormulas, toScaled, fromScaled, FormulaError } from '../shared/formula';
+import { activeMap, fieldRequired } from './conditional-logic';
+
+/** Fixed-point cap: bounds the formula↔condition feedback loop (cycle safety). */
+const MAX_PASSES = 8;
 
 const REFERENCEABLE_INPUTS = [ 'number', 'slider', 'select', 'radio', 'checkbox_group', 'toggle', 'quantity' ];
 const CONTROLLERS = [ 'number', 'slider', 'select', 'radio', 'checkbox_group', 'toggle', 'quantity', 'text' ];
@@ -129,24 +132,16 @@ function isPriced( field ) {
 	return [ 'select', 'radio', 'checkbox_group', 'toggle' ].includes( field.type );
 }
 
-/** Full §8 pass: condition values → active map → input amounts → ordered formulas → summary. */
-export function run( fields, prepared, rawValues ) {
-	const condValues = conditionValues( fields, rawValues );
-	const active = activeMap( fields, condValues );
-
+/** One pass: input value map (active-gated) then formulas in dependency order. */
+function computeValues( fields, prepared, active, rawValues ) {
 	const values = {};
 	fields
 		.filter( ( f ) => REFERENCEABLE_INPUTS.includes( f.type ) )
 		.forEach( ( f ) => {
 			values[ f.id ] = active[ f.id ] !== false ? inputAmount( f, rawValues[ f.id ] ) : 0;
 		} );
-
 	prepared.order.forEach( ( id ) => {
-		if ( prepared.errors[ id ] || ! prepared.asts[ id ] ) {
-			values[ id ] = 0;
-			return;
-		}
-		if ( active[ id ] === false ) {
+		if ( prepared.errors[ id ] || ! prepared.asts[ id ] || active[ id ] === false ) {
 			values[ id ] = 0;
 			return;
 		}
@@ -159,6 +154,43 @@ export function run( fields, prepared, rawValues ) {
 			values[ id ] = 0;
 		}
 	} );
+	return values;
+}
+
+/** Active maps are equal when every field's active state matches (built in field order). */
+function activeEqual( a, b ) {
+	const keys = Object.keys( a );
+	return keys.length === Object.keys( b ).length && keys.every( ( k ) => a[ k ] === b[ k ] );
+}
+
+/**
+ * Full §8 pass with the formula↔condition fixed-point — mirrors Evaluation::run.
+ * A formula result can drive a condition, which changes the active map, which changes
+ * the result; iterate until the active map settles (capped). With no formula-driven
+ * condition this converges on the first pass (identical to the old single pass).
+ */
+export function run( fields, prepared, rawValues ) {
+	const baseCond = conditionValues( fields, rawValues );
+	let condValues = baseCond;
+	let active = activeMap( fields, condValues );
+	let values = {};
+
+	for ( let pass = 0; pass < MAX_PASSES; pass++ ) {
+		values = computeValues( fields, prepared, active, rawValues );
+		const nextCond = { ...baseCond };
+		fields.forEach( ( f ) => {
+			if ( f.type === 'formula' ) {
+				nextCond[ f.id ] = active[ f.id ] !== false ? fromScaled( values[ f.id ] || 0 ) : '';
+			}
+		} );
+		const nextActive = activeMap( fields, nextCond );
+		condValues = nextCond;
+		if ( activeEqual( nextActive, active ) ) {
+			break;
+		}
+		active = nextActive;
+	}
+	values = computeValues( fields, prepared, active, rawValues );
 
 	const lineItems = [];
 	let totalScaled = null;
@@ -177,5 +209,11 @@ export function run( fields, prepared, rawValues ) {
 		} );
 	} );
 
-	return { active, values, lineItems, totalScaled };
+	// THEN=require: which active fields are mandatory now (against the settled condition map).
+	const required = {};
+	fields.forEach( ( f ) => {
+		required[ f.id ] = fieldRequired( f, condValues );
+	} );
+
+	return { active, values, lineItems, totalScaled, required };
 }

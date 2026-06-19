@@ -14,24 +14,13 @@ use Alovio\Calculator\Formula\FormulaGraph;
  */
 final class Evaluation {
 
+	/** Fixed-point cap: bounds the formula↔condition feedback loop (cycle safety). */
+	private const MAX_PASSES = 8;
+
 	public static function run( array $config, array $rawValues ): array {
 		$fields = $config['fields'];
 
-		$conditionValues = self::condition_values( $fields, $rawValues );
-		$active          = ConditionalLogic::active_map( [ 'fields' => $fields ], $conditionValues );
-
-		// §6 formula value map for inputs; inactive ⇒ 0.
-		$values = [];
-		foreach ( $fields as $field ) {
-			if ( ! FieldTypes::is_referenceable( $field['type'] ) || 'formula' === $field['type'] ) {
-				continue;
-			}
-			$values[ $field['id'] ] = ( $active[ $field['id'] ] ?? true )
-				? self::input_amount( $field, $rawValues[ $field['id'] ] ?? null )
-				: 0;
-		}
-
-		// Formulas in dependency order (§7/§8).
+		// Compile formulas once (compile/cycle errors + order are pass-invariant).
 		$errors   = [];
 		$formulas = [];
 		$asts     = [];
@@ -51,24 +40,41 @@ final class Evaluation {
 		$graph = FormulaGraph::order( $formulas );
 		foreach ( $graph['cycles'] as $id ) {
 			$errors[ $id ] = 'cycle';
-			$values[ $id ] = 0;
 		}
-		foreach ( $graph['order'] as $id ) {
-			if ( isset( $errors[ $id ] ) || ! isset( $asts[ $id ] ) ) {
-				$values[ $id ] = 0;
-				continue;
+
+		// Fixed-point: a formula result can drive a condition, which changes the active
+		// map, which changes the result. Re-derive the input map each pass and feed the
+		// formula results back in until the active map stabilises (capped for safety).
+		// With no formula-driven condition this converges on the first pass — identical
+		// to the previous single-pass behaviour.
+		$baseCond        = self::condition_values( $fields, $rawValues );
+		$conditionValues = $baseCond;
+		$active          = ConditionalLogic::active_map( [ 'fields' => $fields ], $conditionValues );
+		$values          = [];
+
+		for ( $pass = 0; $pass < self::MAX_PASSES; $pass++ ) {
+			$tmpErrors = [];
+			$values    = self::compute_values( $fields, $active, $asts, $errors, $graph['order'], $rawValues, $tmpErrors );
+			$nextCond  = $baseCond;
+			foreach ( $fields as $field ) {
+				if ( 'formula' === $field['type'] ) {
+					$nextCond[ $field['id'] ] = ( $active[ $field['id'] ] ?? true )
+						? DecimalMath::fromScaled( (int) ( $values[ $field['id'] ] ?? 0 ) )
+						: '';
+				}
 			}
-			if ( false === ( $active[ $id ] ?? true ) ) {
-				$values[ $id ] = 0; // Inactive formulas contribute 0, skip evaluation (§6).
-				continue;
+			$nextActive      = ConditionalLogic::active_map( [ 'fields' => $fields ], $nextCond );
+			$conditionValues = $nextCond;
+			if ( $nextActive === $active ) {
+				break;
 			}
-			try {
-				$values[ $id ] = Formula::evaluate( $asts[ $id ], $values );
-			} catch ( FormulaError $e ) {
-				$errors[ $id ] = $e->getErrorCode();
-				$values[ $id ] = 0;
-			}
+			$active = $nextActive;
 		}
+
+		// Final values + runtime errors, consistent with the settled active map.
+		$evalErrors = [];
+		$values     = self::compute_values( $fields, $active, $asts, $errors, $graph['order'], $rawValues, $evalErrors );
+		$errors     = $errors + $evalErrors;
 
 		// Summary line items + grand total (= last active formula in field order).
 		$lineItems   = [];
@@ -98,6 +104,41 @@ final class Evaluation {
 			'totalScaled'     => $totalScaled,
 			'errors'          => $errors,
 		];
+	}
+
+	/**
+	 * One evaluation pass: input value map (active-gated) then formulas in dependency
+	 * order. Runtime formula errors are collected into $evalErrors (kept separate from
+	 * compile/cycle errors so transient passes don't pollute the final error map).
+	 *
+	 * @param array<string,mixed>  $structural Compile + cycle errors (read-only here).
+	 * @param string[]             $order      Formula evaluation order.
+	 * @param array<string,string> $evalErrors Out param: runtime errors hit this pass.
+	 * @return array<string,int> field id => scaled value
+	 */
+	private static function compute_values( array $fields, array $active, array $asts, array $structural, array $order, array $rawValues, array &$evalErrors ): array {
+		$values = [];
+		foreach ( $fields as $field ) {
+			if ( ! FieldTypes::is_referenceable( $field['type'] ) || 'formula' === $field['type'] ) {
+				continue;
+			}
+			$values[ $field['id'] ] = ( $active[ $field['id'] ] ?? true )
+				? self::input_amount( $field, $rawValues[ $field['id'] ] ?? null )
+				: 0;
+		}
+		foreach ( $order as $id ) {
+			if ( isset( $structural[ $id ] ) || ! isset( $asts[ $id ] ) || false === ( $active[ $id ] ?? true ) ) {
+				$values[ $id ] = 0; // unparsable, cyclic, or inactive ⇒ 0 (§6).
+				continue;
+			}
+			try {
+				$values[ $id ] = Formula::evaluate( $asts[ $id ], $values );
+			} catch ( FormulaError $e ) {
+				$evalErrors[ $id ] = $e->getErrorCode();
+				$values[ $id ]     = 0;
+			}
+		}
+		return $values;
 	}
 
 	/** Spec §6 condition value map. Untrusted raw input is coerced here. */

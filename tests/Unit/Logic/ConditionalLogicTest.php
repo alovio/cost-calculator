@@ -47,4 +47,19 @@ class ConditionalLogicTest extends TestCase {
 		$this->assertTrue( $on['note'] );
 		$this->assertFalse( $off['note'] );
 	}
+
+	/** THEN=require: requires() reports mandatory state without affecting visibility. */
+	public function test_requires_reports_mandatory_state(): void {
+		$field = array(
+			'conditions'      => array( array( 'field' => 'a', 'operator' => 'is', 'value' => 'yes' ) ),
+			'conditionMatch'  => 'all',
+			'conditionAction' => 'require',
+		);
+		$this->assertTrue( ConditionalLogic::requires( $field, array( 'a' => 'yes' ) ) );  // condition met ⇒ mandatory
+		$this->assertFalse( ConditionalLogic::requires( $field, array( 'a' => 'no' ) ) );  // not met ⇒ optional
+		$this->assertTrue( ConditionalLogic::is_active( $field, array( 'a' => 'no' ) ) );  // require never hides
+
+		$show = array_merge( $field, array( 'conditionAction' => 'show' ) );
+		$this->assertFalse( ConditionalLogic::requires( $show, array( 'a' => 'yes' ) ) );  // show-action is never "required"
+	}
 }

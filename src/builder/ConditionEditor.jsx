@@ -19,9 +19,9 @@ const OP_LABELS = {
 /** Operators that need no value (presence checks). */
 const NO_VALUE_OPS = [ 'is_empty', 'is_not_empty' ];
 
-/** Conditions reference INPUT fields (formula/total controllers are added in the IF pass). */
-const CONTROLLER_TYPES = [ 'number', 'slider', 'select', 'radio', 'checkbox_group', 'toggle', 'quantity', 'text' ];
-const NUMERIC = [ 'number', 'slider', 'quantity' ];
+/** Conditions reference input fields and formula results (e.g. the running total). */
+const CONTROLLER_TYPES = [ 'number', 'slider', 'select', 'radio', 'checkbox_group', 'toggle', 'quantity', 'text', 'formula' ];
+const NUMERIC = [ 'number', 'slider', 'quantity', 'formula' ];
 
 function opsFor( controllerType ) {
 	if ( NUMERIC.includes( controllerType ) ) {
@@ -198,7 +198,13 @@ export default function ConditionEditor( { field } ) {
 						options={ [
 							{ label: __( 'Show this field', 'alovio-calculator' ), value: 'show' },
 							{ label: __( 'Hide this field', 'alovio-calculator' ), value: 'hide' },
+							{ label: __( 'Require this field', 'alovio-calculator' ), value: 'require' },
 						] }
+						help={
+							( field.conditionAction || 'show' ) === 'require'
+								? __( 'The field stays visible and must be filled in before a quote can be requested.', 'alovio-calculator' )
+								: undefined
+						}
 						onChange={ ( v ) => updateField( field.id, { conditionAction: v } ) }
 					/>
 				</>

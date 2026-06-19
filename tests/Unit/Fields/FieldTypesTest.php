@@ -23,6 +23,7 @@ class FieldTypesTest extends TestCase {
 		$this->assertTrue( FieldTypes::is_referenceable( 'toggle' ) );
 		$this->assertFalse( FieldTypes::is_referenceable( 'text' ) );
 		$this->assertTrue( FieldTypes::is_condition_controller( 'text' ) );
-		$this->assertFalse( FieldTypes::is_condition_controller( 'formula' ) ); // spec §6/§7
+		$this->assertTrue( FieldTypes::is_condition_controller( 'formula' ) );  // formula/total now drives conditions
+		$this->assertFalse( FieldTypes::is_condition_controller( 'heading' ) ); // headings still cannot
 	}
 }

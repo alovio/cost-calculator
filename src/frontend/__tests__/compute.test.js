@@ -78,4 +78,21 @@ describe( 'compute (parity with PHP Evaluation)', () => {
 		expect( r.totalScaled ).toBe( 150000 );
 		expect( conditionValues( fields, { extras: [ 'opt_a', 'opt_b', 'opt_zzz' ] } ).extras ).toBe( 'opt_a,opt_b' );
 	} );
+
+	it( 'a formula total drives a condition (fixed-point)', () => {
+		const fields = [
+			norm( { id: 'area', type: 'slider', label: 'Area', min: 10, max: 1000, default: 50 } ),
+			norm( { id: 'total', type: 'formula', label: 'Total', showInSummary: true, expression: '{area} * 10' } ),
+			norm( { id: 'bulk_note', type: 'heading', label: 'Bulk discount applies', conditions: [
+				{ field: 'total', operator: 'gte', value: '1000' },
+			] } ),
+		];
+		const below = run( fields, prepare( fields ), { area: '50' } );  // total 500 < 1000
+		expect( below.totalScaled ).toBe( 5000000 );
+		expect( below.active.bulk_note ).toBe( false );
+
+		const above = run( fields, prepare( fields ), { area: '120' } ); // total 1200 ≥ 1000
+		expect( above.totalScaled ).toBe( 12000000 );
+		expect( above.active.bulk_note ).toBe( true );
+	} );
 } );

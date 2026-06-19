@@ -53,7 +53,7 @@ class FieldSchemaTest extends TestCase {
 		$this->assertSame( 'a', $out['fields'][0]['id'] );
 	}
 
-	public function test_strips_conditions_with_formula_or_unknown_controllers(): void {
+	public function test_strips_unknown_controllers_keeps_formula(): void {
 		$out = FieldSchema::normalize( $this->config( [
 			[ 'id' => 'total', 'type' => 'formula', 'label' => 'T', 'expression' => '1 + 1' ],
 			[ 'id' => 'qty', 'type' => 'quantity', 'label' => 'Q' ],
@@ -64,9 +64,10 @@ class FieldSchemaTest extends TestCase {
 			], 'conditionMatch' => 'any', 'conditionAction' => 'require' ],
 		] ) );
 		$x = $out['fields'][2];
-		$this->assertCount( 1, $x['conditions'] );                  // only qty survives
-		$this->assertSame( 'qty', $x['conditions'][0]['field'] );
-		$this->assertSame( 'show', $x['conditionAction'] );          // require coerced to show (spec §6)
+		$this->assertCount( 2, $x['conditions'] );                   // formula (total) + qty survive; ghost stripped
+		$this->assertSame( 'total', $x['conditions'][0]['field'] );  // formula/total is a valid controller now
+		$this->assertSame( 'qty', $x['conditions'][1]['field'] );
+		$this->assertSame( 'require', $x['conditionAction'] );        // require is a real action now (THEN pass)
 	}
 
 	public function test_expression_normalization(): void {

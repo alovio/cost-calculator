@@ -164,7 +164,8 @@ final class FieldSchema {
 		}
 		$field['conditions']      = $conditions;
 		$field['conditionMatch']  = 'any' === ( $field['conditionMatch'] ?? '' ) ? 'any' : 'all';
-		$field['conditionAction'] = 'hide' === ( $field['conditionAction'] ?? '' ) ? 'hide' : 'show'; // require coerced (spec §6)
+		$action                   = (string) ( $field['conditionAction'] ?? 'show' );
+		$field['conditionAction'] = in_array( $action, [ 'show', 'hide', 'require' ], true ) ? $action : 'show';
 		return $field;
 	}
 

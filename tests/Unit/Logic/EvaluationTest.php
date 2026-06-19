@@ -96,4 +96,25 @@ class EvaluationTest extends TestCase {
 		$this->assertSame( 150000, $r['totalScaled'] );
 		$this->assertSame( 'opt_a,opt_b', $r['conditionValues']['extras'] );
 	}
+
+	/** IF pass: a formula result (the running total) drives a condition via the fixed-point. */
+	public function test_formula_total_drives_a_condition(): void {
+		$config = FieldSchema::normalize( [ 'fields' => [
+			[ 'id' => 'area', 'type' => 'slider', 'label' => 'Area', 'min' => 10, 'max' => 1000, 'default' => 50 ],
+			[ 'id' => 'total', 'type' => 'formula', 'label' => 'Total', 'showInSummary' => true, 'expression' => '{area} * 10' ],
+			[ 'id' => 'bulk_note', 'type' => 'heading', 'label' => 'Bulk discount applies', 'conditions' => [
+				[ 'field' => 'total', 'operator' => 'gte', 'value' => '1000' ],
+			], 'conditionMatch' => 'all', 'conditionAction' => 'show' ],
+		] ] );
+
+		$below = Evaluation::run( $config, [ 'area' => '50' ] );   // total 500 < 1000
+		$this->assertSame( 5000000, $below['totalScaled'] );
+		$this->assertSame( '500', $below['conditionValues']['total'] ); // unscaled formula value exposed to conditions
+		$this->assertFalse( $below['active']['bulk_note'] );
+
+		$above = Evaluation::run( $config, [ 'area' => '120' ] );  // total 1200 ≥ 1000
+		$this->assertSame( 12000000, $above['totalScaled'] );
+		$this->assertSame( '1200', $above['conditionValues']['total'] );
+		$this->assertTrue( $above['active']['bulk_note'] );
+	}
 }

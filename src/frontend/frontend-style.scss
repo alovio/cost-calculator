@@ -226,3 +226,10 @@
 		box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.08);
 	}
 }
+
+/* THEN=require: mark a conditionally-required field with an accent asterisk. */
+.alc-field--required > label::after,
+.alc-field--required legend::after {
+	content: ' *';
+	color: var(--alc-accent);
+}

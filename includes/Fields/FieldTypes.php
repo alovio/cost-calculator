@@ -34,8 +34,8 @@ final class FieldTypes {
 		return in_array( $type, self::REFERENCEABLE, true );
 	}
 
-	/** Spec §6: conditions may reference input fields only — never formula/heading/html. */
+	/** Conditions may reference input fields and formula results (e.g. the running total) — never heading/html. */
 	public static function is_condition_controller( string $type ): bool {
-		return self::is_input( $type );
+		return self::is_input( $type ) || 'formula' === $type;
 	}
 }

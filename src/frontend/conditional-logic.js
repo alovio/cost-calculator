@@ -91,6 +91,26 @@ export function fieldActive( field, values ) {
 	return evaluate( field.condition, values );
 }
 
+/**
+ * Whether a require-action field is mandatory right now (mirrors PHP
+ * ConditionalLogic::requires). 'require' affects validation, not visibility.
+ *
+ * @param {Object} field
+ * @param {Object} values
+ * @return {boolean}
+ */
+export function fieldRequired( field, values ) {
+	if ( Array.isArray( field.conditions ) && field.conditions.length ) {
+		if ( ( field.conditionAction || 'show' ) !== 'require' ) {
+			return false;
+		}
+		const results = field.conditions.map( ( r ) => matchRule( r, values ) );
+		return field.conditionMatch === 'any' ? results.indexOf( true ) !== -1 : results.indexOf( false ) === -1;
+	}
+	const c = field.condition;
+	return !! c && ( c.action || 'show' ) === 'require' && matchRule( c, values );
+}
+
 function controllers( field ) {
 	if ( Array.isArray( field.conditions ) && field.conditions.length ) {
 		return field.conditions.map( ( r ) => r.field ).filter( Boolean );

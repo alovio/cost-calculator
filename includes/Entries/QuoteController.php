@@ -4,6 +4,7 @@ declare( strict_types=1 );
 namespace Alovio\Calculator\Entries;
 
 use Alovio\Calculator\Fields\FieldRepository;
+use Alovio\Calculator\Logic\ConditionalLogic;
 use Alovio\Calculator\Logic\Evaluation;
 
 defined( 'ABSPATH' ) || exit;
@@ -89,7 +90,22 @@ final class QuoteController {
 		}
 
 		// Authoritative recompute — the client's total is ignored (spec §10).
-		$result   = Evaluation::run( $config, $rawValues );
+		$result = Evaluation::run( $config, $rawValues );
+
+		// THEN=require: an active, mandatory field left empty blocks the quote.
+		$requiredErrors = self::validate_required( $config['fields'], $result['conditionValues'], $rawValues );
+		if ( ! empty( $requiredErrors ) ) {
+			return new \WP_REST_Response(
+				array(
+					'ok'          => false,
+					'code'        => 'invalid',
+					'message'     => __( 'Please correct the highlighted fields.', 'alovio-calculator' ),
+					'fieldErrors' => $requiredErrors,
+				),
+				400
+			);
+		}
+
 		$snapshot = array(
 			'values'      => array_map( 'sanitize_text_field', $result['conditionValues'] ), // §12: text fields carry raw visitor input — sanitize at the storage boundary.
 			'lineItems'   => $result['lineItems'],
@@ -104,6 +120,31 @@ final class QuoteController {
 		( new EntryMailer() )->notify( $post, $config, $validated['contact'], $snapshot );
 
 		return new \WP_REST_Response( array( 'ok' => true ), 201 );
+	}
+
+	/**
+	 * THEN=require: collect field errors for active, mandatory fields the visitor left empty.
+	 * Pure + unit-tested; the conditionValues map is the authoritative server one.
+	 *
+	 * @param array<int,array<string,mixed>> $fields
+	 * @param array<string,string>           $conditionValues
+	 * @param array<string,mixed>            $rawValues
+	 * @return array<string,string> field id => message
+	 */
+	public static function validate_required( array $fields, array $conditionValues, array $rawValues ): array {
+		$errors = array();
+		foreach ( $fields as $field ) {
+			if ( ! ConditionalLogic::requires( $field, $conditionValues ) ) {
+				continue;
+			}
+			$v     = $rawValues[ $field['id'] ] ?? '';
+			$empty = is_array( $v ) ? 0 === count( $v ) : '' === trim( (string) $v );
+			if ( $empty ) {
+				/* translators: %s: field label */
+				$errors[ $field['id'] ] = sprintf( __( '%s is required.', 'alovio-calculator' ), (string) ( $field['label'] ?? $field['id'] ) );
+			}
+		}
+		return $errors;
 	}
 
 	/** Pure, unit-tested. */

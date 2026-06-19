@@ -50,4 +50,24 @@ class QuoteControllerTest extends TestCase {
 		);
 		$this->assertArrayHasKey( 'name', $r['fieldErrors'] );
 	}
+
+	public function test_validate_required_blocks_empty_mandatory_fields(): void {
+		$fields = [
+			[ 'id' => 'a', 'type' => 'toggle' ],
+			[
+				'id'              => 'ref',
+				'type'            => 'text',
+				'label'           => 'Reference',
+				'conditions'      => [ [ 'field' => 'a', 'operator' => 'is', 'value' => '1' ] ],
+				'conditionMatch'  => 'all',
+				'conditionAction' => 'require',
+			],
+		];
+		// toggle on ⇒ ref mandatory ⇒ empty ref errors
+		$this->assertArrayHasKey( 'ref', QuoteController::validate_required( $fields, [ 'a' => '1' ], [ 'a' => '1', 'ref' => '' ] ) );
+		// ref filled ⇒ passes
+		$this->assertSame( [], QuoteController::validate_required( $fields, [ 'a' => '1' ], [ 'a' => '1', 'ref' => 'PO-42' ] ) );
+		// toggle off ⇒ ref not mandatory ⇒ empty ref OK
+		$this->assertSame( [], QuoteController::validate_required( $fields, [ 'a' => '' ], [ 'a' => '', 'ref' => '' ] ) );
+	}
 }

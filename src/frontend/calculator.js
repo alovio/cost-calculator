@@ -51,6 +51,31 @@ function applyVisibility( root, active ) {
 	} );
 }
 
+/** THEN=require: flag mandatory fields (visual marker + aria-required for a11y). */
+function applyRequired( root, required ) {
+	Object.entries( required ).forEach( ( [ id, isReq ] ) => {
+		const wrap = root.querySelector( `[data-alc-field="${ id }"]` );
+		if ( ! wrap ) {
+			return;
+		}
+		wrap.classList.toggle( 'alc-field--required', !! isReq );
+		wrap.querySelectorAll( 'input, select, textarea' ).forEach( ( el ) => {
+			el.setAttribute( 'aria-required', isReq ? 'true' : 'false' );
+		} );
+	} );
+}
+
+/** A required field is unsatisfied when the visitor left it empty / unselected. */
+function isEmptyValue( field, raw ) {
+	if ( field.type === 'checkbox_group' ) {
+		return ! Array.isArray( raw ) || raw.length === 0;
+	}
+	if ( field.type === 'toggle' ) {
+		return raw !== '1';
+	}
+	return raw === undefined || raw === null || String( raw ).trim() === '';
+}
+
 function updateInlineLines( root, fields, values ) {
 	fields
 		.filter( ( f ) => f.type === 'formula' )
@@ -73,17 +98,36 @@ function initCalculator( root ) {
 	} catch ( e ) {
 		return;
 	}
-	config.i18n = { networkError: 'Something went wrong. Please try again.' };
+	config.i18n = {
+		networkError: 'Something went wrong. Please try again.',
+		requiredError: 'Please fill in the required fields.',
+	};
 
 	const fields = config.fields || [];
 	const prepared = prepare( fields );
 
+	let lastResult = { active: {}, required: {} };
 	const recompute = () => {
 		const raw = collectRawValues( root, fields );
 		const result = run( fields, prepared, raw );
+		lastResult = result;
 		applyVisibility( root, result.active );
+		applyRequired( root, result.required );
 		updateInlineLines( root, fields, result.values );
 		updateSummary( root, result, config.settings.currency );
+	};
+
+	// THEN=require: block the quote when an active, mandatory field is empty.
+	// Keyed by field id; the server re-validates authoritatively.
+	const validateRequired = () => {
+		const raw = collectRawValues( root, fields );
+		const errors = {};
+		fields.forEach( ( f ) => {
+			if ( lastResult.required[ f.id ] && lastResult.active[ f.id ] !== false && isEmptyValue( f, raw[ f.id ] ) ) {
+				errors[ f.id ] = ( f.label || '' ) + ' ' + 'is required.';
+			}
+		} );
+		return errors;
 	};
 
 	root.addEventListener( 'input', ( e ) => {
@@ -104,7 +148,7 @@ function initCalculator( root ) {
 		}
 	} );
 
-	wireQuoteForm( root, config, () => collectRawValues( root, fields ) );
+	wireQuoteForm( root, config, () => collectRawValues( root, fields ), validateRequired );
 	recompute(); // Sync once on init (server already rendered defaults; this is idempotent).
 }
 

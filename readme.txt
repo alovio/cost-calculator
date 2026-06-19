@@ -14,7 +14,7 @@ Cost, price and quote calculators with live totals. Conditional logic free, deci
 
 **Alovio Calculator** is a calculator-first form builder: give visitors an instant, accurate price while you collect the lead. Build a cost calculator, a price estimate or an instant quote for almost any service — cleaning, moving, construction and renovation, solar panels, landscaping, catering, flooring and tiling, print, agencies, salons or equipment rental — in minutes. Start from a ready template, tweak the prices, and paste a shortcode.
 
-**Conditional logic is free.** Show or hide any field based on another field — sliders, dropdowns, toggles, quantities — with AND/OR rules. No upgrade wall in front of the feature a quote calculator actually needs.
+**Conditional logic is free.** Show, hide or require any field based on another field — or even on the running total — with AND/OR rules and operators for equality, ranges (≥, ≤) and presence (is empty / is not empty). No upgrade wall in front of the feature a quote calculator actually needs.
 
 **The math is exact.** Every calculation runs on a fixed-point decimal engine, mirrored in PHP and JavaScript and locked together by a shared test suite — so 0.1 + 0.2 is 0.3, totals never drift by a cent, and the price your visitor sees is the price your email says. Works on any host running PHP 7.4 or newer.
 
@@ -23,7 +23,7 @@ Cost, price and quote calculators with live totals. Conditional logic free, deci
 * Drag-and-drop builder with 11 field types: number, slider, dropdown, multiple choice (with images), checkboxes, toggle, quantity, text, heading, HTML, formula
 * Per-option prices on choice fields; live sticky summary with line items and total
 * Formula fields with `+ − × ÷`, `if()`, `min`, `max`, `round`, `ceil`, `floor`, `abs` — validated live as you type
-* Conditional logic (show/hide, AND/OR, all operators) — free
+* Conditional logic — free: show / hide / require, AND/OR, equality + range (≥, ≤) + empty/not-empty operators, conditions even on the running total
 * Quote requests: name/email/phone/message form, entries stored in your dashboard, email notification, CSV export
 * 11 ready templates: cleaning price, moving cost, construction cost, solar panel quote, landscaping quote, catering quote, flooring cost, print quote, agency estimate, salon pricing, rental cost
 * Gutenberg block and `[alovio_calculator id="…"]` shortcode
@@ -87,6 +87,9 @@ PHP 7.4 and newer, including PHP 8.4.
 = 1.1.0 =
 * Added 5 new starter templates: construction cost, solar panel quote, landscaping quote, catering quote, and flooring/tiling cost — 11 in total, each demonstrating conditional logic.
 * Templates now showcase conditional pricing: optional priced fields appear based on earlier choices and add to the total only when shown.
+* Conditional logic engine: new operators "is at least" (≥), "is at most" (≤), "is empty" and "is not empty".
+* Conditions can now be driven by the running total or any formula result (e.g. show a bulk-discount note when the total passes a threshold).
+* New "require this field" conditional action — a field stays visible and must be filled before a quote is requested (validated on the server).
 * New default accent color for new calculators.
 * Documentation and readme refinements.
 
