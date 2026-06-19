@@ -7,5 +7,16 @@
   { "name": "is_not + differs -> active", "condition": { "field": "a", "operator": "is_not", "value": "yes", "action": "show" }, "values": { "a": "no" }, "expectedActive": true },
   { "name": "is_not + equals -> inactive", "condition": { "field": "a", "operator": "is_not", "value": "yes", "action": "show" }, "values": { "a": "yes" }, "expectedActive": false },
   { "name": "require action is always active", "condition": { "field": "a", "operator": "is", "value": "yes", "action": "require" }, "values": { "a": "no" }, "expectedActive": true },
-  { "name": "missing controller value treated as empty", "condition": { "field": "a", "operator": "is", "value": "", "action": "show" }, "values": {}, "expectedActive": true }
+  { "name": "missing controller value treated as empty", "condition": { "field": "a", "operator": "is", "value": "", "action": "show" }, "values": {}, "expectedActive": true },
+  { "name": "gte equal -> active", "condition": { "field": "a", "operator": "gte", "value": "5", "action": "show" }, "values": { "a": "5" }, "expectedActive": true },
+  { "name": "gte greater -> active", "condition": { "field": "a", "operator": "gte", "value": "5", "action": "show" }, "values": { "a": "6" }, "expectedActive": true },
+  { "name": "gte less -> inactive", "condition": { "field": "a", "operator": "gte", "value": "5", "action": "show" }, "values": { "a": "4" }, "expectedActive": false },
+  { "name": "gte non-numeric -> inactive", "condition": { "field": "a", "operator": "gte", "value": "5", "action": "show" }, "values": { "a": "x" }, "expectedActive": false },
+  { "name": "lte equal -> active", "condition": { "field": "a", "operator": "lte", "value": "5", "action": "show" }, "values": { "a": "5" }, "expectedActive": true },
+  { "name": "lte greater -> inactive", "condition": { "field": "a", "operator": "lte", "value": "5", "action": "show" }, "values": { "a": "6" }, "expectedActive": false },
+  { "name": "is_empty + empty -> active", "condition": { "field": "a", "operator": "is_empty", "value": "", "action": "show" }, "values": { "a": "" }, "expectedActive": true },
+  { "name": "is_empty + missing -> active", "condition": { "field": "a", "operator": "is_empty", "value": "", "action": "show" }, "values": {}, "expectedActive": true },
+  { "name": "is_empty + filled -> inactive", "condition": { "field": "a", "operator": "is_empty", "value": "", "action": "show" }, "values": { "a": "x" }, "expectedActive": false },
+  { "name": "is_not_empty + filled -> active", "condition": { "field": "a", "operator": "is_not_empty", "value": "", "action": "show" }, "values": { "a": "x" }, "expectedActive": true },
+  { "name": "is_not_empty + empty -> inactive", "condition": { "field": "a", "operator": "is_not_empty", "value": "", "action": "show" }, "values": { "a": "" }, "expectedActive": false }
 ]

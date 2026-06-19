@@ -9,27 +9,34 @@ const OP_LABELS = {
 	is_not: __( 'is not', 'alovio-calculator' ),
 	contains: __( 'contains', 'alovio-calculator' ),
 	gt: __( 'greater than', 'alovio-calculator' ),
+	gte: __( 'is at least', 'alovio-calculator' ),
 	lt: __( 'less than', 'alovio-calculator' ),
+	lte: __( 'is at most', 'alovio-calculator' ),
+	is_empty: __( 'is empty', 'alovio-calculator' ),
+	is_not_empty: __( 'is not empty', 'alovio-calculator' ),
 };
 
-/** Spec §6: conditions reference INPUT fields only — never formula/heading/html. */
+/** Operators that need no value (presence checks). */
+const NO_VALUE_OPS = [ 'is_empty', 'is_not_empty' ];
+
+/** Conditions reference INPUT fields (formula/total controllers are added in the IF pass). */
 const CONTROLLER_TYPES = [ 'number', 'slider', 'select', 'radio', 'checkbox_group', 'toggle', 'quantity', 'text' ];
 const NUMERIC = [ 'number', 'slider', 'quantity' ];
 
 function opsFor( controllerType ) {
 	if ( NUMERIC.includes( controllerType ) ) {
-		return [ 'is', 'gt', 'lt' ];
+		return [ 'is', 'gt', 'gte', 'lt', 'lte', 'is_empty', 'is_not_empty' ];
 	}
 	if ( controllerType === 'select' || controllerType === 'radio' ) {
-		return [ 'is', 'is_not' ];
+		return [ 'is', 'is_not', 'is_empty', 'is_not_empty' ];
 	}
 	if ( controllerType === 'checkbox_group' ) {
-		return [ 'contains', 'is', 'is_not' ]; // contains = membership over comma-joined slugs
+		return [ 'contains', 'is', 'is_not', 'is_empty', 'is_not_empty' ]; // contains = membership over comma-joined slugs
 	}
 	if ( controllerType === 'toggle' ) {
 		return [ 'is' ];
 	}
-	return [ 'is', 'is_not', 'contains', 'gt', 'lt' ]; // text
+	return [ 'is', 'is_not', 'contains', 'gt', 'gte', 'lt', 'lte', 'is_empty', 'is_not_empty' ]; // text
 }
 
 function opOptions( ops ) {
@@ -107,9 +114,13 @@ function RuleRow( { rule, controllers, onChange, onRemove, canRemove } ) {
 				label={ __( 'Operator', 'alovio-calculator' ) }
 				value={ ops.includes( rule.operator ) ? rule.operator : ops[ 0 ] }
 				options={ opOptions( ops ) }
-				onChange={ ( operator ) => onChange( { ...rule, operator } ) }
+				onChange={ ( operator ) =>
+					onChange( NO_VALUE_OPS.includes( operator ) ? { ...rule, operator, value: '' } : { ...rule, operator } )
+				}
 			/>
-			<ValueInput controller={ controller } value={ rule.value } onChange={ ( value ) => onChange( { ...rule, value } ) } />
+			{ ! NO_VALUE_OPS.includes( rule.operator ) && (
+				<ValueInput controller={ controller } value={ rule.value } onChange={ ( value ) => onChange( { ...rule, value } ) } />
+			) }
 			{ canRemove && (
 				<Button isDestructive variant="link" onClick={ onRemove }>{ __( 'Remove rule', 'alovio-calculator' ) }</Button>
 			) }

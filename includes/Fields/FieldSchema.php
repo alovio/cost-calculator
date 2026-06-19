@@ -5,7 +5,7 @@ final class FieldSchema {
 
 	public const SCHEMA_VERSION   = 1;
 	public const EXPRESSION_LIMIT = 1000;
-	private const OPERATORS       = [ 'is', 'is_not', 'contains', 'gt', 'lt' ];
+	private const OPERATORS       = [ 'is', 'is_not', 'contains', 'gt', 'gte', 'lt', 'lte', 'is_empty', 'is_not_empty' ];
 
 	public static function defaults(): array {
 		return [

@@ -29,8 +29,16 @@ function matchRule( rule, values ) {
 			return right !== '' && left.indexOf( right ) !== -1;
 		case 'gt':
 			return isNum( left ) && isNum( right ) && parseFloat( left ) > parseFloat( right );
+		case 'gte':
+			return isNum( left ) && isNum( right ) && parseFloat( left ) >= parseFloat( right );
 		case 'lt':
 			return isNum( left ) && isNum( right ) && parseFloat( left ) < parseFloat( right );
+		case 'lte':
+			return isNum( left ) && isNum( right ) && parseFloat( left ) <= parseFloat( right );
+		case 'is_empty':
+			return left === '';
+		case 'is_not_empty':
+			return left !== '';
 		case 'is':
 		default:
 			return left === right;

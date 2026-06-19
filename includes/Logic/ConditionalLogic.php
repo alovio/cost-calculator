@@ -40,8 +40,16 @@ final class ConditionalLogic {
 				return '' !== $right && false !== strpos( $left, $right );
 			case 'gt':
 				return is_numeric( $left ) && is_numeric( $right ) && (float) $left > (float) $right;
+			case 'gte':
+				return is_numeric( $left ) && is_numeric( $right ) && (float) $left >= (float) $right;
 			case 'lt':
 				return is_numeric( $left ) && is_numeric( $right ) && (float) $left < (float) $right;
+			case 'lte':
+				return is_numeric( $left ) && is_numeric( $right ) && (float) $left <= (float) $right;
+			case 'is_empty':
+				return '' === $left;
+			case 'is_not_empty':
+				return '' !== $left;
 			case 'is':
 			default:
 				return $left === $right;
