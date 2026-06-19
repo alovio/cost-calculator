@@ -86,7 +86,7 @@ class FieldSchemaTest extends TestCase {
 		$this->assertSame( '$', $s['currency']['symbol'] );
 		$this->assertSame( 'before', $s['currency']['position'] ); // default on invalid
 		$this->assertSame( 2, $s['currency']['decimals'] );        // default on out-of-range
-		$this->assertSame( '#0a66ff', $s['theme']['accent'] );     // default on invalid
+		$this->assertSame( '#f97316', $s['theme']['accent'] );     // default on invalid
 		$this->assertTrue( $s['quoteForm']['enabled'] );
 		$this->assertSame( [ 'name', 'email' ], $s['quoteForm']['fields'] );
 		$this->assertSame( '', $s['quoteForm']['notifyEmail'] );

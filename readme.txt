@@ -86,6 +86,8 @@ PHP 7.4 and newer, including PHP 8.4.
 
 = 1.1.0 =
 * Added 5 new starter templates: construction cost, solar panel quote, landscaping quote, catering quote, and flooring/tiling cost — 11 in total, each demonstrating conditional logic.
+* Templates now showcase conditional pricing: optional priced fields appear based on earlier choices and add to the total only when shown.
+* New default accent color for new calculators.
 * Documentation and readme refinements.
 
 = 1.0.0 =

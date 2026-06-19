@@ -19,7 +19,7 @@ final class FieldSchema {
 					'thousandSep' => ',',
 					'decimalSep'  => '.',
 				],
-				'theme'     => [ 'accent' => '#0a66ff' ],
+				'theme'     => [ 'accent' => '#f97316' ],
 				'quoteForm' => [
 					'enabled'        => false,
 					'fields'         => [ 'name', 'email' ],

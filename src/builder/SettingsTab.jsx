@@ -51,7 +51,7 @@ export default function SettingsTab() {
 				<h3>{ __( 'Appearance', 'alovio-calculator' ) }</h3>
 				<p className="alc-hint">{ __( 'Accent color (buttons, slider, total).', 'alovio-calculator' ) }</p>
 				<ColorPicker
-					color={ theme.accent || '#0a66ff' }
+					color={ theme.accent || '#f97316' }
 					onChange={ ( accent ) => updateSettings( { theme: { ...theme, accent } } ) }
 					enableAlpha={ false }
 				/>
