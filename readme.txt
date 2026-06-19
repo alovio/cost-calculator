@@ -4,7 +4,7 @@ Tags: cost calculator, price calculator, quote calculator, calculator builder, e
 Requires at least: 6.2
 Tested up to: 7.0
 Requires PHP: 7.4
-Stable tag: 1.1.1
+Stable tag: 1.1.2
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -85,9 +85,11 @@ PHP 7.4 and newer, including PHP 8.4.
 
 == Changelog ==
 
+= 1.1.2 =
+* Added a "Check for updates" link on the Plugins screen that asks WordPress to re-check WordPress.org for a new version right away.
+
 = 1.1.1 =
 * The 6 themes are now full, distinct designs rather than colour variants: Classic (studio card), Minimal (editorial ledger), Midnight (dark glass), Soft (rounded pastel), Bold (neo-brutalist), Slate (compact dashboard) — each with its own layout, typography and components.
-* Added a "Check for updates" link on the Plugins screen that asks WordPress to re-check WordPress.org for a new version right away.
 * Fixed the calculator container to honour its width on every theme (no horizontal overflow), and the toggle switch now renders consistently across themes.
 
 = 1.1.0 =
