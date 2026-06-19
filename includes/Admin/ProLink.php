@@ -40,7 +40,7 @@ final class ProLink {
 
 		$links[] = sprintf(
 			'<a href="%s" target="_blank" rel="noopener noreferrer" style="color:#f97316;font-weight:600;">%s</a>',
-			esc_url( self::URL ),
+			esc_url( self::URL . '#pro' ),
 			esc_html__( 'Upgrade to Pro', 'alovio-calculator' )
 		);
 
