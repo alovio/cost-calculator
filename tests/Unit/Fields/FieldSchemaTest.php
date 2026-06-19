@@ -80,7 +80,7 @@ class FieldSchemaTest extends TestCase {
 	public function test_settings_defaults_and_sanitization(): void {
 		$out = FieldSchema::normalize( $this->config( [], [
 			'currency'  => [ 'symbol' => '<b>$</b>', 'position' => 'nonsense', 'decimals' => 9 ],
-			'theme'     => [ 'accent' => 'javascript:alert(1)' ],
+			'theme'     => [ 'accent' => 'javascript:alert(1)', 'preset' => 'hacker' ],
 			'quoteForm' => [ 'enabled' => 1, 'fields' => [ 'name', 'email', 'bogus' ], 'notifyEmail' => 'not-an-email' ],
 		] ) );
 		$s = $out['settings'];
@@ -88,6 +88,10 @@ class FieldSchemaTest extends TestCase {
 		$this->assertSame( 'before', $s['currency']['position'] ); // default on invalid
 		$this->assertSame( 2, $s['currency']['decimals'] );        // default on out-of-range
 		$this->assertSame( '#f97316', $s['theme']['accent'] );     // default on invalid
+		$this->assertSame( 'classic', $s['theme']['preset'] );     // unknown theme ⇒ classic default
+
+		$ok = FieldSchema::normalize( [ 'fields' => [], 'settings' => [ 'theme' => [ 'preset' => 'midnight' ] ] ] );
+		$this->assertSame( 'midnight', $ok['settings']['theme']['preset'] ); // a valid theme survives
 		$this->assertTrue( $s['quoteForm']['enabled'] );
 		$this->assertSame( [ 'name', 'email' ], $s['quoteForm']['fields'] );
 		$this->assertSame( '', $s['quoteForm']['notifyEmail'] );

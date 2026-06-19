@@ -49,6 +49,20 @@ export default function SettingsTab() {
 
 			<section>
 				<h3>{ __( 'Appearance', 'alovio-calculator' ) }</h3>
+				<SelectControl
+					label={ __( 'Theme', 'alovio-calculator' ) }
+					help={ __( 'A ready-made look — pick one and tweak the accent below. No CSS needed.', 'alovio-calculator' ) }
+					value={ theme.preset || 'classic' }
+					options={ [
+						{ label: __( 'Classic — clean & neutral', 'alovio-calculator' ), value: 'classic' },
+						{ label: __( 'Minimal — flat & airy', 'alovio-calculator' ), value: 'minimal' },
+						{ label: __( 'Midnight — dark', 'alovio-calculator' ), value: 'midnight' },
+						{ label: __( 'Soft — rounded & gentle', 'alovio-calculator' ), value: 'soft' },
+						{ label: __( 'Bold — high contrast', 'alovio-calculator' ), value: 'bold' },
+						{ label: __( 'Slate — professional', 'alovio-calculator' ), value: 'slate' },
+					] }
+					onChange={ ( preset ) => updateSettings( { theme: { ...theme, preset } } ) }
+				/>
 				<p className="alc-hint">{ __( 'Accent color (buttons, slider, total).', 'alovio-calculator' ) }</p>
 				<ColorPicker
 					color={ theme.accent || '#f97316' }

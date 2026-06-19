@@ -20,6 +20,7 @@ final class CalculatorRenderer {
 		$currency = $config['settings']['currency'];
 		$quote    = $config['settings']['quoteForm'];
 		$accent   = $config['settings']['theme']['accent'];
+		$preset   = $config['settings']['theme']['preset'] ?? 'classic';
 
 		$successMessage = '' !== $quote['successMessage']
 			? $quote['successMessage']
@@ -39,7 +40,7 @@ final class CalculatorRenderer {
 			),
 		);
 
-		$html  = sprintf( '<div class="alc-calculator" data-alc-id="%d" style="--alc-accent:%s">', $id, esc_attr( $accent ) );
+		$html  = sprintf( '<div class="alc-calculator alc-theme--%s" data-alc-id="%d" style="--alc-accent:%s">', esc_attr( $preset ), $id, esc_attr( $accent ) );
 		$html .= '<div class="alc-fields">';
 		foreach ( $config['fields'] as $field ) {
 			$html .= self::render_field( $field, $result );

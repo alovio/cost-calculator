@@ -6,6 +6,7 @@ final class FieldSchema {
 	public const SCHEMA_VERSION   = 1;
 	public const EXPRESSION_LIMIT = 1000;
 	private const OPERATORS       = [ 'is', 'is_not', 'contains', 'gt', 'gte', 'lt', 'lte', 'is_empty', 'is_not_empty' ];
+	private const THEMES          = [ 'classic', 'minimal', 'midnight', 'soft', 'bold', 'slate' ];
 
 	public static function defaults(): array {
 		return [
@@ -19,7 +20,7 @@ final class FieldSchema {
 					'thousandSep' => ',',
 					'decimalSep'  => '.',
 				],
-				'theme'     => [ 'accent' => '#f97316' ],
+				'theme'     => [ 'accent' => '#f97316', 'preset' => 'classic' ],
 				'quoteForm' => [
 					'enabled'        => false,
 					'fields'         => [ 'name', 'email' ],
@@ -186,6 +187,8 @@ final class FieldSchema {
 		}
 
 		$accent = sanitize_hex_color( (string) ( $raw['theme']['accent'] ?? '' ) );
+		$preset = (string) ( $raw['theme']['preset'] ?? '' );
+		$preset = in_array( $preset, self::THEMES, true ) ? $preset : $d['theme']['preset'];
 
 		return [
 			'currency'  => [
@@ -195,7 +198,7 @@ final class FieldSchema {
 				'thousandSep' => sanitize_text_field( (string) ( $currency['thousandSep'] ?? $d['currency']['thousandSep'] ) ),
 				'decimalSep'  => sanitize_text_field( (string) ( $currency['decimalSep'] ?? $d['currency']['decimalSep'] ) ),
 			],
-			'theme'     => [ 'accent' => '' !== (string) $accent ? $accent : $d['theme']['accent'] ],
+			'theme'     => [ 'accent' => '' !== (string) $accent ? $accent : $d['theme']['accent'], 'preset' => $preset ],
 			'quoteForm' => [
 				'enabled'        => ! empty( $quote['enabled'] ),
 				'fields'         => $fields,

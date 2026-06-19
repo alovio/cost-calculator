@@ -1,18 +1,87 @@
 /* Alovio Calculator front-end theme — tokens via CSS custom properties (spec §8).
-   Everything namespaced .alc-; logical properties for RTL safety. */
+   Everything namespaced .alc-; logical properties for RTL safety.
+
+   Six ready themes ship as variable presets: the base block below is "classic"
+   (the default); .alc-theme--{minimal,midnight,soft,bold,slate} override the tokens.
+   --alc-accent is set inline by the renderer (the per-calculator accent colour). */
 
 .alc-calculator {
+	/* themeable tokens (classic defaults) */
 	--alc-radius: 8px;
+	--alc-text: inherit;
+	--alc-muted: #6b7280;
+	--alc-field-bg: transparent;
+	--alc-border: #c8c8cf;
+	--alc-surface: #fafafa;
+	--alc-surface-border: #e0e0e6;
+	--alc-divider: #e4e4ea;
+	--alc-button-text: #ffffff;
+	--alc-shadow: none;
+
 	display: grid;
 	grid-template-columns: 1fr 280px;
 	gap: 24px;
 	align-items: start;
 	font: inherit;
+	color: var(--alc-text);
 
 	*,
 	*::before,
 	*::after {
 		box-sizing: border-box;
+	}
+
+	/* ── Theme presets ───────────────────────────────────────────────────── */
+	&.alc-theme--minimal {
+		--alc-radius: 4px;
+		--alc-field-bg: transparent;
+		--alc-border: #d6d6dc;
+		--alc-surface: transparent;
+		--alc-surface-border: #ececef;
+		--alc-divider: #ececef;
+	}
+
+	&.alc-theme--midnight {
+		--alc-text: #e6e8eb;
+		--alc-muted: #9aa0a6;
+		--alc-field-bg: #1c1f24;
+		--alc-border: #343a40;
+		--alc-surface: #16181c;
+		--alc-surface-border: #2a2f36;
+		--alc-divider: #2a2f36;
+		--alc-button-text: #0c0a09;
+		color-scheme: dark; /* dark-aware native checkbox/radio/range */
+	}
+
+	&.alc-theme--soft {
+		--alc-radius: 14px;
+		--alc-field-bg: #ffffff;
+		--alc-border: #e7e7ee;
+		--alc-surface: #f6f7fb;
+		--alc-surface-border: #ebecf3;
+		--alc-divider: #ebecf3;
+		--alc-shadow: 0 6px 22px rgba(20, 20, 50, 0.07);
+	}
+
+	&.alc-theme--bold {
+		--alc-radius: 6px;
+		--alc-text: #0f172a;
+		--alc-muted: #475569;
+		--alc-field-bg: #ffffff;
+		--alc-border: #0f172a;
+		--alc-surface: #ffffff;
+		--alc-surface-border: #0f172a;
+		--alc-divider: #cbd5e1;
+	}
+
+	&.alc-theme--slate {
+		--alc-text: #334155;
+		--alc-muted: #64748b;
+		--alc-field-bg: #ffffff;
+		--alc-border: #cbd5e1;
+		--alc-surface: #f8fafc;
+		--alc-surface-border: #e2e8f0;
+		--alc-divider: #e2e8f0;
 	}
 }
 
@@ -32,7 +101,9 @@
 		width: 100%;
 		max-width: 320px;
 		padding: 8px 10px;
-		border: 1px solid #c8c8cf;
+		color: inherit;
+		background: var(--alc-field-bg);
+		border: 1px solid var(--alc-border);
 		border-radius: var(--alc-radius);
 	}
 
@@ -105,9 +176,10 @@
 	position: sticky;
 	inset-block-start: 24px;
 	padding: 18px;
-	border: 1px solid #e0e0e6;
+	border: 1px solid var(--alc-surface-border);
 	border-radius: var(--alc-radius);
-	background: #fafafa;
+	background: var(--alc-surface);
+	box-shadow: var(--alc-shadow);
 
 	&__lines {
 		list-style: none;
@@ -119,7 +191,7 @@
 			justify-content: space-between;
 			gap: 12px;
 			padding-block: 4px;
-			border-block-end: 1px dashed #e4e4ea;
+			border-block-end: 1px dashed var(--alc-divider);
 			font-size: 0.92em;
 		}
 	}
@@ -143,8 +215,10 @@
 	grid-column: 1 / -1;
 	margin-block-start: 8px;
 	padding: 18px;
-	border: 1px solid #e0e0e6;
+	border: 1px solid var(--alc-surface-border);
 	border-radius: var(--alc-radius);
+	background: var(--alc-surface);
+	box-shadow: var(--alc-shadow);
 
 	h3 {
 		margin-block-start: 0;
@@ -160,7 +234,9 @@
 			width: 100%;
 			max-width: 420px;
 			padding: 8px 10px;
-			border: 1px solid #c8c8cf;
+			color: inherit;
+			background: var(--alc-field-bg);
+			border: 1px solid var(--alc-border);
 			border-radius: var(--alc-radius);
 		}
 	}
@@ -170,7 +246,7 @@
 		border: 0;
 		border-radius: var(--alc-radius);
 		background: var(--alc-accent);
-		color: #fff;
+		color: var(--alc-button-text);
 		font-weight: 600;
 		cursor: pointer;
 
@@ -183,19 +259,19 @@
 
 .alc-field-error {
 	display: block;
-	color: #b32d2e;
+	color: #d6453c;
 	font-size: 0.85em;
 	margin-block-start: 4px;
 }
 
 .alc-quote-feedback.is-error {
-	color: #b32d2e;
+	color: #d6453c;
 	margin-block-start: 10px;
 }
 
 .alc-quote-success {
 	font-weight: 600;
-	color: #007017;
+	color: #1a9e57;
 }
 
 /* Honeypot: visually hidden, NOT display:none (bots skip those). */
