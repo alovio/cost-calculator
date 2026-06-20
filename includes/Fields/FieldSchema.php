@@ -20,7 +20,11 @@ final class FieldSchema {
 					'thousandSep' => ',',
 					'decimalSep'  => '.',
 				],
-				'theme'     => [ 'accent' => '#f97316', 'preset' => 'classic', 'layout' => 'single' ],
+				'theme'     => [
+					'accent' => '#f97316',
+					'preset' => 'classic',
+					'layout' => 'single',
+				],
 				'quoteForm' => [
 					'enabled'        => false,
 					'fields'         => [ 'name', 'email' ],
@@ -204,7 +208,11 @@ final class FieldSchema {
 				'thousandSep' => sanitize_text_field( (string) ( $currency['thousandSep'] ?? $d['currency']['thousandSep'] ) ),
 				'decimalSep'  => sanitize_text_field( (string) ( $currency['decimalSep'] ?? $d['currency']['decimalSep'] ) ),
 			],
-			'theme'     => [ 'accent' => '' !== (string) $accent ? $accent : $d['theme']['accent'], 'preset' => $preset, 'layout' => $layout ],
+			'theme'     => [
+				'accent' => '' !== (string) $accent ? $accent : $d['theme']['accent'],
+				'preset' => $preset,
+				'layout' => $layout,
+			],
 			'quoteForm' => [
 				'enabled'        => ! empty( $quote['enabled'] ),
 				'fields'         => $fields,
