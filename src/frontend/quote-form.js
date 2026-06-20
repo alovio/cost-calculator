@@ -74,6 +74,16 @@ export function wireQuoteForm( root, config, getRawValues, validateRequired ) {
 		if ( response.status === 201 && body.ok ) {
 			// Success: replace the form contents; calculator selections persist.
 			form.innerHTML = `<p class="alc-quote-success">${ config.settings.quoteForm.successMessage }</p>`;
+			// An add-on (e.g. Pro) may return a download URL for the just-created quote.
+			if ( typeof body.pdfUrl === 'string' && /^https?:\/\//.test( body.pdfUrl ) ) {
+				const link = document.createElement( 'a' );
+				link.className = 'alc-quote-download';
+				link.href = body.pdfUrl;
+				link.textContent = config.settings.quoteForm.downloadLabel || 'Download PDF';
+				link.setAttribute( 'download', '' );
+				link.rel = 'noopener';
+				form.appendChild( link );
+			}
 			return;
 		}
 

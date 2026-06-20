@@ -36,6 +36,7 @@ final class CalculatorRenderer {
 					'enabled'        => $quote['enabled'],
 					'fields'         => $quote['fields'],
 					'successMessage' => $successMessage,
+					'downloadLabel'  => __( 'Download PDF', 'alovio-calculator' ),
 				),
 			),
 		);

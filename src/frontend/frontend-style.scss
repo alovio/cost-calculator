@@ -223,6 +223,25 @@
 	color: #1a9e57;
 }
 
+/* Shown only when a quote response carries a pdfUrl (e.g. the Pro add-on). */
+.alc-quote-download {
+	display: inline-flex;
+	align-items: center;
+	margin-block-start: 12px;
+	padding-block: 9px;
+	padding-inline: 16px;
+	border-radius: 8px;
+	background: var(--alc-accent, #f97316);
+	color: #fff;
+	font-weight: 600;
+	font-size: 0.95em;
+	text-decoration: none;
+}
+
+.alc-quote-download:hover {
+	filter: brightness(0.94);
+}
+
 /* Honeypot: visually hidden, NOT display:none (bots skip those). */
 .alc-hp {
 	position: absolute !important;
