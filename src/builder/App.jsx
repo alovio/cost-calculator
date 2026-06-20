@@ -11,6 +11,7 @@ import SettingsTab from './SettingsTab';
 import CalculatorList from './CalculatorList';
 import EntriesList from './EntriesList';
 import ProTab from './ProTab';
+import Preview from './Preview';
 
 
 export default function App() {
@@ -128,6 +129,7 @@ function Builder( { calculatorId, onBack } ) {
 				tabs={ [
 					{ name: 'fields', title: __( 'Fields', 'alovio-calculator' ) },
 					{ name: 'settings', title: __( 'Settings', 'alovio-calculator' ) },
+					{ name: 'preview', title: __( 'Preview', 'alovio-calculator' ) },
 					...( window.ALOVIO_CALC_BUILDER && window.ALOVIO_CALC_BUILDER.isPro
 						? []
 						: [ { name: 'pro', title: __( 'Pro', 'alovio-calculator' ) } ] ),
@@ -145,6 +147,9 @@ function Builder( { calculatorId, onBack } ) {
 					}
 					if ( tab.name === 'pro' ) {
 						return <ProTab />;
+					}
+					if ( tab.name === 'preview' ) {
+						return <Preview />;
 					}
 					return <SettingsTab />;
 				} }

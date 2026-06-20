@@ -36,6 +36,7 @@ final class Plugin {
 			1
 		);
 		( new Admin\RestController() )->register();
+		( new Admin\Preview() )->register();
 		( new Entries\QuoteController() )->register();
 		( new Entries\EntriesRestController() )->register();
 		( new Entries\CsvExporter() )->register();
