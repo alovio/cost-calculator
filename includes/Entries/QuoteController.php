@@ -113,13 +113,37 @@ final class QuoteController {
 			'currency'    => $config['settings']['currency'],
 		);
 
-		$repo = new EntriesRepository();
-		$repo->insert( EntriesRepository::row_from_submission( $calculator_id, $validated['contact'], $snapshot ) );
+		$repo    = new EntriesRepository();
+		$entryId = $repo->insert( EntriesRepository::row_from_submission( $calculator_id, $validated['contact'], $snapshot ) );
 
 		update_option( 'alovio_calc_entry_count', (int) get_option( 'alovio_calc_entry_count', 0 ) + 1 ); // Review nudge counter (§10).
-		( new EntryMailer() )->notify( $post, $config, $validated['contact'], $snapshot );
 
-		return new \WP_REST_Response( array( 'ok' => true ), 201 );
+		/**
+		 * Fires after a quote entry is stored. The free plugin does nothing with it;
+		 * the Pro add-on hooks this to generate a PDF, push a webhook, etc.
+		 *
+		 * @param int      $entryId  Stored entry id.
+		 * @param array    $snapshot Quote snapshot: values, lineItems, totalScaled, currency.
+		 * @param array    $contact  Sanitized contact fields.
+		 * @param \WP_Post $post     Calculator post.
+		 * @param array    $config   Calculator config.
+		 */
+		do_action( 'alovio_calc_quote_stored', $entryId, $snapshot, $validated['contact'], $post, $config );
+
+		( new EntryMailer() )->notify( $post, $config, $validated['contact'], $snapshot, $entryId );
+
+		/**
+		 * Filters the quote success response body. The free plugin returns just
+		 * `array( 'ok' => true )`; the Pro add-on injects e.g. a `pdfUrl`.
+		 *
+		 * @param array $response The response body.
+		 * @param int   $entryId  Stored entry id.
+		 * @param array $snapshot Quote snapshot.
+		 * @param array $config   Calculator config.
+		 */
+		$response = apply_filters( 'alovio_calc_quote_response', array( 'ok' => true ), $entryId, $snapshot, $config );
+
+		return new \WP_REST_Response( $response, 201 );
 	}
 
 	/**

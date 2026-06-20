@@ -7,7 +7,7 @@ defined( 'ABSPATH' ) || exit;
 
 /**
  * Pro gating stub (spec §15). All Pro gating flows through these filters; the
- * future Pro ADD-ON PLUGIN (separate, Freemius-distributed — Guideline 5) hooks them:
+ * future Pro ADD-ON PLUGIN (separate, Code Heaven-distributed — Guideline 5) hooks them:
  *
  *   alovio_calc_is_pro (bool)               — unlocks Pro UI affordances in the builder
  *   alovio_calc_field_types (array)         — additional field types
