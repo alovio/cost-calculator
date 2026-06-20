@@ -4,7 +4,7 @@ Tags: cost calculator, price calculator, quote calculator, calculator builder, e
 Requires at least: 6.2
 Tested up to: 7.0
 Requires PHP: 7.4
-Stable tag: 1.1.2
+Stable tag: 1.2.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -20,7 +20,7 @@ Cost, price and quote calculators with live totals. Conditional logic free, deci
 
 = Features (all free) =
 
-* Drag-and-drop builder with 11 field types: number, slider, dropdown, multiple choice (with images), checkboxes, toggle, quantity, text, heading, HTML, formula
+* Drag-and-drop builder with 12 field types: number, slider, dropdown, multiple choice (with images), checkboxes, toggle, quantity, text, heading, HTML, formula, section/step divider
 * Per-option prices on choice fields; live sticky summary with line items and total
 * Formula fields with `+ − × ÷`, `if()`, `min`, `max`, `round`, `ceil`, `floor`, `abs` — validated live as you type
 * Conditional logic — free: show / hide / require, AND/OR, equality + range (≥, ≤) + empty/not-empty operators, conditions even on the running total
@@ -84,6 +84,11 @@ PHP 7.4 and newer, including PHP 8.4.
 6. Per-calculator settings: currency, accent color, quote form
 
 == Changelog ==
+
+= 1.2.0 =
+* New "Section / Step divider" field — group the form into labelled sections in the builder.
+* Added support for the Alovio Calculator Pro add-on: the plugin now exposes the extension points the add-on uses for PDF quotes, the multi-step wizard layout, webhooks and more.
+* The quote success message can now show a "Download PDF" link when the Pro add-on is active.
 
 = 1.1.2 =
 * Added a "Check for updates" link on the Plugins screen that asks WordPress to re-check WordPress.org for a new version right away.
