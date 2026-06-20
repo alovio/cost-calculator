@@ -103,4 +103,21 @@ class FieldSchemaTest extends TestCase {
 		$this->assertSame( [], $out['fields'] );
 		$this->assertArrayHasKey( 'currency', $out['settings'] );
 	}
+
+	public function test_step_divider_and_layout(): void {
+		$out  = FieldSchema::normalize( $this->config(
+			[ [ 'id' => 's1', 'type' => 'step', 'label' => 'Your details', 'description' => 'Tell us about you' ] ],
+			[ 'theme' => [ 'layout' => 'wizard' ] ]
+		) );
+		$step = $out['fields'][0];
+		$this->assertSame( 'step', $step['type'] );
+		$this->assertSame( 'Your details', $step['label'] );
+		$this->assertSame( 'Tell us about you', $step['description'] );
+		$this->assertArrayNotHasKey( 'options', $step );                 // a divider, not a choice
+		$this->assertSame( 'wizard', $out['settings']['theme']['layout'] );
+
+		$bad = FieldSchema::normalize( $this->config( [], [ 'theme' => [ 'layout' => 'spaceship' ] ] ) );
+		$this->assertSame( 'single', $bad['settings']['theme']['layout'] ); // invalid ⇒ single
+		$this->assertSame( 'single', FieldSchema::normalize( [] )['settings']['theme']['layout'] ); // default
+	}
 }

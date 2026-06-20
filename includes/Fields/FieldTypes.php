@@ -8,7 +8,7 @@ namespace Alovio\Calculator\Fields;
  */
 final class FieldTypes {
 
-	public const FREE = [ 'number', 'slider', 'select', 'radio', 'checkbox_group', 'toggle', 'quantity', 'text', 'heading', 'html', 'formula' ];
+	public const FREE = [ 'number', 'slider', 'select', 'radio', 'checkbox_group', 'toggle', 'quantity', 'text', 'heading', 'html', 'formula', 'step' ];
 
 	private const CHOICE = [ 'select', 'radio', 'checkbox_group' ];
 

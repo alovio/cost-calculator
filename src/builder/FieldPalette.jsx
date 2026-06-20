@@ -3,7 +3,7 @@ import { Button } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { STORE } from './store';
 
-const FALLBACK = [ 'number', 'slider', 'select', 'radio', 'checkbox_group', 'toggle', 'quantity', 'text', 'heading', 'html', 'formula' ];
+const FALLBACK = [ 'number', 'slider', 'select', 'radio', 'checkbox_group', 'toggle', 'quantity', 'text', 'heading', 'html', 'formula', 'step' ];
 
 const LABELS = {
 	number: __( 'Number', 'alovio-calculator' ),
@@ -17,6 +17,7 @@ const LABELS = {
 	heading: __( 'Heading', 'alovio-calculator' ),
 	html: __( 'HTML content', 'alovio-calculator' ),
 	formula: __( 'Formula (calculated)', 'alovio-calculator' ),
+	step: __( 'Step / Section', 'alovio-calculator' ),
 };
 
 export default function FieldPalette() {

@@ -32,6 +32,7 @@ final class CalculatorRenderer {
 			'fields'        => $config['fields'],
 			'settings'      => array(
 				'currency'  => $currency,
+				'layout'    => $config['settings']['theme']['layout'] ?? 'single',
 				'quoteForm' => array(
 					'enabled'        => $quote['enabled'],
 					'fields'         => $quote['fields'],
@@ -157,6 +158,12 @@ final class CalculatorRenderer {
 					$label,
 					esc_html( DecimalMath::fromScaled( $amount ) )
 				);
+
+			case 'step':
+				$desc = ! empty( $field['description'] )
+					? '<p class="alc-step__desc">' . esc_html( $field['description'] ) . '</p>'
+					: '';
+				return sprintf( '<div class="alc-step__head"><h3 class="alc-step__title">%s</h3>%s</div>', $label, $desc );
 		}
 
 		return '';

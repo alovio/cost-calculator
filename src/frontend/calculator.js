@@ -1,6 +1,7 @@
 import { prepare, run } from './compute';
 import { updateSummary } from './summary';
 import { wireQuoteForm } from './quote-form';
+import { setupWizard } from './wizard';
 
 /** Collect raw values from the DOM, scoped by [data-alc-field] wrappers. */
 function collectRawValues( root, fields ) {
@@ -101,6 +102,7 @@ function initCalculator( root ) {
 	config.i18n = {
 		networkError: 'Something went wrong. Please try again.',
 		requiredError: 'Please fill in the required fields.',
+		wizard: { back: 'Back', next: 'Next', step: 'Step', of: 'of' },
 	};
 
 	const fields = config.fields || [];
@@ -130,6 +132,18 @@ function initCalculator( root ) {
 		return errors;
 	};
 
+	// Per-step validation for the wizard layout (same rule, scoped to given ids).
+	const validateStep = ( ids ) => {
+		const raw = collectRawValues( root, fields );
+		const errors = {};
+		fields.forEach( ( f ) => {
+			if ( ids.indexOf( f.id ) !== -1 && lastResult.required[ f.id ] && lastResult.active[ f.id ] !== false && isEmptyValue( f, raw[ f.id ] ) ) {
+				errors[ f.id ] = ( f.label || '' ) + ' ' + 'is required.';
+			}
+		} );
+		return errors;
+	};
+
 	root.addEventListener( 'input', ( e ) => {
 		if ( e.target.closest( '.alc-quote' ) ) {
 			return; // Contact inputs don't affect the math.
@@ -150,6 +164,10 @@ function initCalculator( root ) {
 
 	wireQuoteForm( root, config, () => collectRawValues( root, fields ), validateRequired );
 	recompute(); // Sync once on init (server already rendered defaults; this is idempotent).
+
+	if ( config.settings && config.settings.layout === 'wizard' ) {
+		setupWizard( root, config, validateStep );
+	}
 }
 
 export function initCalculators( doc ) {

@@ -10,7 +10,7 @@ class FieldTypesTest extends TestCase {
 	public function test_free_list_matches_spec_section_6(): void {
 		Filters\expectApplied( 'alovio_calc_field_types' )->andReturnFirstArg();
 		$this->assertSame(
-			[ 'number', 'slider', 'select', 'radio', 'checkbox_group', 'toggle', 'quantity', 'text', 'heading', 'html', 'formula' ],
+			[ 'number', 'slider', 'select', 'radio', 'checkbox_group', 'toggle', 'quantity', 'text', 'heading', 'html', 'formula', 'step' ],
 			FieldTypes::all()
 		);
 	}
@@ -25,5 +25,9 @@ class FieldTypesTest extends TestCase {
 		$this->assertTrue( FieldTypes::is_condition_controller( 'text' ) );
 		$this->assertTrue( FieldTypes::is_condition_controller( 'formula' ) );  // formula/total now drives conditions
 		$this->assertFalse( FieldTypes::is_condition_controller( 'heading' ) ); // headings still cannot
+		// Step dividers are pure layout — never input/referenceable/controller.
+		$this->assertFalse( FieldTypes::is_input( 'step' ) );
+		$this->assertFalse( FieldTypes::is_referenceable( 'step' ) );
+		$this->assertFalse( FieldTypes::is_condition_controller( 'step' ) );
 	}
 }

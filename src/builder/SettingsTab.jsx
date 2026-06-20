@@ -1,5 +1,5 @@
 import { useDispatch, useSelect } from '@wordpress/data';
-import { TextControl, SelectControl, ToggleControl, CheckboxControl, ColorPicker } from '@wordpress/components';
+import { TextControl, SelectControl, ToggleControl, CheckboxControl, ColorPicker, Notice } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { STORE } from './store';
 
@@ -11,6 +11,7 @@ export default function SettingsTab() {
 	const currency = settings.currency || {};
 	const theme = settings.theme || {};
 	const quote = settings.quoteForm || {};
+	const isPro = !! ( window.ALOVIO_CALC_BUILDER && window.ALOVIO_CALC_BUILDER.isPro );
 
 	const setCurrency = ( patch ) => updateSettings( { currency: { ...currency, ...patch } } );
 	const setQuote = ( patch ) => updateSettings( { quoteForm: { ...quote, ...patch } } );
@@ -69,6 +70,26 @@ export default function SettingsTab() {
 					onChange={ ( accent ) => updateSettings( { theme: { ...theme, accent } } ) }
 					enableAlpha={ false }
 				/>
+			</section>
+
+			<section>
+				<h3>{ __( 'Layout', 'alovio-calculator' ) }</h3>
+				{ isPro ? (
+					<SelectControl
+						label={ __( 'Form display', 'alovio-calculator' ) }
+						help={ __( 'Wizard splits the form into steps at each Step / Section divider.', 'alovio-calculator' ) }
+						value={ theme.layout || 'single' }
+						options={ [
+							{ label: __( 'Single page', 'alovio-calculator' ), value: 'single' },
+							{ label: __( 'Multi-step wizard', 'alovio-calculator' ), value: 'wizard' },
+						] }
+						onChange={ ( layout ) => updateSettings( { theme: { ...theme, layout } } ) }
+					/>
+				) : (
+					<Notice status="info" isDismissible={ false }>
+						{ __( 'Multi-step wizard is a Pro feature.', 'alovio-calculator' ) }
+					</Notice>
+				) }
 			</section>
 
 			<section>

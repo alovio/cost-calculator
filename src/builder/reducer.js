@@ -20,6 +20,7 @@ export const DEFAULTS = {
 	heading: { label: 'Section heading', showInSummary: false },
 	html: { label: 'Content', content: '', showInSummary: false },
 	formula: { label: 'Total', expression: '', showInSummary: true },
+	step: { label: 'Step', description: '', showInSummary: false },
 };
 
 let counter = 0;

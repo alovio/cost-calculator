@@ -52,6 +52,17 @@ export default function FieldSettings() {
 		);
 	}
 
+	if ( field.type === 'step' ) {
+		return (
+			<div className="alc-settings">
+				<TextControl label={ __( 'Step title', 'alovio-calculator' ) } value={ field.label } onChange={ ( label ) => set( { label } ) } />
+				<TextareaControl label={ __( 'Description (optional)', 'alovio-calculator' ) } value={ field.description || '' } onChange={ ( description ) => set( { description } ) } rows={ 3 } />
+				<p className="alc-hint">{ __( 'Splits the form into a section. With the Wizard layout (Pro), each section becomes a step.', 'alovio-calculator' ) }</p>
+				<ConditionEditor field={ field } />
+			</div>
+		);
+	}
+
 	if ( field.type === 'formula' ) {
 		return (
 			<div className="alc-settings">

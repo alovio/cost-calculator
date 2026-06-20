@@ -20,7 +20,7 @@ final class FieldSchema {
 					'thousandSep' => ',',
 					'decimalSep'  => '.',
 				],
-				'theme'     => [ 'accent' => '#f97316', 'preset' => 'classic' ],
+				'theme'     => [ 'accent' => '#f97316', 'preset' => 'classic', 'layout' => 'single' ],
 				'quoteForm' => [
 					'enabled'        => false,
 					'fields'         => [ 'name', 'email' ],
@@ -112,6 +112,10 @@ final class FieldSchema {
 			case 'heading':
 				$field['placeholder'] = sanitize_text_field( (string) ( $raw['placeholder'] ?? '' ) );
 				break;
+
+			case 'step':
+				$field['description'] = sanitize_text_field( (string) ( $raw['description'] ?? '' ) );
+				break;
 		}
 
 		return $field;
@@ -189,6 +193,8 @@ final class FieldSchema {
 		$accent = sanitize_hex_color( (string) ( $raw['theme']['accent'] ?? '' ) );
 		$preset = (string) ( $raw['theme']['preset'] ?? '' );
 		$preset = in_array( $preset, self::THEMES, true ) ? $preset : $d['theme']['preset'];
+		$layout = (string) ( $raw['theme']['layout'] ?? '' );
+		$layout = in_array( $layout, [ 'single', 'wizard' ], true ) ? $layout : $d['theme']['layout'];
 
 		return [
 			'currency'  => [
@@ -198,7 +204,7 @@ final class FieldSchema {
 				'thousandSep' => sanitize_text_field( (string) ( $currency['thousandSep'] ?? $d['currency']['thousandSep'] ) ),
 				'decimalSep'  => sanitize_text_field( (string) ( $currency['decimalSep'] ?? $d['currency']['decimalSep'] ) ),
 			],
-			'theme'     => [ 'accent' => '' !== (string) $accent ? $accent : $d['theme']['accent'], 'preset' => $preset ],
+			'theme'     => [ 'accent' => '' !== (string) $accent ? $accent : $d['theme']['accent'], 'preset' => $preset, 'layout' => $layout ],
 			'quoteForm' => [
 				'enabled'        => ! empty( $quote['enabled'] ),
 				'fields'         => $fields,
