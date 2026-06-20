@@ -4,7 +4,7 @@ Tags: cost calculator, price calculator, quote calculator, calculator builder, e
 Requires at least: 6.2
 Tested up to: 7.0
 Requires PHP: 7.4
-Stable tag: 1.2.0
+Stable tag: 1.3.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -84,6 +84,9 @@ PHP 7.4 and newer, including PHP 8.4.
 6. Per-calculator settings: currency, accent color, quote form
 
 == Changelog ==
+
+= 1.3.0 =
+* New "Preview" tab in the builder — see your calculator exactly as visitors do, updating live as you edit, without leaving the editor.
 
 = 1.2.0 =
 * New "Section / Step divider" field — group the form into labelled sections in the builder.
