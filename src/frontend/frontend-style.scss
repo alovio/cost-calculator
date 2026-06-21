@@ -3270,3 +3270,61 @@
 .alc-calculator.alc-theme--slate .alc-toggle__track {
 	flex: 0 0 auto;
 }
+
+/* Image choice options → responsive card grid (radio/checkbox whose options have images).
+   Placed last + token-based so it works across every theme. */
+.alc-calculator .alc-choices--cards {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+	gap: 12px;
+	margin: 0;
+	padding: 0;
+	border: 0;
+}
+
+.alc-calculator .alc-choices--cards .alc-choice {
+	position: relative;
+	flex-direction: column;
+	align-items: stretch;
+	gap: 10px;
+	padding: 12px;
+	text-align: center;
+	border: 2px solid var(--alc-border, #e2e4e7);
+	border-radius: var(--alc-radius, 8px);
+	background: var(--alc-field-bg, var(--alc-surface, #fff));
+	transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.alc-calculator .alc-choices--cards .alc-choice input {
+	position: absolute;
+	inset-block-start: 8px;
+	inset-inline-end: 8px;
+	margin: 0;
+}
+
+.alc-calculator .alc-choices--cards .alc-choice__image img {
+	display: block;
+	inline-size: 100%;
+	block-size: auto;
+	aspect-ratio: 4 / 3;
+	object-fit: cover;
+	border-radius: calc(var(--alc-radius, 8px) / 1.5);
+}
+
+.alc-calculator .alc-choices--cards .alc-choice__label {
+	font-weight: 600;
+}
+
+.alc-calculator .alc-choices--cards .alc-choice:hover {
+	border-color: var(--alc-accent);
+}
+
+.alc-calculator .alc-choices--cards .alc-choice:has(input:checked) {
+	border-color: var(--alc-accent);
+	box-shadow: 0 0 0 1px var(--alc-accent);
+}
+
+.alc-calculator .alc-choices--cards .alc-choice:has(input:focus-visible) {
+	outline: 2px solid var(--alc-accent);
+	outline-offset: 2px;
+}

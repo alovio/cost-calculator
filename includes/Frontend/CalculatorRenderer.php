@@ -110,12 +110,19 @@ final class CalculatorRenderer {
 
 			case 'radio':
 			case 'checkbox_group':
-				$type  = 'radio' === $field['type'] ? 'radio' : 'checkbox';
+				$type       = 'radio' === $field['type'] ? 'radio' : 'checkbox';
+				$has_images = false;
+				foreach ( $field['options'] as $opt ) {
+					if ( ! empty( $opt['image'] ) ) {
+						$has_images = true;
+						break;
+					}
+				}
 				$items = '';
-				foreach ( $field['options'] as $i => $opt ) {
+				foreach ( $field['options'] as $opt ) {
 					$image = '';
-					if ( 'radio' === $field['type'] && ! empty( $opt['image'] ) ) {
-						$image = '<span class="alc-choice__image">' . wp_get_attachment_image( (int) $opt['image'], 'thumbnail' ) . '</span>';
+					if ( ! empty( $opt['image'] ) ) {
+						$image = '<span class="alc-choice__image">' . wp_get_attachment_image( (int) $opt['image'], $has_images ? 'medium' : 'thumbnail' ) . '</span>';
 					}
 					$items .= sprintf(
 						'<label class="alc-choice"><input type="%1$s" name="alc_%2$s" value="%3$s">%4$s<span class="alc-choice__label">%5$s</span></label>',
@@ -126,7 +133,7 @@ final class CalculatorRenderer {
 						esc_html( $opt['label'] )
 					);
 				}
-				return sprintf( '<fieldset><legend>%s</legend>%s</fieldset>', $label, $items );
+				return sprintf( '<fieldset class="alc-choices%3$s"><legend>%1$s</legend>%2$s</fieldset>', $label, $items, $has_images ? ' alc-choices--cards' : '' );
 
 			case 'toggle':
 				$checked = ! empty( $field['default'] ) ? ' checked' : '';
