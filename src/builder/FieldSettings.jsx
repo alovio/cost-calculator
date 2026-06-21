@@ -80,6 +80,12 @@ export default function FieldSettings() {
 	return (
 		<div className="alc-settings">
 			<TextControl label={ __( 'Label', 'alovio-calculator' ) } value={ field.label } onChange={ ( label ) => set( { label } ) } />
+			<TextControl
+				label={ __( 'Help text', 'alovio-calculator' ) }
+				help={ __( 'Optional hint shown under the field.', 'alovio-calculator' ) }
+				value={ field.help || '' }
+				onChange={ ( help ) => set( { help } ) }
+			/>
 
 			{ field.type === 'text' && (
 				<TextControl label={ __( 'Placeholder', 'alovio-calculator' ) } value={ field.placeholder || '' } onChange={ ( placeholder ) => set( { placeholder } ) } />

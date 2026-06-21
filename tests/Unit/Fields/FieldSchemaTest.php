@@ -34,6 +34,13 @@ class FieldSchemaTest extends TestCase {
 		$this->assertSame( 2.5, $opts[0]['price'] );
 	}
 
+	public function test_field_help_text_is_sanitized(): void {
+		$out = FieldSchema::normalize( $this->config( [
+			[ 'id' => 'qty', 'type' => 'number', 'label' => 'Quantity', 'help' => '  How many <b>units</b>?  ' ],
+		] ) );
+		$this->assertSame( 'How many units?', $out['fields'][0]['help'] );
+	}
+
 	public function test_preserves_existing_option_slugs(): void {
 		$out = FieldSchema::normalize( $this->config( [
 			[ 'id' => 'service', 'type' => 'radio', 'label' => 'S', 'options' => [

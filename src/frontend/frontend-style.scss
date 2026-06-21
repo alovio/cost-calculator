@@ -102,6 +102,13 @@
 	}
 }
 
+.alc-field__help {
+	margin: 4px 0 0;
+	font-size: 0.85em;
+	line-height: 1.4;
+	color: var(--alc-muted, #6b7280);
+}
+
 .alc-toggle {
 	display: inline-flex;
 	align-items: center;

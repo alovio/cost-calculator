@@ -67,12 +67,18 @@ final class CalculatorRenderer {
 
 		$inner = self::render_input( $field, $result );
 
+		$help = '';
+		if ( ! empty( $field['help'] ) ) {
+			$help = sprintf( '<p class="alc-field__help">%s</p>', esc_html( $field['help'] ) );
+		}
+
 		return sprintf(
-			'<div class="alc-field alc-field--%s" data-alc-field="%s"%s>%s</div>',
+			'<div class="alc-field alc-field--%s" data-alc-field="%s"%s>%s%s</div>',
 			esc_attr( $field['type'] ),
 			esc_attr( $id ),
 			$hidden,
-			$inner
+			$inner,
+			$help
 		);
 	}
 
