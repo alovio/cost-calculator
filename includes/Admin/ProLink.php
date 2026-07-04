@@ -12,7 +12,7 @@ defined( 'ABSPATH' ) || exit;
  */
 final class ProLink {
 
-	private const URL = 'https://alovio.org/calculator';
+	private const URL = 'https://alovio.org/store/calculator-pro';
 
 	public function register(): void {
 		add_filter( 'plugin_row_meta', array( $this, 'row_meta' ), 10, 2 );

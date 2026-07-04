@@ -4,7 +4,7 @@ Tags: cost calculator, price calculator, quote calculator, calculator builder, e
 Requires at least: 6.2
 Tested up to: 7.0
 Requires PHP: 7.4
-Stable tag: 1.4.0
+Stable tag: 1.4.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -38,7 +38,12 @@ No payment processing — this is a quoting tool, not a checkout. Estimates stay
 
 = Free vs Pro =
 
-Everything above is free forever — including conditional logic. **Alovio Calculator Pro** (coming soon) adds a multi-step wizard, PDF quotes, repeater fields, image option styles, webhooks/Zapier and quote analytics. [Learn more](https://alovio.org/calculator).
+Everything above is free forever — including conditional logic. **Alovio Calculator Pro** adds a multi-step wizard layout, branded PDF quotes (logo, tax/VAT), webhooks/Zapier and a quote analytics dashboard. [Get Alovio Calculator Pro](https://alovio.org/store/calculator-pro).
+
+= Also by Alovio =
+
+* [Alovio Checkout Fields](https://wordpress.org/plugins/corelabs-checkout-fields/) — custom WooCommerce checkout fields with full conditional logic, field-driven fees and file uploads. 100% free.
+* See [alovio.org](https://alovio.org) for the full family.
 
 == Frequently Asked Questions ==
 
@@ -84,6 +89,10 @@ PHP 7.4 and newer, including PHP 8.4.
 6. Per-calculator settings: currency, accent color, quote form
 
 == Changelog ==
+
+= 1.4.1 =
+* Alovio Calculator Pro is now available (multi-step wizard, branded PDF quotes, webhooks/Zapier, quote analytics) — links and the Pro tab updated; image choice cards were already free since 1.4.0.
+* "Also by Alovio" section: Alovio Checkout Fields.
 
 = 1.4.0 =
 * Builder Preview gained Desktop / Tablet / Mobile width buttons and an "Open full preview" link, so you can check the responsive layout without leaving the editor.
