@@ -19,7 +19,7 @@ Alovio Calculator is live on wp.org at v1.4.1 (builder + 12 field types, decimal
 
 - `App.jsx` keeps its three views (list / builder / entries). The builder view drops `TabPanel` and becomes **`StudioShell`**: coal-dark header + 3-column workspace filling the admin content area.
 - Header: flame logo + plugin name · **inline-editable calculator name** · spacer · save-status pill (grey saved / amber dirty / green just-saved / red error) · **Undo + Redo** ghost buttons · **Save** primary button · **Pro** ghost button (hidden when `isPro`).
-- Keyboard: ⌘S/Ctrl+S save, ⌘Z undo, ⌘⇧Z redo. `beforeunload` dirty guard stays.
+- Keyboard: ⌘S/Ctrl+S save, ⌘Z undo, ⌘⇧Z redo. The undo/redo shortcuts are suppressed while any text input/textarea (canvas or panel) has focus, so native text-editing undo is never hijacked. `beforeunload` dirty guard stays.
 - Design tokens ported from Checkout Fields' `builder.css` into **`src/builder/builder.scss`** (compiled to `build/index.css` by wp-scripts), renamed to a **`--alcb-*`** prefix (builder-scoped; the frontend keeps its `--alc-*` tokens). Flame `#f97316`/`#ea580c`, coal `#1c1917`, ink greys, radii, layered shadow, gradient primary button/logo/empty-state.
 - The **entries view gets a light token restyle only** (header, buttons) — no rework this release.
 
@@ -27,7 +27,7 @@ Alovio Calculator is live on wp.org at v1.4.1 (builder + 12 field types, decimal
 
 Replaces both `Canvas.jsx` and the `Preview.jsx` tab.
 
-- **Rendering:** structural state changes (fields/settings) trigger a 400 ms-debounced **`POST alovio-calc/v1/render`** (new endpoint beside the existing `/preview`; same `FieldSchema::normalize` path, `manage_options`-gated) returning `{ html }` — the exact `CalculatorRenderer::render()` fragment. The fragment is injected **inline** (no iframe), then the frontend bundle initialises it. There is ONE canonical renderer (PHP); no React replica, no drift.
+- **Rendering:** structural state changes (fields/settings) trigger a 400 ms-debounced **`POST alovio-calc/v1/render`** (new endpoint beside the existing `/preview`; same `FieldSchema::normalize` path, `manage_options`-gated) returning `{ html }` — the exact `CalculatorRenderer::render()` fragment. The fragment is injected **inline** (no iframe), then the frontend bundle initialises it. There is ONE canonical renderer (PHP); no React replica, no drift. Each request carries a monotonic sequence token; a response older than the latest applied one is discarded, so an out-of-order (stale) success can never clobber a newer render.
 - **Frontend init refactor:** `src/frontend/calculator.js` exports an `init(rootEl)` function (auto-init on DOMContentLoaded preserved for the site). `BuilderAssets.php` enqueues the frontend script + stylesheet on the builder screen so the canvas runs the real engine: typed values compute totals instantly client-side, conditions fire, themes apply, wizard steps navigate (real `wizard.js`).
 - **Value persistence:** before each re-render the visitor-value map is read from the DOM and re-applied after injection, so sample values survive structural edits. Toolbar has a "Reset values" action.
 - **Canvas toolbar:** Desktop/Tablet/Mobile width toggle (constrains the sheet) · theme quick-switcher (writes `settings.theme.preset`, undoable) · Reset values · "Open full preview" link (existing `/preview` full-page path stays for this).
@@ -59,9 +59,9 @@ Categorised icon grid — **Inputs** (number, slider, quantity, text, textarea, 
 
 ### 2.6 Reducer & drafts
 
-- History: `past[]` / `future[]`, bounded **50**, `remember()` on mutating actions only (`ADD_FIELD`, `UPDATE_FIELD`, `REMOVE_FIELD`, `DUPLICATE_FIELD`, `REORDER`, `INSERT_AT`, `INSERT_FIELDS`, `UPDATE_SETTINGS`, name edits). `SELECT`/`HYDRATE` bypass history. Redo cleared on new mutation.
+- History: `past[]` / `future[]`, bounded **50** (deliberate divergence from the donor's 25), `remember()` on mutating actions only (`ADD_FIELD`, `UPDATE_FIELD`, `REMOVE_FIELD`, `DUPLICATE_FIELD`, `REORDER`, `INSERT_AT`, `INSERT_FIELDS`, `UPDATE_SETTINGS`, name edits). `SELECT`/`HYDRATE` bypass history. Redo cleared on new mutation.
 - New actions: `INSERT_AT(type, index)`, `INSERT_FIELDS(fields, index)` (with id/condition-reference remap, ported from Checkout Fields), `UNDO`, `REDO`.
-- **Draft recovery (`draft.js`):** on state change (1 s debounce) serialize `{calcId, name, fields, settings, savedAt}` to `localStorage` key `alovio_calc_draft_<id>`; on builder open, if a draft is newer than the server record's modified time show a restore/discard notice bar. Cleared on successful save.
+- **Draft recovery (`draft.js`):** on state change (1 s debounce) serialize `{calcId, name, fields, settings, savedAt}` to `localStorage` key `alovio_calc_draft_<id>`; on builder open, if a draft is newer than the server record's modified time show a restore/discard notice bar. Cleared on successful save. The calculator GET response gains a `modified` timestamp (`RestController` addition) to make this comparison possible.
 
 ## 3. Track B — Repeater + new field types (all FREE)
 
@@ -74,6 +74,7 @@ Categorised icon grid — **Inputs** (number, slider, quantity, text, textarea, 
 - **Aggregation:** the repeater's sum of row totals is exposed as `{repeater_id}` — referenceable in top-level formulas and usable as a condition controller (like formula fields). `Evaluation::run` computes repeater sums in a pre-pass before the existing fixed-point loop; a repeater hidden by its own conditions contributes 0. Summary shows one line item per row (rowLabel with `{n}` substitution).
 - **Frontend:** PHP renders row markup once inside a `<template>`; JS clones/reindexes rows (+ Add row, per-row remove, min/max enforcement). `compute.js` mirrors row evaluation exactly; **parity fixtures extended** with repeater cases in the shared JSON suite.
 - **Quote flow:** payload carries repeater values as an array of row objects `{childId: value}`. `QuoteController`'s authoritative server recompute mirrors the same semantics; the 201/400/429 contract is unchanged. Server guards: `maxRows` cap, payload size limit.
+- **Entries surfaces:** the entry detail modal renders a repeater as grouped rows ("Room 1: Area 20, Rate Standard — $120.00", one line per row). `CsvExporter` flattens each repeater to ONE cell: rows joined with `" | "` in the form `Room 1: area=20, rate=Standard ($120.00)` — RFC-4180 quoting and the existing injection guard apply unchanged. The notification email uses the same per-row lines as the detail modal.
 - **Builder:** the canvas shows the real rendered repeater. Selecting it opens a "Row fields" mini-list in the Options tab slot (add child from the restricted type list, reorder, click-to-edit a child in the same panel).
 
 ### 3.2 New simple field types
@@ -82,7 +83,9 @@ Categorised icon grid — **Inputs** (number, slider, quantity, text, textarea, 
 
 ### 3.3 Quote-form file upload
 
-Ported from Checkout Fields' proven FileUploads approach: async upload to a dedicated endpoint returning a token; the token is submitted with the quote and linked to the entry. Hardening: type allowlist (jpg/png/webp/pdf), size cap (`quoteForm.file.maxMb`, default 5), rate-limited public endpoint + honeypot, random filenames in a non-executable uploads subdir (`.htaccess`), orphan files GC'd by a daily cron after 24 h, files deleted with entry delete and privacy erase. Download via a capability-gated admin endpoint; entry detail and notification email reference the file. Settings: `quoteForm.file{enabled,label,types,maxMb}` (off by default).
+Ported from Checkout Fields' proven FileUploads approach: async upload to a dedicated endpoint returning a token; the token is submitted with the quote and linked to the entry. Hardening: type allowlist (jpg/png/webp/pdf), size cap (`quoteForm.file.maxMb`, default 5), rate-limited public endpoint + honeypot, random filenames in a non-executable uploads subdir (`.htaccess`), orphan files GC'd by a daily cron after 24 h, files deleted with entry delete and privacy erase. Settings: `quoteForm.file{enabled,label,types,maxMb}` (off by default).
+
+**Entries surfaces:** the entry detail modal shows the original filename as a download link to the capability-gated admin endpoint; `CsvExporter` adds a `file` column containing the original filename (never a URL); the notification email lists the filename with a link to the entry in the dashboard (the file itself is not attached).
 
 ### 3.4 Slider polish
 
@@ -104,9 +107,22 @@ No activation redirect. (a) One dismissible post-activation notice ("Create your
 
 ## 5. Track D — Pro v1.1 (separate repo `~/alovio-calculator-pro`, same-day release)
 
-1. **Conditional email routing** — rule list ("if field X matches Y, also notify Z"); sits on the existing `alovio_calc_quote_email` filter; no free-plugin changes required.
-2. **PDF template variants** — 2–3 layout presets + per-calculator footer/terms text, extending the existing Dompdf service.
-3. **Funnel analytics** — views → interactions → quote conversions per calculator. **Free-side support (in 2.0):** an anonymous, GDPR-clean beacon `POST alovio-calc/v1/view` (rate-limited, no cookies/PII) incrementing per-calculator postmeta counters, plus an `alovio_calc_view_recorded` action; documented as approximate under page caching. Pro reads the counters and renders the funnel.
+Track D is **planned and implemented in the Pro repo with its own implementation plan**; the free-plugin plan for this spec covers tracks A–C plus the free-side beacon below (§5.3). The Pro features are specified here to the level the Pro plan needs:
+
+### 5.1 Conditional email routing
+
+- **Storage:** option `alovio_calc_pro_routing` — an array of rules `{ calculatorId (0 = any), fieldId, operator, value, emails[] }`. Operators reuse the free plugin's conditional set (`is, is_not, contains, gte, lte, is_empty, is_not_empty`); `emails` holds 1–5 validated addresses.
+- **UI:** a new "Email routing" admin page under the Calculator menu (same pattern/styling as the existing Pro `BrandingSettings`/`WebhookSettings` pages): rule table with add/remove rows — calculator select, field select (populated from that calculator's config), operator, value, emails.
+- **Evaluation:** inside the existing `alovio_calc_quote_email` filter — match each rule against the submitted entry's values using the free plugin's public `ConditionalLogic::matches()` semantics; matched rules' emails are appended to the recipient list (deduped). A rule whose field is absent from the payload is skipped. No free-plugin changes required.
+
+### 5.2 PDF template variants
+
+Three named presets extending the existing Dompdf `PdfService`: **Classic** (current navy header band — default), **Compact** (no header band, small logo top-left, single-column, tighter margins), **Letterhead** (full-width logo strip on white, quote table below, bordered terms block at the bottom). Settings live on the existing "Quote PDF" branding page: preset radio (thumbnail per preset), a global footer/terms textarea (exists), plus a **per-calculator terms override** table (calculator select + textarea rows). Preset choice is global; terms resolve per-calculator override → global.
+
+### 5.3 Funnel analytics
+
+- **Free-side support (ships in free 2.0):** an anonymous, GDPR-clean beacon `POST alovio-calc/v1/track` `{calc, event: 'view' | 'interact'}` — rate-limited, no cookies/PII, fired once per pageload per event type by the frontend script (`interact` = first input change). Increments per-calculator postmeta counters (`_alovio_calc_views`, `_alovio_calc_interactions`) bucketed per day (last 90 days kept), fires an `alovio_calc_event_recorded` action. Documented as approximate under page caching.
+- **Pro-side UI:** the existing Analytics page gains a per-calculator funnel section: three stat tiles (Views, Interactions, Quotes — quotes counted from the entries table as today) with stage-to-stage conversion percentages between the tiles, over a fixed last-30-days window, reusing the page's existing CSS-only chart style. No new tables.
 
 Google Sheets OAuth integration is explicitly deferred (webhooks→Zapier already covers it).
 
@@ -117,6 +133,7 @@ Google Sheets OAuth integration is explicitly deferred (webhooks→Zapier alread
 - All 6 wp.org screenshots re-shot (hero = the Studio); icon/banner unchanged.
 - alovio.org/calculator + store page copy updated; demo.alovio.org/wp synced (new build + a repeater showcase calculator) and re-snapshotted.
 - Budgets: frontend bundle **≤ 30 KB gz including repeater**; builder bundle measured at the first Studio chunk, then a budget is set and enforced in the QA checklist.
+- **Planning note:** the free-plugin implementation plan covers tracks A–C (plus §5.3's beacon) and should sequence them as ordered chunk groups — Studio shell/canvas → repeater/new fields → importer/onboarding — each group closing with green gates so the branch stays releasable throughout. Track D gets its own plan in the Pro repo.
 
 ## 7. Testing
 
