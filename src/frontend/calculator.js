@@ -2,42 +2,63 @@ import { prepare, run } from './compute';
 import { updateSummary } from './summary';
 import { wireQuoteForm } from './quote-form';
 import { setupWizard } from './wizard';
+import { setupRepeaters } from './repeater';
 
-/** Collect raw values from the DOM, scoped by [data-alc-field] wrappers. */
-function collectRawValues( root, fields ) {
+/** Read one field-shaped value from a scope element (a field wrapper or a repeater child cell). */
+function readValue( scope, type ) {
+	switch ( type ) {
+		case 'number':
+		case 'slider':
+		case 'quantity':
+		case 'text': {
+			const input = scope.querySelector( 'input' );
+			return input ? input.value : '';
+		}
+		case 'select': {
+			const select = scope.querySelector( 'select' );
+			return select ? select.value : '';
+		}
+		case 'radio': {
+			const checked = scope.querySelector( 'input:checked' );
+			return checked ? checked.value : '';
+		}
+		case 'checkbox_group':
+			return Array.from( scope.querySelectorAll( 'input:checked' ) ).map( ( i ) => i.value );
+		case 'toggle': {
+			const box = scope.querySelector( 'input[type="checkbox"]' );
+			return box && box.checked ? '1' : '';
+		}
+	}
+	return undefined;
+}
+
+/** Collect raw values from the DOM, scoped by [data-alc-field] wrappers. Exported for tests. */
+export function collectRawValues( root, fields ) {
 	const raw = {};
 	fields.forEach( ( f ) => {
 		const wrap = root.querySelector( `[data-alc-field="${ f.id }"]` );
 		if ( ! wrap ) {
 			return;
 		}
-		switch ( f.type ) {
-			case 'number':
-			case 'slider':
-			case 'quantity':
-			case 'text': {
-				const input = wrap.querySelector( 'input' );
-				raw[ f.id ] = input ? input.value : '';
-				break;
-			}
-			case 'select': {
-				const select = wrap.querySelector( 'select' );
-				raw[ f.id ] = select ? select.value : '';
-				break;
-			}
-			case 'radio': {
-				const checked = wrap.querySelector( 'input:checked' );
-				raw[ f.id ] = checked ? checked.value : '';
-				break;
-			}
-			case 'checkbox_group':
-				raw[ f.id ] = Array.from( wrap.querySelectorAll( 'input:checked' ) ).map( ( i ) => i.value );
-				break;
-			case 'toggle': {
-				const box = wrap.querySelector( 'input[type="checkbox"]' );
-				raw[ f.id ] = box && box.checked ? '1' : '';
-				break;
-			}
+		if ( f.type === 'repeater' ) {
+			const rows = [];
+			wrap.querySelectorAll( '[data-alc-rows] [data-alc-row]' ).forEach( ( rowEl ) => {
+				const row = {};
+				( f.fields || [] ).forEach( ( child ) => {
+					const cell = rowEl.querySelector( `[data-alc-child="${ child.id }"]` );
+					const v = cell ? readValue( cell, child.type ) : undefined;
+					if ( v !== undefined ) {
+						row[ child.id ] = v;
+					}
+				} );
+				rows.push( row );
+			} );
+			raw[ f.id ] = rows;
+			return;
+		}
+		const v = readValue( wrap, f.type );
+		if ( v !== undefined ) {
+			raw[ f.id ] = v;
 		}
 	} );
 	return raw;
@@ -164,6 +185,7 @@ export function init( root ) {
 	} );
 
 	wireQuoteForm( root, config, () => collectRawValues( root, fields ), validateRequired );
+	setupRepeaters( root, fields, recompute );
 	recompute(); // Sync once on init (server already rendered defaults; this is idempotent).
 
 	if ( config.settings && config.settings.layout === 'wizard' ) {
