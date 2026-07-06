@@ -284,3 +284,24 @@ body.alcb-builder-page #wpbody-content > .error { display: none; }
 .alcb-draftbar button { border: none; cursor: pointer; font-weight: 800; border-radius: var(--alcb-r-sm); padding: 5px 12px; }
 .alcb-draftbar__restore { background: var(--alcb-flame-deep); color: #fff; }
 .alcb-draftbar__discard { background: transparent; color: var(--alcb-ink-2); }
+
+// ── 10 · Surviving list/entries chrome — light token restyle (spec §2.1).
+// Class names unchanged (CalculatorList/EntriesList keep .alc-topbar); style only.
+.alc-app .alc-topbar {
+	margin: 16px 0;
+	padding: 14px 18px;
+	background: var(--alcb-panel);
+	border: 1px solid var(--alcb-line);
+	border-radius: var(--alcb-r);
+	box-shadow: var(--alcb-shadow);
+}
+.alc-app .alc-topbar .alc-heading { font-size: 15px; font-weight: 800; color: var(--alcb-ink); }
+.alc-app .alc-topbar .components-button { border-radius: var(--alcb-r-sm); }
+.alc-app .alc-topbar .components-button.is-primary {
+	background: linear-gradient(135deg, var(--alcb-flame), var(--alcb-flame-deep));
+}
+.alc-app .alc-topbar .components-button.is-secondary {
+	color: var(--alcb-ink-2);
+	box-shadow: inset 0 0 0 1px var(--alcb-line-2);
+}
+.alc-app .alc-topbar .components-button.is-tertiary { color: var(--alcb-ink-2); }
