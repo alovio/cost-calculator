@@ -34,3 +34,86 @@ body.alcb-builder-page #wpfooter { display: none; }
 body.alcb-builder-page #wpbody-content > .notice,
 body.alcb-builder-page #wpbody-content > .update-nag,
 body.alcb-builder-page #wpbody-content > .error { display: none; }
+
+// ── 03 · App frame + header
+.alcb-app {
+	font-size: 13px;
+	color: var(--alcb-ink);
+	background: var(--alcb-bg);
+	display: flex;
+	flex-direction: column;
+	height: calc(100vh - 32px); // minus admin bar
+	overflow: hidden;
+}
+.alcb-app *, .alcb-app *::before, .alcb-app *::after { box-sizing: border-box; }
+.alcb-app--center { align-items: center; justify-content: center; }
+
+.alcb-hdr {
+	height: 58px; flex: none; background: var(--alcb-coal); color: #fff;
+	display: flex; align-items: center; gap: 12px; padding: 0 16px;
+}
+.alcb-back {
+	width: 34px; height: 34px; border-radius: var(--alcb-r-sm); flex: none;
+	border: 1px solid #44403c; background: transparent; color: #d6d3d1; font-size: 15px; cursor: pointer;
+}
+.alcb-back:hover { border-color: #78716c; color: #fff; }
+.alcb-logo { display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 15px; white-space: nowrap; }
+.alcb-logo .alcb-mark {
+	width: 28px; height: 28px; border-radius: 8px;
+	background: linear-gradient(135deg, var(--alcb-flame), var(--alcb-flame-deep));
+	display: flex; align-items: center; justify-content: center; font-size: 14px;
+}
+.alcb-logo .alcb-sub { color: #a8a29e; font-weight: 600; font-size: 13px; margin-left: 2px; }
+.alcb-name {
+	height: 34px; min-width: 180px; max-width: 340px; flex: 1;
+	border: 1px solid transparent; border-radius: var(--alcb-r-sm);
+	background: transparent; color: #fff; font-size: 14px; font-weight: 700; padding: 0 10px;
+}
+.alcb-name:hover { border-color: #44403c; }
+.alcb-name:focus { border-color: var(--alcb-flame); background: var(--alcb-coal-2); outline: none; box-shadow: none; }
+.alcb-name::placeholder { color: #78716c; }
+.alcb-hdr .alcb-grow { flex: 1; }
+.alcb-status { display: flex; align-items: center; gap: 7px; color: #a8a29e; font-size: 12.5px; font-weight: 600; white-space: nowrap; }
+.alcb-status .alcb-dot { width: 7px; height: 7px; border-radius: 50%; background: #57534e; }
+.alcb-status.is-dirty .alcb-dot { background: var(--alcb-amber); }
+.alcb-status.is-saved { color: var(--alcb-green); }
+.alcb-status.is-saved .alcb-dot { background: var(--alcb-green); }
+.alcb-status.is-error { color: #fca5a5; }
+.alcb-status.is-error .alcb-dot { background: var(--alcb-red); }
+
+.alcb-btn-ghost {
+	height: 34px; padding: 0 14px; border-radius: var(--alcb-r-sm);
+	border: 1px solid #44403c; background: transparent; color: #d6d3d1;
+	font-size: 13px; font-weight: 700; cursor: pointer;
+	display: inline-flex; align-items: center; gap: 7px;
+}
+.alcb-btn-ghost:hover:not(:disabled) { border-color: #78716c; color: #fff; }
+.alcb-btn-ghost:disabled { opacity: 0.4; cursor: default; }
+.alcb-btn-pro { color: #fdba74; border-color: rgba(249, 115, 22, 0.45); }
+.alcb-btn-pro.is-on { background: rgba(249, 115, 22, 0.18); }
+.alcb-btn-primary {
+	height: 34px; padding: 0 18px; border-radius: var(--alcb-r-sm); border: none;
+	background: linear-gradient(135deg, var(--alcb-flame), var(--alcb-flame-deep));
+	color: #fff; font-size: 13px; font-weight: 800; cursor: pointer;
+	box-shadow: 0 4px 14px -4px rgba(234, 88, 12, 0.6);
+	display: inline-flex; align-items: center; gap: 7px;
+}
+.alcb-btn-primary:hover { filter: brightness(1.06); }
+.alcb-btn-primary:disabled { opacity: 0.6; cursor: default; }
+
+// ── 04 · Workspace grid
+.alcb-work {
+	flex: 1;
+	display: grid;
+	grid-template-columns: 252px 1fr 340px;
+	min-height: 0;
+}
+@media (max-width: 1100px) { .alcb-work { grid-template-columns: 220px 1fr 300px; } }
+.alcb-col { min-height: 0; overflow-y: auto; }
+.alcb-col--left { background: var(--alcb-panel); border-right: 1px solid var(--alcb-line); padding: 14px; }
+.alcb-col--center { display: flex; flex-direction: column; padding: 16px 22px; }
+.alcb-col--right { background: var(--alcb-panel); border-left: 1px solid var(--alcb-line); padding: 14px; }
+.alcb-sec-label {
+	font-size: 11px; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase;
+	color: var(--alcb-ink-3); margin: 4px 2px 10px; display: block;
+}
