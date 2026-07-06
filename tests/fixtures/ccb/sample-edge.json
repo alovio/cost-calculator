@@ -1,0 +1,272 @@
+{
+    "ccbVersion": "4.0.14",
+    "id": 239,
+    "title": "CCB Edge",
+    "postType": "cost-calc",
+    "meta": {
+        "stm-fields": [
+            {
+                "alias": "page_break_field_id_0",
+                "description": "",
+                "groupElements": [
+                    {
+                        "fields": [
+                            {
+                                "label": "Material",
+                                "_id": "0",
+                                "default": "",
+                                "description": "",
+                                "required": false,
+                                "_event": "change",
+                                "type": "drop-down",
+                                "allowRound": false,
+                                "additionalCss": "",
+                                "additionalStyles": "",
+                                "allowCurrency": false,
+                                "calculateHidden": false,
+                                "hasNextTick": true,
+                                "nextTickCount": 0,
+                                "disableOptions": [],
+                                "fieldCurrency": false,
+                                "seperateCurrency": false,
+                                "addToSummary": true,
+                                "_tag": "cost-drop-down",
+                                "icon": "ccb-icon-ic_dropdown",
+                                "alias": "dropDown_field_id_0",
+                                "desc_option": "after",
+                                "summary_view": "show_value",
+                                "options": [
+                                    {
+                                        "optionText": "Wood",
+                                        "optionValue": ""
+                                    },
+                                    {
+                                        "optionText": "Metal",
+                                        "optionValue": ""
+                                    }
+                                ],
+                                "show_value_in_option": true,
+                                "width": 100,
+                                "fieldCurrencySettings": {
+                                    "currency": "$",
+                                    "currencyPosition": "left_with_space",
+                                    "thousands_separator": ",",
+                                    "num_after_integer": 2,
+                                    "decimal_separator": "."
+                                },
+                                "id": 0,
+                                "fieldName": "Dropdown",
+                                "hidden": false,
+                                "pageId": "",
+                                "sectionId": "",
+                                "index": 0
+                            },
+                            {
+                                "label": "HTML",
+                                "_id": "1",
+                                "_event": "",
+                                "type": "html",
+                                "htmlContent": "<h1>Html Field Content</h1>",
+                                "placeholder": "",
+                                "hidden": false,
+                                "_tag": "cost-html",
+                                "additionalCss": "",
+                                "additionalStyles": "",
+                                "icon": "ccb-icon-ic_html",
+                                "alias": "html_field_id_1",
+                                "width": 34,
+                                "id": 1,
+                                "fieldName": "HTML",
+                                "pageId": "",
+                                "sectionId": "",
+                                "index": 0,
+                                "rowBreak": true
+                            },
+                            {
+                                "_id": "3",
+                                "currency": "$",
+                                "type": "total",
+                                "additionalCss": "",
+                                "_tag": "cost-total",
+                                "costCalcFormula": "if( dropDown_field_id_0 > 2){ dropDown_field_id_0 * 3 + 25}",
+                                "additionalStyles": "",
+                                "alias": "total_field_id_3",
+                                "icon": "ccb-icon-ic_formula",
+                                "label": "Quote",
+                                "formulaFieldView": false,
+                                "letter": "",
+                                "formulaView": false,
+                                "legacyFormula": "",
+                                "fieldCurrency": false,
+                                "calculateHidden": false,
+                                "advancedJsCalculation": false,
+                                "description": "",
+                                "fieldCurrencySettings": {
+                                    "currency": "$",
+                                    "currencyPosition": "left_with_space",
+                                    "thousands_separator": ",",
+                                    "num_after_integer": 2,
+                                    "decimal_separator": "."
+                                },
+                                "id": 3,
+                                "fieldName": "Formula",
+                                "hidden": false,
+                                "pageId": "",
+                                "sectionId": "",
+                                "index": 0,
+                                "width": 33,
+                                "useCurrencySign": false
+                            },
+                            {
+                                "label": "Divider",
+                                "_event": "",
+                                "_id": "2",
+                                "len": "25%",
+                                "size": "1px",
+                                "type": "line",
+                                "style": "solid",
+                                "description": "",
+                                "placeholder": "",
+                                "_tag": "cost-line",
+                                "additionalCss": "",
+                                "additionalStyles": "",
+                                "icon": "ccb-icon-ic_divider",
+                                "alias": "line_field_id_2",
+                                "id": 2,
+                                "fieldName": "Divider",
+                                "hidden": false,
+                                "pageId": "",
+                                "sectionId": "",
+                                "index": 0,
+                                "width": 33
+                            }
+                        ],
+                        "alias": "section_field_id_0",
+                        "description": "",
+                        "label": "Section #1",
+                        "letter": "",
+                        "type": "section",
+                        "_id": 0
+                    }
+                ],
+                "label": "Page 1",
+                "letter": "",
+                "type": "page-break",
+                "_id": 0,
+                "previousBtnLabel": "Back",
+                "nextBtnLabel": "Next"
+            }
+        ],
+        "stm-formula": [],
+        "stm-conditions": {
+            "nodes_v4": [],
+            "links_v4": [],
+            "spaces": []
+        },
+        "stm-name": "CCB Edge",
+        "stm-total-summary": {
+            "sticky": false,
+            "zero_values_for_orders_pdf_emails": true,
+            "mobile_mode": false,
+            "mini_widget_formulas": [],
+            "arrangement_sections": [
+                {
+                    "id": "summary_section_1",
+                    "title": "Section #1",
+                    "sort_id": 1,
+                    "items": [
+                        {
+                            "id": "summary_item_total_summary",
+                            "title": "Header",
+                            "alias": "total_summary",
+                            "sort_id": 1,
+                            "locked": true,
+                            "static": true,
+                            "options": {
+                                "title": "Total Summary"
+                            }
+                        },
+                        {
+                            "id": "summary_item_details",
+                            "title": "Details",
+                            "alias": "details",
+                            "sort_id": 2,
+                            "locked": true,
+                            "static": true,
+                            "options": {
+                                "default_state": "expanded",
+                                "show_zero_values": true,
+                                "cost_breakdown": true
+                            }
+                        },
+                        {
+                            "id": "summary_item_coupons",
+                            "title": "Coupons",
+                            "alias": "coupons",
+                            "sort_id": 3,
+                            "locked": false,
+                            "static": false,
+                            "options": []
+                        },
+                        {
+                            "id": "summary_item_total",
+                            "title": "Total",
+                            "alias": "total",
+                            "sort_id": 4,
+                            "locked": true,
+                            "static": true,
+                            "options": []
+                        },
+                        {
+                            "id": "summary_item_purchase_button",
+                            "title": "Purchase Button",
+                            "alias": "purchase_button",
+                            "sort_id": 5,
+                            "locked": true,
+                            "static": true,
+                            "options": {
+                                "width": 100
+                            }
+                        },
+                        {
+                            "id": "summary_item_pdf_button",
+                            "title": "PDF Button",
+                            "alias": "pdf_button",
+                            "sort_id": 6,
+                            "locked": true,
+                            "static": true,
+                            "options": {
+                                "width": 100
+                            }
+                        },
+                        {
+                            "id": "summary_item_share_button",
+                            "title": "Share Button",
+                            "alias": "share_button",
+                            "sort_id": 7,
+                            "locked": true,
+                            "static": true,
+                            "options": {
+                                "width": 100
+                            }
+                        },
+                        {
+                            "id": "summary_item_payments",
+                            "title": "Payments",
+                            "alias": "payments",
+                            "sort_id": 8,
+                            "locked": true,
+                            "static": true,
+                            "draggable": true,
+                            "options": {
+                                "layout": "horizontal"
+                            }
+                        }
+                    ]
+                }
+            ]
+        },
+        "form_id": "1",
+        "calc_saved": "1"
+    }
+}
