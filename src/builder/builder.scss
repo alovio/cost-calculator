@@ -1,0 +1,36 @@
+// Alovio Calculator — Builder Studio v2 (chrome only; the frontend keeps --alc-*).
+// Compiled into build/index.css by wp-scripts (imported from src/index.js).
+
+// ── 01 · Design tokens (ported from Checkout Fields builder.css, --clcf-* → --alcb-*)
+:root {
+	--alcb-flame: #f97316;
+	--alcb-flame-deep: #ea580c;
+	--alcb-flame-soft: #ffedd5;
+	--alcb-flame-border: #fed7aa;
+	--alcb-coal: #1c1917;
+	--alcb-coal-2: #292524;
+	--alcb-ink: #1f2328;
+	--alcb-ink-2: #57606a;
+	--alcb-ink-3: #8b949e;
+	--alcb-bg: #f6f5f4;
+	--alcb-panel: #ffffff;
+	--alcb-line: #e7e5e4;
+	--alcb-line-2: #d6d3d1;
+	--alcb-green: #10b981;
+	--alcb-green-soft: #d1fae5;
+	--alcb-green-ink: #065f46;
+	--alcb-amber: #f59e0b; // addition vs donor (hardcoded there): save-pill dirty state
+	--alcb-red: #ef4444; // addition vs donor (hardcoded there): save-pill error state
+	--alcb-r: 12px;
+	--alcb-r-sm: 8px;
+	--alcb-shadow: 0 1px 2px rgba(28, 25, 23, 0.06), 0 8px 24px -12px rgba(28, 25, 23, 0.14);
+}
+
+// ── 02 · wp-admin integration: full-bleed app, no pushed-down layout
+body.alcb-builder-page #wpcontent { padding-left: 0; }
+body.alcb-builder-page #wpbody-content { padding-bottom: 0; }
+body.alcb-builder-page #wpfooter { display: none; }
+// Admin notices would push the full-height app down and break its layout.
+body.alcb-builder-page #wpbody-content > .notice,
+body.alcb-builder-page #wpbody-content > .update-nag,
+body.alcb-builder-page #wpbody-content > .error { display: none; }

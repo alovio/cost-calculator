@@ -16,6 +16,7 @@ final class BuilderAssets {
 
 	public function register(): void {
 		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue' ) );
+		add_filter( 'admin_body_class', array( $this, 'body_class' ) );
 	}
 
 	public function enqueue( string $hook ): void {
@@ -61,5 +62,16 @@ final class BuilderAssets {
 				'adminPost'   => esc_url_raw( admin_url( 'admin-post.php' ) ),
 			)
 		);
+	}
+
+	/**
+	 * Marks the builder screen so builder.scss can go full-bleed (spec §2.1).
+	 */
+	public function body_class( string $classes ): string {
+		$screen = function_exists( 'get_current_screen' ) ? get_current_screen() : null;
+		if ( $screen && 'toplevel_page_' . AdminPage::SLUG === $screen->id ) {
+			$classes .= ' alcb-builder-page';
+		}
+		return $classes;
 	}
 }
