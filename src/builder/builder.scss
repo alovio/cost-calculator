@@ -274,3 +274,13 @@ body.alcb-builder-page #wpbody-content > .error { display: none; }
 .alcb-narrow { max-width: 180px; }
 .alcb-pro h3 { margin-top: 0; }
 .alcb-pro li { margin-bottom: 4px; }
+
+// ── 09 · Draft-restore bar
+.alcb-draftbar {
+	flex: none; display: flex; align-items: center; gap: 12px;
+	padding: 8px 20px; background: var(--alcb-flame-soft);
+	border-bottom: 1px solid var(--alcb-flame-border); color: var(--alcb-flame-deep); font-weight: 600;
+}
+.alcb-draftbar button { border: none; cursor: pointer; font-weight: 800; border-radius: var(--alcb-r-sm); padding: 5px 12px; }
+.alcb-draftbar__restore { background: var(--alcb-flame-deep); color: #fff; }
+.alcb-draftbar__discard { background: transparent; color: var(--alcb-ink-2); }

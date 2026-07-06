@@ -7,6 +7,7 @@ import { getCalculator, saveCalculator } from './api';
 import PaletteV2 from './PaletteV2';
 import LiveCanvas from './LiveCanvas';
 import SettingsPanel from './SettingsPanel';
+import { saveDraft, loadDraft, clearDraft, isDraftNewer, DRAFT_DEBOUNCE_MS } from './draft';
 
 /**
  * True when the event target edits text — undo/redo shortcuts must never
@@ -33,6 +34,7 @@ export default function StudioShell( { calculatorId, onBack } ) {
 	const [ saving, setSaving ] = useState( false );
 	const [ flash, setFlash ] = useState( null ); // 'saved' | 'error' | null
 	const [ proOpen, setProOpen ] = useState( false );
+	const [ draft, setDraft ] = useState( null );
 	const savedRef = useRef( null );
 	const modifiedRef = useRef( '' ); // server post_modified_gmt (fed from chunk 2; draft.js consumes it in chunk 4)
 	const isPro = !! ( window.ALOVIO_CALC_BUILDER && window.ALOVIO_CALC_BUILDER.isPro );
@@ -46,6 +48,10 @@ export default function StudioShell( { calculatorId, onBack } ) {
 				hydrate( calc.config.fields || [], calc.config.settings || {}, calc.title || '' );
 				savedRef.current = snapshot( calc.config.fields || [], calc.config.settings || {}, calc.title || '' );
 				modifiedRef.current = calc.modified || '';
+				const d = loadDraft( calculatorId );
+				if ( isDraftNewer( d, calc.modified || '' ) ) {
+					setDraft( d ); // newest-wins prompt — the user decides (spec §8)
+				}
 			} )
 			.catch( () => setLoadError( true ) )
 			.finally( () => setLoading( false ) );
@@ -65,6 +71,14 @@ export default function StudioShell( { calculatorId, onBack } ) {
 		return () => window.removeEventListener( 'beforeunload', handler );
 	}, [ dirty ] );
 
+	useEffect( () => {
+		if ( loading || ! dirty ) {
+			return undefined;
+		}
+		const t = window.setTimeout( () => saveDraft( calculatorId, { name, fields, settings } ), DRAFT_DEBOUNCE_MS );
+		return () => window.clearTimeout( t );
+	}, [ calculatorId, name, fields, settings, dirty, loading ] );
+
 	const save = useCallback( async () => {
 		setSaving( true );
 		try {
@@ -78,6 +92,8 @@ export default function StudioShell( { calculatorId, onBack } ) {
 			hydrate( saved.config.fields || [], saved.config.settings || {}, saved.title || '' );
 			savedRef.current = snapshot( saved.config.fields || [], saved.config.settings || {}, saved.title || '' );
 			modifiedRef.current = saved.modified || modifiedRef.current;
+			clearDraft( calculatorId );
+			setDraft( null );
 			setFlash( 'saved' );
 			window.setTimeout( () => setFlash( null ), 2500 );
 		} catch ( e ) {
@@ -170,10 +186,18 @@ export default function StudioShell( { calculatorId, onBack } ) {
 					</button>
 				) }
 			</div>
+			{ draft && (
+				<div className="alcb-draftbar" role="status">
+					<span>{ __( 'A newer unsaved draft of this calculator exists on this device.', 'alovio-calculator' ) }</span>
+					<button className="alcb-draftbar__restore" onClick={ () => { hydrate( draft.fields || [], draft.settings || {}, draft.name || '' ); setDraft( null ); } }>
+						{ __( 'Restore draft', 'alovio-calculator' ) }
+					</button>
+					<button className="alcb-draftbar__discard" onClick={ () => { clearDraft( calculatorId ); setDraft( null ); } }>
+						{ __( 'Discard', 'alovio-calculator' ) }
+					</button>
+				</div>
+			) }
 			<div className="alcb-work">
-				{ /* INTERIM (see plan header table): v1 components run inside the new
-				     shell until chunks 2–4 replace each column. Their alc-* styles
-				     still ship from assets/css/builder.css. */ }
 				<div className="alcb-col alcb-col--left"><PaletteV2 /></div>
 				<div className="alcb-col alcb-col--center alcb-col--canvas"><LiveCanvas calculatorId={ calculatorId } /></div>
 				<div className="alcb-col alcb-col--right alcb-col--panel"><SettingsPanel proOpen={ proOpen } /></div>
