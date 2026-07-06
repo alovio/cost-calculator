@@ -72,6 +72,21 @@ export function collectRawValues( root, fields ) {
 	return raw;
 }
 
+/** Bubble text (+unit) and thumb-tracking position. Works for top-level and repeater-row sliders. */
+export function updateSliderUi( input ) {
+	const holder = input.closest( '.alc-slider' );
+	const out = holder && holder.querySelector( 'output' );
+	if ( ! out ) {
+		return;
+	}
+	const unit = holder.getAttribute( 'data-alc-unit' ) || '';
+	out.textContent = input.value + ( unit ? ' ' + unit : '' );
+	const min = parseFloat( input.min || '0' );
+	const max = parseFloat( input.max || '100' );
+	const pct = max > min ? ( ( parseFloat( input.value ) - min ) / ( max - min ) ) * 100 : 0;
+	holder.style.setProperty( '--alc-pos', `${ pct }%` );
+}
+
 function applyVisibility( root, active ) {
 	Object.entries( active ).forEach( ( [ id, isActive ] ) => {
 		const wrap = root.querySelector( `[data-alc-field="${ id }"]` );
@@ -179,10 +194,7 @@ export function init( root ) {
 			return; // Contact inputs don't affect the math.
 		}
 		if ( e.target.type === 'range' ) {
-			const out = e.target.parentElement.querySelector( 'output' );
-			if ( out ) {
-				out.textContent = e.target.value;
-			}
+			updateSliderUi( e.target );
 		}
 		recompute();
 	} );

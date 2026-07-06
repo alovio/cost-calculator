@@ -158,4 +158,15 @@ class CalculatorRendererTest extends TestCase {
 		$this->assertStringContainsString( '<textarea id="alc-notes" rows="3" placeholder="Tell us more">', $html );
 		$this->assertStringContainsString( 'placeholder="you@example.com"', $html );
 	}
+
+	public function test_slider_bubble_scale_and_unit(): void {
+		$config = FieldSchema::normalize( [ 'fields' => [
+			[ 'id' => 'area', 'type' => 'slider', 'label' => 'Area', 'min' => 10, 'max' => 110, 'default' => 35, 'unit' => 'm2' ],
+		] ] );
+		$html = CalculatorRenderer::render( 7, $config );
+		$this->assertStringContainsString( 'class="alc-slider" data-alc-unit="m2"', $html );
+		$this->assertStringContainsString( '--alc-pos:25%', $html );                       // (35-10)/(110-10)
+		$this->assertStringContainsString( 'class="alc-slider__bubble">35 m2<', $html );   // unit suffix
+		$this->assertStringContainsString( '<div class="alc-slider__scale" aria-hidden="true"><span>10</span><span>110</span></div>', $html );
+	}
 }

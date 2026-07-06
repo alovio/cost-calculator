@@ -229,4 +229,13 @@ class FieldSchemaTest extends TestCase {
 		$this->assertSame( 'x', $out['fields'][1]['placeholder'] );
 		$this->assertSame( '', $out['fields'][2]['placeholder'] );
 	}
+
+	public function test_slider_unit_setting(): void {
+		$out = FieldSchema::normalize( $this->config( [
+			[ 'id' => 'area', 'type' => 'slider', 'label' => 'Area', 'unit' => ' m² <b>x</b> ' ],
+			[ 'id' => 'qty', 'type' => 'number', 'label' => 'Qty', 'unit' => 'kg' ],
+		] ) );
+		$this->assertSame( 'm² x', $out['fields'][0]['unit'] ); // sanitized
+		$this->assertArrayNotHasKey( 'unit', $out['fields'][1] ); // slider-only setting
+	}
 }

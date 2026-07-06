@@ -68,6 +68,9 @@ export default function FieldGeneral( { field, set } ) {
 					<TextControl type="number" label={ __( 'Default', 'alovio-calculator' ) } value={ field.default ?? '' } onChange={ ( v ) => set( { default: num( v ) } ) } />
 				</div>
 			) }
+			{ 'slider' === field.type && (
+				<TextControl label={ __( 'Unit suffix', 'alovio-calculator' ) } help={ __( 'Shown after the value in the slider bubble, e.g. "m²".', 'alovio-calculator' ) } value={ field.unit || '' } onChange={ ( unit ) => set( { unit } ) } />
+			) }
 			{ 'toggle' === field.type && (
 				<>
 					<TextControl

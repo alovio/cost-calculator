@@ -10,7 +10,7 @@
 
 export const DEFAULTS = {
 	number: { label: 'Number', min: null, max: null, step: null, default: 0, showInSummary: false },
-	slider: { label: 'Slider', min: 0, max: 100, step: 1, default: 0, showInSummary: true },
+	slider: { label: 'Slider', min: 0, max: 100, step: 1, default: 0, unit: '', showInSummary: true },
 	select: { label: 'Dropdown', options: [ { label: 'Option 1', price: 0 } ], showInSummary: false },
 	radio: { label: 'Choose one', options: [ { label: 'Option 1', price: 0 } ], showInSummary: false },
 	checkbox_group: { label: 'Check all that apply', options: [ { label: 'Option 1', price: 0 } ], showInSummary: false },

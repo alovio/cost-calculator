@@ -1,6 +1,6 @@
 /** @jest-environment jsdom */
 import { setupRepeaters } from '../repeater';
-import { collectRawValues } from '../calculator';
+import { collectRawValues, updateSliderUi } from '../calculator';
 
 const FIELD = {
 	id: 'rooms', type: 'repeater', label: 'Rooms', minRows: 1, maxRows: 2, rowLabel: 'Room {n}',
@@ -66,5 +66,15 @@ describe( 'repeater DOM behaviour', () => {
 		root.querySelectorAll( 'input[type="radio"]' )[ 1 ].checked = true;
 		const raw = collectRawValues( root, [ FIELD ] );
 		expect( raw.rooms ).toEqual( [ { r_area: '5', r_rate: '' }, { r_area: '9', r_rate: 'opt_a' } ] );
+	} );
+} );
+
+describe( 'updateSliderUi', () => {
+	it( 'writes the bubble text with unit and the thumb-tracking position', () => {
+		document.body.innerHTML = '<div class="alc-slider" data-alc-unit="m2"><div class="alc-slider__rail"><input type="range" min="10" max="110" value="60"><output></output></div></div>';
+		const input = document.querySelector( 'input[type="range"]' );
+		updateSliderUi( input );
+		expect( document.querySelector( 'output' ).textContent ).toBe( '60 m2' );
+		expect( document.querySelector( '.alc-slider' ).style.getPropertyValue( '--alc-pos' ) ).toBe( '50%' );
 	} );
 } );

@@ -95,6 +95,9 @@ final class FieldSchema {
 				foreach ( [ 'min', 'max', 'step', 'default' ] as $k ) {
 					$field[ $k ] = isset( $raw[ $k ] ) && is_numeric( $raw[ $k ] ) ? (float) $raw[ $k ] : null;
 				}
+				if ( 'slider' === $type ) {
+					$field['unit'] = sanitize_text_field( (string) ( $raw['unit'] ?? '' ) );
+				}
 				// Deliberately NO price on numeric fields — formulas do the multiplying (§6 value maps stay unambiguous).
 				break;
 

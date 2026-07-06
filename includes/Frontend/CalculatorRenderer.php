@@ -99,12 +99,26 @@ final class CalculatorRenderer {
 
 			case 'slider':
 				$value = self::default_number( $field );
+				$unit  = (string) ( $field['unit'] ?? '' );
+				$min   = isset( $field['min'] ) && null !== $field['min'] ? (float) $field['min'] : 0.0;
+				$max   = isset( $field['max'] ) && null !== $field['max'] ? (float) $field['max'] : 100.0;
+				$pos   = $max > $min ? ( ( (float) $value - $min ) / ( $max - $min ) ) * 100 : 0.0;
 				return sprintf(
-					'<label for="alc-%1$s">%2$s</label><div class="alc-slider"><input type="range" id="alc-%1$s"%3$s value="%4$s"><output for="alc-%1$s">%4$s</output></div>',
+					'<label for="alc-%1$s">%2$s</label>'
+					. '<div class="alc-slider" data-alc-unit="%5$s" style="--alc-pos:%6$s%%">'
+					. '<div class="alc-slider__rail"><input type="range" id="alc-%1$s"%3$s value="%4$s">'
+					. '<output for="alc-%1$s" class="alc-slider__bubble">%7$s</output></div>'
+					. '<div class="alc-slider__scale" aria-hidden="true"><span>%8$s</span><span>%9$s</span></div>'
+					. '</div>',
 					$id,
 					$label,
 					self::range_attrs( $field ),
-					esc_attr( $value )
+					esc_attr( $value ),
+					esc_attr( $unit ),
+					esc_attr( self::trim_float( round( $pos, 2 ) ) ),
+					esc_html( $value . ( '' !== $unit ? ' ' . $unit : '' ) ),
+					esc_html( self::trim_float( $min ) ),
+					esc_html( self::trim_float( $max ) )
 				);
 
 			case 'select':
