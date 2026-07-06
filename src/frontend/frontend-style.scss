@@ -122,6 +122,54 @@
 	}
 }
 
+/* ---- REPEATER (base; themes override tokens/surfaces below) ---- */
+.alc-repeater {
+	border: 1px solid var(--alc-surface-border);
+	border-radius: var(--alc-radius);
+	padding: 12px;
+
+	> legend { font-weight: 600; padding: 0 4px; }
+
+	&__row {
+		border-block-end: 1px solid var(--alc-divider);
+		padding-block: 10px;
+
+		&:last-child { border-block-end: 0; }
+	}
+
+	&__row-head { display: flex; align-items: center; justify-content: space-between; margin-block-end: 6px; }
+	&__row-label { font-weight: 600; font-size: 0.9em; color: var(--alc-muted); }
+
+	&__remove {
+		border: 0;
+		background: none;
+		color: var(--alc-muted);
+		font-size: 18px;
+		line-height: 1;
+		padding: 2px 6px;
+		cursor: pointer;
+
+		&:hover { color: #b91c1c; }
+		&[hidden] { display: none !important; }
+	}
+
+	&__row-fields { display: grid; gap: 10px; }
+	&__child > label { display: block; font-weight: 600; }
+
+	&__add {
+		margin-block-start: 10px;
+		padding: 8px 14px;
+		border: 1px dashed var(--alc-border);
+		border-radius: var(--alc-radius);
+		background: none;
+		color: var(--alc-accent);
+		font-weight: 600;
+		cursor: pointer;
+
+		&:disabled { opacity: 0.5; cursor: not-allowed; }
+	}
+}
+
 .alc-line {
 	display: flex;
 	justify-content: space-between;
@@ -3335,3 +3383,17 @@
 	outline: 2px solid var(--alc-accent);
 	outline-offset: 2px;
 }
+
+/* ---- REPEATER: per-theme surface overrides (match each theme's .alc-choices/.alc-summary treatment) ---- */
+.alc-calculator.alc-theme--classic .alc-repeater { background: #fff; box-shadow: none; }
+.alc-calculator.alc-theme--classic .alc-repeater__add { border-color: var(--alc-accent); }
+
+.alc-calculator.alc-theme--minimal .alc-repeater { border: 0; border-block-start: 2px solid var(--alc-border); border-radius: 0; padding-inline: 0; }
+
+.alc-calculator.alc-theme--midnight .alc-repeater { background: rgba(255, 255, 255, 0.03); border-color: var(--alc-surface-border); }
+
+.alc-calculator.alc-theme--soft .alc-repeater { background: var(--alc-surface); border: 0; }
+
+.alc-calculator.alc-theme--bold .alc-repeater { border-width: 2px; border-color: var(--alc-border); }
+
+.alc-calculator.alc-theme--slate .alc-repeater { background: var(--alc-surface); border-color: var(--alc-surface-border); }
