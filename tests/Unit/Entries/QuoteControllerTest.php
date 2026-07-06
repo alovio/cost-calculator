@@ -123,4 +123,25 @@ class QuoteControllerTest extends TestCase {
 		$this->assertSame( 1200000, $snap[0]['rows'][0]['total'] );
 		$this->assertSame( '20', $snap[0]['rows'][0]['values']['r_area'] );
 	}
+
+	public function test_resolve_file_gates_tokens(): void {
+		$cfg_on = [ 'settings' => [ 'quoteForm' => [ 'file' => [ 'enabled' => true ] ] ] ];
+		// Feature off or no token sent ⇒ null (no file — not an error).
+		$this->assertNull( QuoteController::resolve_file( [ 'settings' => [ 'quoteForm' => [] ] ], str_repeat( 'a', 32 ) ) );
+		$this->assertNull( QuoteController::resolve_file( $cfg_on, '' ) );
+		// Malformed / unknown tokens ⇒ false (handle() maps this to 400 file_invalid).
+		$this->assertFalse( QuoteController::resolve_file( $cfg_on, 'not-a-token' ) );
+		Functions\when( 'get_option' )->justReturn( false );
+		$this->assertFalse( QuoteController::resolve_file( $cfg_on, str_repeat( 'a', 32 ) ) );
+	}
+
+	public function test_resolve_file_returns_consumed_meta(): void {
+		$cfg_on = [ 'settings' => [ 'quoteForm' => [ 'file' => [ 'enabled' => true ] ] ] ];
+		Functions\when( 'get_option' )->justReturn( [ 'name' => 'roof.jpg', 'stored' => '3f2ab.jpg' ] );
+		Functions\expect( 'delete_option' )->once(); // one-time token
+		$this->assertSame(
+			[ 'name' => 'roof.jpg', 'stored' => '3f2ab.jpg' ],
+			QuoteController::resolve_file( $cfg_on, str_repeat( 'a', 32 ) )
+		);
+	}
 }

@@ -147,6 +147,8 @@ export function init( root ) {
 	config.i18n = {
 		networkError: 'Something went wrong. Please try again.',
 		requiredError: 'Please fill in the required fields.',
+		fileUploading: 'Uploading…',
+		fileTooLarge: 'File is too large (max %d MB).',
 		wizard: { back: 'Back', next: 'Next', step: 'Step', of: 'of' },
 	};
 

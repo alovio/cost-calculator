@@ -119,6 +119,14 @@ export default function EntriesList( { onBack } ) {
 						{ open.phone && <> · <strong>{ __( 'Phone:', 'alovio-calculator' ) }</strong> { open.phone }</> }
 					</p>
 					{ open.message && <p><strong>{ __( 'Message:', 'alovio-calculator' ) }</strong> { open.message }</p> }
+					{ open.snapshot && open.snapshot.file && open.snapshot.file.name && (
+						<p>
+							<strong>{ __( 'File:', 'alovio-calculator' ) }</strong>{ ' ' }
+							<a href={ `${ window.ALOVIO_CALC_BUILDER.root }alovio-calc/v1/entries/${ open.id }/file?_wpnonce=${ window.ALOVIO_CALC_BUILDER.nonce }` }>
+								{ open.snapshot.file.name }
+							</a>
+						</p>
+					) }
 					{ open.snapshot && Array.isArray( open.snapshot.repeaters ) && open.snapshot.repeaters.map( ( rep ) => (
 						<div key={ rep.id } className="alc-entry-repeater">
 							<strong>{ rep.label }</strong>

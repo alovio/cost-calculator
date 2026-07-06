@@ -9,7 +9,7 @@ defined( 'ABSPATH' ) || exit;
 
 final class CsvExporter {
 
-	private const COLUMNS = array( 'id', 'calculator_id', 'created_at', 'name', 'email', 'phone', 'message', 'total', 'status', 'repeaters', 'snapshot' );
+	private const COLUMNS = array( 'id', 'calculator_id', 'created_at', 'name', 'email', 'phone', 'message', 'total', 'status', 'repeaters', 'file', 'snapshot' );
 
 	public function register(): void {
 		add_action( 'admin_post_alovio_calc_export_entries', array( $this, 'handle' ) );
@@ -46,7 +46,9 @@ final class CsvExporter {
 		echo implode( ',', self::COLUMNS ) . "\n"; // phpcs:ignore WordPress.Security.EscapeOutput -- CSV stream, constant header.
 		foreach ( $rows as $row ) {
 			$decoded          = json_decode( (string) ( $row['snapshot'] ?? '' ), true );
-			$row['repeaters'] = self::repeater_cell( is_array( $decoded ) ? $decoded : array() );
+			$snap             = is_array( $decoded ) ? $decoded : array();
+			$row['repeaters'] = self::repeater_cell( $snap );
+			$row['file']      = (string) ( $snap['file']['name'] ?? '' );
 			echo self::csv_row( $row ) . "\n"; // phpcs:ignore WordPress.Security.EscapeOutput -- CSV-escaped above.
 		}
 		exit;

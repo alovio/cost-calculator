@@ -96,4 +96,27 @@ class EntryMailerTest extends TestCase {
 		);
 		$this->assertSame( [], EntryMailer::repeater_lines( $snapshot, 'ghost' ) );
 	}
+
+	public function test_file_name_and_dashboard_link_in_email_without_attachment(): void {
+		Functions\when( 'apply_filters' )->returnArg( 2 );
+		Functions\when( 'admin_url' )->alias( static fn( $path = '' ) => 'https://site.test/wp-admin/' . $path );
+
+		$captured = null;
+		Functions\when( 'wp_mail' )->alias(
+			static function ( $to, $subject, $message, $headers, $attachments ) use ( &$captured ) {
+				$captured = compact( 'to', 'subject', 'message', 'headers', 'attachments' );
+				return true;
+			}
+		);
+
+		$snapshot         = $this->snapshot();
+		$snapshot['file'] = array( 'name' => 'roof.jpg', 'stored' => '3f2ab.jpg' );
+
+		( new EntryMailer() )->notify( $this->post(), $this->config(), array( 'name' => 'T' ), $snapshot, 3 );
+
+		$this->assertStringContainsString( 'roof.jpg', $captured['message'] );
+		$this->assertStringContainsString( 'https://site.test/wp-admin/admin.php?page=alovio-calculator', $captured['message'] );
+		$this->assertStringNotContainsString( '3f2ab.jpg', $captured['message'] ); // stored name never leaks
+		$this->assertSame( array(), $captured['attachments'] ); // spec §3.3: the file itself is not attached
+	}
 }

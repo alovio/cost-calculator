@@ -169,4 +169,21 @@ class CalculatorRendererTest extends TestCase {
 		$this->assertStringContainsString( 'class="alc-slider__bubble">35 m2<', $html );   // unit suffix
 		$this->assertStringContainsString( '<div class="alc-slider__scale" aria-hidden="true"><span>10</span><span>110</span></div>', $html );
 	}
+
+	public function test_quote_form_file_block_when_enabled(): void {
+		$config = $this->config();
+		$config['settings']['quoteForm']['file'] = [ 'enabled' => true, 'label' => '', 'types' => [ 'jpg', 'pdf' ], 'maxMb' => 5 ];
+		$html = CalculatorRenderer::render( 7, $config );
+		$this->assertStringContainsString( 'class="alc-quote__file"', $html );
+		$this->assertStringContainsString( 'accept=".jpg,.pdf"', $html );
+		$this->assertStringContainsString( 'name="alc_file_token"', $html );
+		$this->assertStringContainsString( 'alc-quote__file-status', $html );
+		$payload = $this->payload( $html );
+		$this->assertTrue( $payload['settings']['quoteForm']['file']['enabled'] );
+		$this->assertStringContainsString( '/quote-file', $payload['settings']['quoteForm']['file']['endpoint'] );
+
+		$off = CalculatorRenderer::render( 7, $this->config() );
+		$this->assertStringNotContainsString( 'alc-quote__file', $off );
+		$this->assertFalse( $this->payload( $off )['settings']['quoteForm']['file']['enabled'] );
+	}
 }

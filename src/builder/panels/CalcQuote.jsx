@@ -15,6 +15,15 @@ export default function CalcQuote() {
 		setQuote( { fields: next } );
 	};
 
+	const FILE_TYPES = [ 'jpg', 'png', 'webp', 'pdf' ];
+	const file = quote.file || {};
+	const fileTypes = file.types || FILE_TYPES;
+	const setFile = ( patch ) => setQuote( { file: { ...file, ...patch } } );
+	const toggleFileType = ( key, on ) => {
+		const next = on ? [ ...fileTypes, key ] : fileTypes.filter( ( t ) => t !== key );
+		setFile( { types: next } );
+	};
+
 	return (
 		<>
 			<span className="alcb-sec-label">{ __( 'Quote requests', 'alovio-calculator' ) }</span>
@@ -43,6 +52,36 @@ export default function CalcQuote() {
 						value={ quote.successMessage || '' }
 						onChange={ ( successMessage ) => setQuote( { successMessage } ) }
 					/>
+
+					<span className="alcb-sec-label">{ __( 'File upload', 'alovio-calculator' ) }</span>
+					<ToggleControl
+						label={ __( 'Allow a file attachment', 'alovio-calculator' ) }
+						help={ __( 'Visitors can attach one file to their quote request.', 'alovio-calculator' ) }
+						checked={ !! file.enabled }
+						onChange={ ( enabled ) => setFile( { enabled } ) }
+					/>
+					{ !! file.enabled && (
+						<>
+							<TextControl
+								label={ __( 'Upload field label', 'alovio-calculator' ) }
+								placeholder={ __( 'Attach a file', 'alovio-calculator' ) }
+								value={ file.label || '' }
+								onChange={ ( label ) => setFile( { label } ) }
+							/>
+							<p className="alcb-hint">{ __( 'Allowed file types', 'alovio-calculator' ) }</p>
+							{ FILE_TYPES.map( ( t ) => (
+								<CheckboxControl key={ t } label={ t.toUpperCase() } checked={ fileTypes.includes( t ) } onChange={ ( on ) => toggleFileType( t, on ) } />
+							) ) }
+							<TextControl
+								type="number"
+								min={ 1 }
+								max={ 20 }
+								label={ __( 'Max file size (MB)', 'alovio-calculator' ) }
+								value={ file.maxMb ?? 5 }
+								onChange={ ( v ) => setFile( { maxMb: parseInt( v, 10 ) || 5 } ) }
+							/>
+						</>
+					) }
 				</>
 			) }
 		</>

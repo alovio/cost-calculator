@@ -39,6 +39,14 @@ final class EntryMailer {
 		}
 		$lines[] = __( 'Total', 'alovio-calculator' ) . ': ' . DecimalMath::fromScaled( $snapshot['totalScaled'] );
 
+		if ( ! empty( $snapshot['file']['name'] ) ) {
+			$lines[] = '';
+			/* translators: %s: uploaded file name. */
+			$lines[] = sprintf( __( 'Attached file: %s', 'alovio-calculator' ), $snapshot['file']['name'] );
+			/* translators: %s: admin dashboard URL. */
+			$lines[] = sprintf( __( 'Download it from the entry in your dashboard: %s', 'alovio-calculator' ), admin_url( 'admin.php?page=alovio-calculator' ) );
+		}
+
 		/* translators: %s: site name. */
 		$subject = sprintf( __( '[%s] New quote request', 'alovio-calculator' ), wp_specialchars_decode( get_bloginfo( 'name' ), ENT_QUOTES ) );
 

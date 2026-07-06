@@ -125,6 +125,11 @@ final class QuoteController {
 			);
 		}
 
+		$fileMeta = self::resolve_file( $config, (string) $request->get_param( 'fileToken' ) );
+		if ( false === $fileMeta ) {
+			return $this->bad_request( 'file_invalid', __( 'The uploaded file could not be verified — please upload it again.', 'alovio-calculator' ) );
+		}
+
 		$snapshot = array(
 			'values'      => array_map( 'sanitize_text_field', $result['conditionValues'] ), // §12: text fields carry raw visitor input — sanitize at the storage boundary.
 			'lineItems'   => $result['lineItems'],
@@ -132,6 +137,12 @@ final class QuoteController {
 			'totalScaled' => $result['totalScaled'] ?? 0,
 			'currency'    => $config['settings']['currency'],
 		);
+		if ( null !== $fileMeta ) {
+			$snapshot['file'] = array(
+				'name'   => sanitize_file_name( $fileMeta['name'] ),
+				'stored' => $fileMeta['stored'],
+			);
+		}
 
 		$repo    = new EntriesRepository();
 		$entryId = $repo->insert( EntriesRepository::row_from_submission( $calculator_id, $validated['contact'], $snapshot ) );
@@ -303,6 +314,19 @@ final class QuoteController {
 			);
 		}
 		return $out;
+	}
+
+	/**
+	 * File-token gate (spec §3.3). null ⇒ no file expected/sent; array ⇒ consumed
+	 * meta; false ⇒ token invalid (handle() answers 400 file_invalid).
+	 *
+	 * @return array|false|null
+	 */
+	public static function resolve_file( array $config, string $fileToken ) {
+		if ( empty( $config['settings']['quoteForm']['file']['enabled'] ) || '' === $fileToken ) {
+			return null;
+		}
+		return FileUploads::consume( $fileToken ) ?? false;
 	}
 
 	private function within_rate_limit(): bool {

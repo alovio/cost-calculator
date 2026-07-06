@@ -38,6 +38,13 @@ final class CalculatorRenderer {
 					'fields'         => $quote['fields'],
 					'successMessage' => $successMessage,
 					'downloadLabel'  => __( 'Download PDF', 'alovio-calculator' ),
+					'file'           => empty( $quote['file']['enabled'] ) ? array( 'enabled' => false ) : array(
+						'enabled'  => true,
+						'label'    => '' !== $quote['file']['label'] ? $quote['file']['label'] : __( 'Attach a file', 'alovio-calculator' ),
+						'types'    => $quote['file']['types'],
+						'maxMb'    => $quote['file']['maxMb'],
+						'endpoint' => esc_url( rest_url( 'alovio-calc/v1/quote-file' ) ),
+					),
 				),
 			),
 		);
@@ -361,6 +368,17 @@ final class CalculatorRenderer {
 				$type,
 				esc_attr( $key ),
 				$required
+			);
+		}
+
+		if ( ! empty( $quote['file']['enabled'] ) ) {
+			$file_label = '' !== $quote['file']['label'] ? $quote['file']['label'] : __( 'Attach a file', 'alovio-calculator' );
+			$inputs    .= sprintf(
+				'<label class="alc-quote__field alc-quote__file-field">%1$s<input type="file" class="alc-quote__file" accept="%2$s"></label>'
+				. '<input type="hidden" name="alc_file_token" value="">'
+				. '<span class="alc-quote__file-status" role="status"></span>',
+				esc_html( $file_label ),
+				esc_attr( '.' . implode( ',.', $quote['file']['types'] ) )
 			);
 		}
 
