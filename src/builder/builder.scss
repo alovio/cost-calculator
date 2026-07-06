@@ -347,3 +347,12 @@ body.alcb-builder-page #wpbody-content > .error { display: none; }
 	box-shadow: inset 0 0 0 1px var(--alcb-line-2);
 }
 .alc-app .alc-topbar .components-button.is-tertiary { color: var(--alcb-ink-2); }
+
+/* CCB import modal */
+.alc-ccb-modal { max-width: 560px; }
+.alc-ccb-report__item { border-bottom: 1px solid rgba( 128, 128, 128, 0.2 ); padding: 8px 0; }
+.alc-ccb-report__item h3 { margin: 0 0 4px; font-size: 14px; }
+.alc-ccb-report__error { color: #b91c1c; margin: 0; }
+.alc-ccb-report__skipped li,
+.alc-ccb-report__warnings li { margin: 2px 0 2px 16px; list-style: disc; font-size: 12px; }
+.alc-ccb-report__warnings li { color: #92400e; }
