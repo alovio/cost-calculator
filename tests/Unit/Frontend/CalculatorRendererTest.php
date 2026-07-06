@@ -23,6 +23,7 @@ class CalculatorRendererTest extends TestCase {
 		Functions\when( 'wp_json_encode' )->alias( static fn( $data, $flags = 0 ) => json_encode( $data, $flags ) );
 		Functions\when( '__' )->returnArg();
 		Functions\when( 'esc_html__' )->alias( static fn( $s ) => htmlspecialchars( (string) $s, ENT_QUOTES ) );
+		Functions\when( 'esc_attr__' )->alias( static fn( $s ) => htmlspecialchars( (string) $s, ENT_QUOTES ) );
 		Functions\when( 'wp_get_attachment_image' )->justReturn( '<img src="thumb.jpg" alt="" />' );
 	}
 
@@ -113,5 +114,31 @@ class CalculatorRendererTest extends TestCase {
 		$this->assertMatchesRegularExpression( '/<option value="opt_m"[^>]*selected>/', $html );
 		$this->assertMatchesRegularExpression( '/<option value="opt_s">/', $html );
 		$this->assertMatchesRegularExpression( '/<input type="checkbox"[^>]*value="opt_x"[^>]*checked>/', $html );
+	}
+
+	public function test_repeater_renders_rows_template_and_controls(): void {
+		$config = FieldSchema::normalize( [ 'fields' => [
+			[ 'id' => 'rooms', 'type' => 'repeater', 'label' => 'Rooms <b>x</b>', 'minRows' => 2, 'maxRows' => 5,
+				'rowLabel' => 'Room {n}', 'addLabel' => 'Add room', 'rowExpression' => '', 'fields' => [
+				[ 'id' => 'r_rate', 'type' => 'radio', 'label' => 'Rate', 'options' => [
+					[ 'value' => 'opt_a', 'label' => 'A', 'price' => 1 ],
+				] ],
+				[ 'id' => 'r_area', 'type' => 'number', 'label' => 'Area', 'default' => 3 ],
+			] ],
+		] ] );
+		$html = CalculatorRenderer::render( 7, $config );
+
+		// 2 server-rendered initial rows (minRows) + 1 inert copy inside <template>.
+		$this->assertSame( 3, substr_count( $html, '<div class="alc-repeater__row" data-alc-row>' ) );
+		$this->assertStringContainsString( '<template data-alc-row-template>', $html );
+		$this->assertStringContainsString( 'name="alc_rooms_r_rate_1"', $html );      // row-scoped radio names
+		$this->assertStringContainsString( 'name="alc_rooms_r_rate_2"', $html );
+		$this->assertStringContainsString( 'name="alc_rooms_r_rate___ROW__"', $html ); // template placeholder
+		$this->assertStringContainsString( 'data-alc-child="r_area"', $html );
+		$this->assertStringContainsString( 'data-alc-add', $html );
+		$this->assertStringContainsString( 'Add room', $html );
+		$this->assertStringContainsString( 'data-alc-row-label>Room 1<', $html );
+		$this->assertStringContainsString( 'Rooms &lt;b&gt;x&lt;/b&gt;', $html );      // legend escaped
+		$this->assertStringNotContainsString( '<b>x</b>', $html );
 	}
 }

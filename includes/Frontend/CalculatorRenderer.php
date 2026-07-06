@@ -173,6 +173,9 @@ final class CalculatorRenderer {
 					esc_html( DecimalMath::fromScaled( $amount ) )
 				);
 
+			case 'repeater':
+				return self::render_repeater( $field, $result );
+
 			case 'step':
 				$desc = ! empty( $field['description'] )
 					? '<p class="alc-step__desc">' . esc_html( $field['description'] ) . '</p>'
@@ -180,6 +183,95 @@ final class CalculatorRenderer {
 				return sprintf( '<div class="alc-step__head"><h3 class="alc-step__title">%s</h3>%s</div>', $label, $desc );
 		}
 
+		return '';
+	}
+
+	/** Rows container + one inert row copy in <template> (spec §3.1: PHP renders row markup ONCE). */
+	private static function render_repeater( array $field, array $result ): string {
+		$rows    = '';
+		$initial = isset( $result['repeaters'][ $field['id'] ]['rows'] ) ? $result['repeaters'][ $field['id'] ]['rows'] : array();
+		$count   = max( 1, count( $initial ) );
+		for ( $i = 1; $i <= $count; $i++ ) {
+			$rows .= self::render_repeater_row( $field, (string) $i );
+		}
+		$add = '' !== $field['addLabel'] ? $field['addLabel'] : __( 'Add row', 'alovio-calculator' );
+
+		return '<fieldset class="alc-repeater"><legend>' . esc_html( $field['label'] ) . '</legend>'
+			. '<div class="alc-repeater__rows" data-alc-rows>' . $rows . '</div>'
+			. '<template data-alc-row-template>' . self::render_repeater_row( $field, '__ROW__' ) . '</template>'
+			. '<button type="button" class="alc-repeater__add" data-alc-add>' . esc_html( $add ) . '</button>'
+			. '</fieldset>';
+	}
+
+	private static function render_repeater_row( array $field, string $index ): string {
+		$children = '';
+		foreach ( $field['fields'] as $child ) {
+			$children .= sprintf(
+				'<div class="alc-repeater__child alc-repeater__child--%s" data-alc-child="%s">%s</div>',
+				esc_attr( $child['type'] ),
+				esc_attr( $child['id'] ),
+				self::render_repeater_child( $field['id'], $child, $index )
+			);
+		}
+		$label = '' !== $field['rowLabel']
+			? str_replace( '{n}', $index, $field['rowLabel'] )
+			: trim( $field['label'] . ' ' . $index );
+
+		return '<div class="alc-repeater__row" data-alc-row>'
+			. '<div class="alc-repeater__row-head">'
+			. '<span class="alc-repeater__row-label" data-alc-row-label>' . esc_html( $label ) . '</span>'
+			. '<button type="button" class="alc-repeater__remove" data-alc-remove aria-label="' . esc_attr__( 'Remove row', 'alovio-calculator' ) . '">&times;</button>'
+			. '</div><div class="alc-repeater__row-fields">' . $children . '</div></div>';
+	}
+
+	/**
+	 * Child controls use IMPLICIT label association (no id/for — nothing to reindex on
+	 * clone). Only radio/checkbox names carry the row index; JS renumbers those.
+	 * Option images are deliberately not rendered inside rows (template weight).
+	 */
+	private static function render_repeater_child( string $repId, array $child, string $index ): string {
+		$label = esc_html( $child['label'] );
+		switch ( $child['type'] ) {
+			case 'number':
+			case 'quantity':
+				return sprintf( '<label>%s<input type="number"%s value="%s"></label>', $label, self::range_attrs( $child ), esc_attr( self::default_number( $child ) ) );
+			case 'slider':
+				$value = self::default_number( $child );
+				return sprintf(
+					'<label>%1$s<span class="alc-slider"><input type="range"%2$s value="%3$s"><output>%3$s</output></span></label>',
+					$label,
+					self::range_attrs( $child ),
+					esc_attr( $value )
+				);
+			case 'select':
+				$options = '<option value="">' . esc_html__( '— select —', 'alovio-calculator' ) . '</option>';
+				foreach ( $child['options'] as $opt ) {
+					$options .= sprintf( '<option value="%s">%s</option>', esc_attr( $opt['value'] ), esc_html( $opt['label'] ) );
+				}
+				return sprintf( '<label>%s<select>%s</select></label>', $label, $options );
+			case 'radio':
+			case 'checkbox_group':
+				$type  = 'radio' === $child['type'] ? 'radio' : 'checkbox';
+				$name  = sprintf( 'alc_%s_%s_%s', $repId, $child['id'], $index );
+				$items = '';
+				foreach ( $child['options'] as $opt ) {
+					$items .= sprintf(
+						'<label class="alc-choice"><input type="%1$s" name="%2$s" value="%3$s"><span class="alc-choice__label">%4$s</span></label>',
+						$type,
+						esc_attr( $name ),
+						esc_attr( $opt['value'] ),
+						esc_html( $opt['label'] )
+					);
+				}
+				return sprintf( '<fieldset class="alc-choices"><legend>%s</legend>%s</fieldset>', $label, $items );
+			case 'toggle':
+				$checked = ! empty( $child['default'] ) ? ' checked' : '';
+				return sprintf(
+					'<label class="alc-toggle"><input type="checkbox"%s><span class="alc-toggle__track" aria-hidden="true"></span>%s</label>',
+					$checked,
+					$label
+				);
+		}
 		return '';
 	}
 
