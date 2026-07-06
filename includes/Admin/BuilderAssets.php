@@ -68,6 +68,7 @@ final class BuilderAssets {
 				'templates'   => $templates,
 				'exportNonce' => wp_create_nonce( 'alovio_calc_export_entries' ),
 				'adminPost'   => esc_url_raw( admin_url( 'admin-post.php' ) ),
+				'ccbDetected' => ( new \Alovio\Calculator\Import\CcbDetector() )->is_present(),
 			)
 		);
 	}

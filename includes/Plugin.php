@@ -49,6 +49,7 @@ final class Plugin {
 		( new Admin\ReviewNudge() )->register();
 		( new Admin\UpdateCheck() )->register();
 		( new Admin\ProLink() )->register();
+		( new Import\ImportController() )->register();
 		Pro\ProModule::register();
 	}
 
