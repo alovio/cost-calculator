@@ -8,12 +8,12 @@ namespace Alovio\Calculator\Fields;
  */
 final class FieldTypes {
 
-	public const FREE = [ 'number', 'slider', 'select', 'radio', 'checkbox_group', 'toggle', 'quantity', 'text', 'heading', 'html', 'formula', 'step', 'repeater' ];
+	public const FREE = [ 'number', 'slider', 'select', 'radio', 'checkbox_group', 'toggle', 'quantity', 'text', 'heading', 'html', 'formula', 'step', 'repeater', 'date', 'email', 'phone', 'url', 'textarea' ];
 
 	private const CHOICE = [ 'select', 'radio', 'checkbox_group' ];
 
 	/** Fields a visitor types/picks values into. */
-	private const INPUT = [ 'number', 'slider', 'select', 'radio', 'checkbox_group', 'toggle', 'quantity', 'text' ];
+	private const INPUT = [ 'number', 'slider', 'select', 'radio', 'checkbox_group', 'toggle', 'quantity', 'text', 'date', 'email', 'phone', 'url', 'textarea' ];
 
 	/** Fields usable as {refs} in formulas (spec §6 formula value map). */
 	private const REFERENCEABLE = [ 'number', 'slider', 'select', 'radio', 'checkbox_group', 'toggle', 'quantity', 'formula', 'repeater' ];

@@ -119,6 +119,11 @@ final class FieldSchema {
 
 			case 'text':
 			case 'heading':
+			case 'date':
+			case 'email':
+			case 'phone':
+			case 'url':
+			case 'textarea':
 				$field['placeholder'] = sanitize_text_field( (string) ( $raw['placeholder'] ?? '' ) );
 				break;
 

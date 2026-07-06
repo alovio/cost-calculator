@@ -218,4 +218,15 @@ class FieldSchemaTest extends TestCase {
 		$this->assertCount( 1, $out['fields'][1]['conditions'] ); // repeater sum drives conditions (spec §3.1)
 		$this->assertSame( [], $out['fields'][2]['conditions'] ); // child ids are row-scoped, never controllers
 	}
+
+	public function test_new_text_like_types_normalize_with_placeholder(): void {
+		$out = FieldSchema::normalize( $this->config( [
+			[ 'id' => 'visit', 'type' => 'date', 'label' => 'Visit date', 'placeholder' => ' pick one ' ],
+			[ 'id' => 'notes', 'type' => 'textarea', 'label' => 'Notes', 'placeholder' => '<b>x</b>' ],
+			[ 'id' => 'site', 'type' => 'url', 'label' => 'Site' ],
+		] ) );
+		$this->assertSame( 'pick one', $out['fields'][0]['placeholder'] );
+		$this->assertSame( 'x', $out['fields'][1]['placeholder'] );
+		$this->assertSame( '', $out['fields'][2]['placeholder'] );
+	}
 }
