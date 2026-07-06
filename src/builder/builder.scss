@@ -218,3 +218,16 @@ body.alcb-builder-page #wpbody-content > .error { display: none; }
 	padding: 4px 9px; border-radius: 999px; cursor: pointer;
 }
 .alcb-chip:hover { background: #fee7cd; }
+
+// ── 08 · Settings panel, options rows, logic tokens
+.alcb-hint { color: var(--alcb-ink-3); font-size: 12px; margin: 6px 0 0; }
+.alcb-row4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+.alcb-opt-row { display: flex; align-items: center; gap: 6px; margin-bottom: 6px; }
+.alcb-opt-row.is-dragging { opacity: 0.45; }
+.alcb-opt-row > .components-base-control { margin-bottom: 0; }
+.alcb-opt-row > .components-base-control:first-of-type { flex: 2; }
+.alcb-opt-grip { cursor: grab; color: var(--alcb-ink-3); flex: none; }
+.alcb-opt-img { display: flex; align-items: center; gap: 4px; flex: none; }
+.alcb-opt-img img { border-radius: 4px; object-fit: cover; }
+.alcb-opt-default { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; font-weight: 700; color: var(--alcb-ink-2); flex: none; }
+.alcb-opt-foot { display: flex; align-items: center; gap: 10px; margin-top: 8px; }
