@@ -10,9 +10,26 @@ class FieldTypesTest extends TestCase {
 	public function test_free_list_matches_spec_section_6(): void {
 		Filters\expectApplied( 'alovio_calc_field_types' )->andReturnFirstArg();
 		$this->assertSame(
-			[ 'number', 'slider', 'select', 'radio', 'checkbox_group', 'toggle', 'quantity', 'text', 'heading', 'html', 'formula', 'step' ],
+			[ 'number', 'slider', 'select', 'radio', 'checkbox_group', 'toggle', 'quantity', 'text', 'heading', 'html', 'formula', 'step', 'repeater' ],
 			FieldTypes::all()
 		);
+	}
+
+	public function test_repeater_type_flags(): void {
+		$this->assertContains( 'repeater', FieldTypes::all() );
+		$this->assertTrue( FieldTypes::is_referenceable( 'repeater' ) );
+		$this->assertTrue( FieldTypes::is_condition_controller( 'repeater' ) );
+		$this->assertFalse( FieldTypes::is_input( 'repeater' ) );
+		$this->assertFalse( FieldTypes::is_choice( 'repeater' ) );
+	}
+
+	public function test_repeater_child_type_allowlist(): void {
+		foreach ( [ 'number', 'slider', 'select', 'radio', 'checkbox_group', 'toggle', 'quantity' ] as $type ) {
+			$this->assertTrue( FieldTypes::is_repeater_child( $type ), $type );
+		}
+		foreach ( [ 'text', 'heading', 'html', 'formula', 'step', 'repeater' ] as $type ) {
+			$this->assertFalse( FieldTypes::is_repeater_child( $type ), $type );
+		}
 	}
 
 	public function test_classifiers(): void {
