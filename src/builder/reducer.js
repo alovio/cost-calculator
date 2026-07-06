@@ -29,25 +29,58 @@ export function makeId() {
 	return `fld_${ counter }_${ Math.random().toString( 36 ).slice( 2, 7 ) }`;
 }
 
-export const initialState = { fields: [], settings: {}, selectedId: null };
+export const HISTORY_LIMIT = 50;
+
+export const initialState = { name: '', fields: [], settings: {}, selectedId: null, past: [], future: [] };
 
 function cloneOptions( options ) {
 	return Array.isArray( options ) ? options.map( ( o ) => ( { ...o } ) ) : undefined;
 }
 
+/** What undo/redo restores (spec §2.6): structure, settings and the calculator name. */
+function snapshot( state ) {
+	return { name: state.name, fields: state.fields, settings: state.settings };
+}
+
+/** Push the current snapshot before a mutating action (bounded). */
+function remember( state ) {
+	const past = [ ...state.past, snapshot( state ) ];
+	if ( past.length > HISTORY_LIMIT ) {
+		past.shift();
+	}
+	return past;
+}
+
+function makeField( fieldType, id ) {
+	const defaults = DEFAULTS[ fieldType ] || DEFAULTS.text;
+	const field = { id, type: fieldType, ...defaults };
+	if ( defaults.options ) {
+		field.options = cloneOptions( defaults.options );
+	}
+	return field;
+}
+
+function clampIndex( index, length ) {
+	const i = typeof index === 'number' && ! Number.isNaN( index ) ? index : length;
+	return Math.max( 0, Math.min( i, length ) );
+}
+
+/** Keep the selection only if the restored snapshot still contains that field. */
+function keepSelection( fields, selectedId ) {
+	return fields.some( ( f ) => f.id === selectedId ) ? selectedId : null;
+}
+
 export function reducer( state = initialState, action = {} ) {
 	switch ( action.type ) {
 		case 'ADD_FIELD': {
-			const defaults = DEFAULTS[ action.fieldType ] || DEFAULTS.text;
-			const field = { id: action.id, type: action.fieldType, ...defaults };
-			if ( defaults.options ) {
-				field.options = cloneOptions( defaults.options );
-			}
-			return { ...state, fields: [ ...state.fields, field ], selectedId: field.id };
+			const field = makeField( action.fieldType, action.id );
+			return { ...state, past: remember( state ), future: [], fields: [ ...state.fields, field ], selectedId: field.id };
 		}
 		case 'UPDATE_FIELD':
 			return {
 				...state,
+				past: remember( state ),
+				future: [],
 				fields: state.fields.map( ( f ) => ( f.id === action.id ? { ...f, ...action.patch } : f ) ),
 			};
 		case 'REMOVE_FIELD': {
@@ -59,7 +92,7 @@ export function reducer( state = initialState, action = {} ) {
 					}
 					return f;
 				} );
-			return { ...state, fields, selectedId: state.selectedId === action.id ? null : state.selectedId };
+			return { ...state, past: remember( state ), future: [], fields, selectedId: state.selectedId === action.id ? null : state.selectedId };
 		}
 		case 'DUPLICATE_FIELD': {
 			const idx = state.fields.findIndex( ( f ) => f.id === action.id );
@@ -76,7 +109,7 @@ export function reducer( state = initialState, action = {} ) {
 			}
 			const fields = [ ...state.fields ];
 			fields.splice( idx + 1, 0, copy );
-			return { ...state, fields, selectedId: copy.id };
+			return { ...state, past: remember( state ), future: [], fields, selectedId: copy.id };
 		}
 		case 'REORDER': {
 			const fields = [ ...state.fields ];
@@ -85,21 +118,88 @@ export function reducer( state = initialState, action = {} ) {
 			}
 			const [ moved ] = fields.splice( action.from, 1 );
 			fields.splice( action.to, 0, moved );
-			return { ...state, fields };
+			return { ...state, past: remember( state ), future: [], fields };
 		}
 		case 'SELECT':
 			return { ...state, selectedId: action.id };
 		case 'UPDATE_SETTINGS':
-			return { ...state, settings: { ...state.settings, ...action.patch } };
+			return { ...state, past: remember( state ), future: [], settings: { ...state.settings, ...action.patch } };
+		case 'INSERT_AT': {
+			const field = makeField( action.fieldType, action.id );
+			const fields = [ ...state.fields ];
+			fields.splice( clampIndex( action.index, fields.length ), 0, field );
+			return { ...state, past: remember( state ), future: [], fields, selectedId: field.id };
+		}
+		case 'INSERT_FIELDS': {
+			if ( ! Array.isArray( action.fields ) || ! action.fields.length ) {
+				return state;
+			}
+			const fields = [ ...state.fields ];
+			fields.splice( clampIndex( action.index, fields.length ), 0, ...action.fields );
+			return { ...state, past: remember( state ), future: [], fields, selectedId: action.fields[ 0 ].id };
+		}
+		case 'SET_NAME':
+			return { ...state, past: remember( state ), future: [], name: String( action.name ?? '' ) };
+		case 'UNDO': {
+			if ( ! state.past.length ) {
+				return state;
+			}
+			const past = [ ...state.past ];
+			const prev = past.pop();
+			return {
+				...state,
+				...prev,
+				past,
+				future: [ snapshot( state ), ...state.future ],
+				selectedId: keepSelection( prev.fields, state.selectedId ),
+			};
+		}
+		case 'REDO': {
+			if ( ! state.future.length ) {
+				return state;
+			}
+			const [ next, ...future ] = state.future;
+			return {
+				...state,
+				...next,
+				past: remember( state ),
+				future,
+				selectedId: keepSelection( next.fields, state.selectedId ),
+			};
+		}
 		case 'HYDRATE':
 			return {
 				...state,
+				name: typeof action.name === 'string' ? action.name : '',
 				fields: Array.isArray( action.fields ) ? action.fields : [],
 				settings: action.settings && typeof action.settings === 'object' ? action.settings : {},
+				past: [],
+				future: [],
 			};
 		default:
 			return state;
 	}
+}
+
+/**
+ * Remap template-local ids to fresh unique ids, rewriting intra-template
+ * condition references. Refs to ids outside the template and option `value`
+ * slugs are left untouched. Never mutates its input.
+ */
+export function remapFields( templateFields ) {
+	const idMap = {};
+	const fields = ( templateFields || [] ).map( ( f ) => {
+		const copy = JSON.parse( JSON.stringify( f ) );
+		idMap[ copy.id ] = makeId();
+		copy.id = idMap[ copy.id ];
+		return copy;
+	} );
+	fields.forEach( ( f ) => {
+		if ( Array.isArray( f.conditions ) ) {
+			f.conditions = f.conditions.map( ( r ) => ( r.field && idMap[ r.field ] ? { ...r, field: idMap[ r.field ] } : r ) );
+		}
+	} );
+	return fields;
 }
 
 export const actions = {
@@ -110,7 +210,12 @@ export const actions = {
 	reorder: ( from, to ) => ( { type: 'REORDER', from, to } ),
 	selectField: ( id ) => ( { type: 'SELECT', id } ),
 	updateSettings: ( patch ) => ( { type: 'UPDATE_SETTINGS', patch } ),
-	hydrate: ( fields, settings ) => ( { type: 'HYDRATE', fields, settings } ),
+	insertAt: ( fieldType, index ) => ( { type: 'INSERT_AT', fieldType, index, id: makeId() } ),
+	insertFields: ( templateFields, index ) => ( { type: 'INSERT_FIELDS', fields: remapFields( templateFields ), index } ),
+	undo: () => ( { type: 'UNDO' } ),
+	redo: () => ( { type: 'REDO' } ),
+	setName: ( name ) => ( { type: 'SET_NAME', name } ),
+	hydrate: ( fields, settings, name ) => ( { type: 'HYDRATE', fields, settings, name } ),
 };
 
 export const selectors = {
@@ -118,4 +223,7 @@ export const selectors = {
 	getSettings: ( state ) => state.settings,
 	getSelected: ( state ) => state.fields.find( ( f ) => f.id === state.selectedId ) || null,
 	getSelectedId: ( state ) => state.selectedId,
+	getName: ( state ) => state.name,
+	canUndo: ( state ) => state.past.length > 0,
+	canRedo: ( state ) => state.future.length > 0,
 };
