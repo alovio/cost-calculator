@@ -255,3 +255,22 @@ body.alcb-builder-page #wpbody-content > .error { display: none; }
 .alcb-seg { display: flex; border: 1px solid var(--alcb-line-2); border-radius: 9px; overflow: hidden; }
 .alcb-seg button { flex: 1; text-align: center; padding: 8px 0; font-size: 12.5px; font-weight: 800; color: var(--alcb-ink-3); background: #fff; border: none; cursor: pointer; }
 .alcb-seg button.is-on { background: linear-gradient(135deg, var(--alcb-flame), var(--alcb-flame-deep)); color: #fff; }
+.alcb-col--panel { padding: 0; display: flex; flex-direction: column; }
+.alcb-settings { display: flex; flex-direction: column; min-height: 0; flex: 1; }
+.alcb-sp-head { padding: 16px 18px 0; flex: none; }
+.alcb-sp-title { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
+.alcb-sp-title h3 { font-size: 14px; font-weight: 800; margin: 0; line-height: 1.25; }
+.alcb-sp-title small { display: block; font-size: 11px; color: var(--alcb-ink-3); font-weight: 600; }
+.alcb-gear { margin-left: auto; border: none; background: none; cursor: pointer; font-size: 15px; color: var(--alcb-ink-3); }
+.alcb-gear:hover { color: var(--alcb-flame-deep); }
+.alcb-tabs { display: flex; gap: 2px; border-bottom: 1px solid var(--alcb-line); }
+.alcb-tab { padding: 9px 13px; font-size: 12.5px; font-weight: 700; color: var(--alcb-ink-3); border: none; background: none; cursor: pointer; border-bottom: 2px solid transparent; }
+.alcb-tab.is-on { color: var(--alcb-flame-deep); border-bottom-color: var(--alcb-flame); }
+.alcb-sp-body { padding: 16px 18px; overflow-y: auto; flex: 1; }
+.alcb-sp-foot { padding: 13px 18px; border-top: 1px solid var(--alcb-line); flex: none; display: flex; align-items: center; gap: 8px; color: var(--alcb-ink-3); font-size: 11.5px; }
+.alcb-kbd { border: 1px solid var(--alcb-line-2); border-radius: 5px; padding: 2px 6px; font-size: 10.5px; font-weight: 700; background: #fff; }
+.alcb-sp-body .components-base-control { margin-bottom: 14px; }
+.alcb-sp-body .components-base-control__label { font-size: 11px; font-weight: 800; letter-spacing: 0.05em; text-transform: uppercase; color: var(--alcb-ink-2); }
+.alcb-narrow { max-width: 180px; }
+.alcb-pro h3 { margin-top: 0; }
+.alcb-pro li { margin-bottom: 4px; }

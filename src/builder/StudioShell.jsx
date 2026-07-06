@@ -6,9 +6,7 @@ import { STORE } from './store';
 import { getCalculator, saveCalculator } from './api';
 import PaletteV2 from './PaletteV2';
 import LiveCanvas from './LiveCanvas';
-import FieldSettings from './FieldSettings';
-import SettingsTab from './SettingsTab';
-import ProTab from './ProTab';
+import SettingsPanel from './SettingsPanel';
 
 /**
  * True when the event target edits text — undo/redo shortcuts must never
@@ -19,12 +17,11 @@ function isTextTarget( t ) {
 }
 
 export default function StudioShell( { calculatorId, onBack } ) {
-	const { fields, settings, name, selected, canUndo, canRedo } = useSelect(
+	const { fields, settings, name, canUndo, canRedo } = useSelect(
 		( select ) => ( {
 			fields: select( STORE ).getFields(),
 			settings: select( STORE ).getSettings(),
 			name: select( STORE ).getName(),
-			selected: select( STORE ).getSelected(),
 			canUndo: select( STORE ).canUndo(),
 			canRedo: select( STORE ).canRedo(),
 		} ),
@@ -179,9 +176,7 @@ export default function StudioShell( { calculatorId, onBack } ) {
 				     still ship from assets/css/builder.css. */ }
 				<div className="alcb-col alcb-col--left"><PaletteV2 /></div>
 				<div className="alcb-col alcb-col--center alcb-col--canvas"><LiveCanvas calculatorId={ calculatorId } /></div>
-				<div className="alcb-col alcb-col--right">
-					{ proOpen ? <ProTab /> : ( selected ? <FieldSettings /> : <SettingsTab /> ) }
-				</div>
+				<div className="alcb-col alcb-col--right alcb-col--panel"><SettingsPanel proOpen={ proOpen } /></div>
 			</div>
 		</div>
 	);
