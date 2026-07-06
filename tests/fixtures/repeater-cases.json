@@ -1,0 +1,179 @@
+{
+    "cases": [
+        {
+            "name": "price mode rows sum child contributions",
+            "fields": [
+                { "id": "rooms", "type": "repeater", "label": "Rooms", "showInSummary": true, "minRows": 1, "maxRows": 5, "addLabel": "", "rowLabel": "Room {n}", "rowExpression": "", "fields": [
+                    { "id": "r_rate", "type": "select", "label": "Rate", "options": [ { "value": "opt_std", "label": "Standard", "price": 100, "image": 0 }, { "value": "opt_dlx", "label": "Deluxe", "price": 150, "image": 0 } ] },
+                    { "id": "r_express", "type": "toggle", "label": "Express", "price": 15, "default": false }
+                ] },
+                { "id": "total", "type": "formula", "label": "Total", "showInSummary": true, "expression": "{rooms}" }
+            ],
+            "values": { "rooms": [ { "r_rate": "opt_std", "r_express": "1" }, { "r_rate": "opt_dlx" } ] },
+            "repeater": { "id": "rooms", "sum": "265", "rows": [ { "label": "Room 1", "total": "115" }, { "label": "Room 2", "total": "150" } ] },
+            "expected": {
+                "values": { "rooms": "265", "total": "265" },
+                "total": "265",
+                "lineItems": [
+                    { "id": "rooms__1", "label": "Room 1", "amount": "115", "isCurrency": true, "repeaterId": "rooms" },
+                    { "id": "rooms__2", "label": "Room 2", "amount": "150", "isCurrency": true, "repeaterId": "rooms" },
+                    { "id": "total", "label": "Total", "amount": "265", "isCurrency": true }
+                ]
+            }
+        },
+        {
+            "name": "rowExpression evaluates row-locally",
+            "fields": [
+                { "id": "rooms", "type": "repeater", "label": "Rooms", "showInSummary": false, "minRows": 1, "maxRows": 10, "addLabel": "", "rowLabel": "Room {n}", "rowExpression": "{r_area} * {r_rate}", "fields": [
+                    { "id": "r_area", "type": "number", "label": "Area", "min": null, "max": null, "step": null, "default": 0 },
+                    { "id": "r_rate", "type": "select", "label": "Rate", "options": [ { "value": "opt_std", "label": "Standard", "price": 2.5, "image": 0 }, { "value": "opt_dlx", "label": "Deluxe", "price": 4, "image": 0 } ] }
+                ] },
+                { "id": "total", "type": "formula", "label": "Total", "showInSummary": true, "expression": "{rooms}" }
+            ],
+            "values": { "rooms": [ { "r_area": "20", "r_rate": "opt_std" }, { "r_area": "10", "r_rate": "opt_dlx" } ] },
+            "repeater": { "id": "rooms", "sum": "90", "rows": [ { "label": "Room 1", "total": "50" }, { "label": "Room 2", "total": "40" } ] },
+            "expected": { "values": { "rooms": "90", "total": "90" }, "total": "90" }
+        },
+        {
+            "name": "rows beyond maxRows are sliced off",
+            "fields": [
+                { "id": "rooms", "type": "repeater", "label": "Rooms", "showInSummary": false, "minRows": 1, "maxRows": 2, "addLabel": "", "rowLabel": "", "rowExpression": "{r_qty} * 10", "fields": [
+                    { "id": "r_qty", "type": "number", "label": "Qty", "min": null, "max": null, "step": null, "default": 0 }
+                ] }
+            ],
+            "values": { "rooms": [ { "r_qty": "1" }, { "r_qty": "2" }, { "r_qty": "3" } ] },
+            "repeater": { "id": "rooms", "sum": "30", "rows": [ { "label": "Rooms 1", "total": "10" }, { "label": "Rooms 2", "total": "20" } ] },
+            "expected": { "values": { "rooms": "30" } }
+        },
+        {
+            "name": "absent value yields minRows default rows",
+            "fields": [
+                { "id": "rooms", "type": "repeater", "label": "Rooms", "showInSummary": false, "minRows": 2, "maxRows": 5, "addLabel": "", "rowLabel": "Room {n}", "rowExpression": "{r_area} * 3", "fields": [
+                    { "id": "r_area", "type": "number", "label": "Area", "min": null, "max": null, "step": null, "default": 5 }
+                ] }
+            ],
+            "values": {},
+            "repeater": { "id": "rooms", "sum": "30", "rows": [ { "label": "Room 1", "total": "15" }, { "label": "Room 2", "total": "15" } ] },
+            "expected": { "values": { "rooms": "30" } }
+        },
+        {
+            "name": "hidden repeater contributes zero",
+            "fields": [
+                { "id": "gate", "type": "toggle", "label": "Gate", "price": 0, "default": false },
+                { "id": "rooms", "type": "repeater", "label": "Rooms", "showInSummary": true, "minRows": 1, "maxRows": 5, "addLabel": "", "rowLabel": "Room {n}", "rowExpression": "{r_qty} * 10", "conditions": [ { "field": "gate", "operator": "is", "value": "1" } ], "conditionMatch": "all", "conditionAction": "show", "fields": [
+                    { "id": "r_qty", "type": "quantity", "label": "Qty", "min": null, "max": null, "step": null, "default": 5 }
+                ] },
+                { "id": "total", "type": "formula", "label": "Total", "showInSummary": true, "expression": "{rooms} + 1" }
+            ],
+            "values": { "gate": "" },
+            "repeater": { "id": "rooms", "sum": "50", "rows": [ { "label": "Room 1", "total": "50" } ] },
+            "expected": {
+                "values": { "rooms": "0", "total": "1" },
+                "total": "1",
+                "active": { "rooms": false },
+                "lineItems": [ { "id": "total", "label": "Total", "amount": "1", "isCurrency": true } ]
+            }
+        },
+        {
+            "name": "repeater referenced in a top formula",
+            "fields": [
+                { "id": "rooms", "type": "repeater", "label": "Rooms", "showInSummary": false, "minRows": 1, "maxRows": 5, "addLabel": "", "rowLabel": "Room {n}", "rowExpression": "{r_qty}", "fields": [
+                    { "id": "r_qty", "type": "number", "label": "Qty", "min": null, "max": null, "step": null, "default": 0 }
+                ] },
+                { "id": "total", "type": "formula", "label": "Total", "showInSummary": true, "expression": "{rooms} * 1.5 + 10" }
+            ],
+            "values": { "rooms": [ { "r_qty": "40" } ] },
+            "repeater": { "id": "rooms", "sum": "40", "rows": [ { "label": "Room 1", "total": "40" } ] },
+            "expected": { "values": { "rooms": "40", "total": "70" }, "total": "70" }
+        },
+        {
+            "name": "repeater sum drives a condition",
+            "fields": [
+                { "id": "rooms", "type": "repeater", "label": "Rooms", "showInSummary": false, "minRows": 1, "maxRows": 5, "addLabel": "", "rowLabel": "Room {n}", "rowExpression": "", "fields": [
+                    { "id": "r_extra", "type": "toggle", "label": "Extra", "price": 60, "default": false }
+                ] },
+                { "id": "bulk_note", "type": "heading", "label": "Bulk discount applies", "conditions": [ { "field": "rooms", "operator": "gte", "value": "100" } ], "conditionMatch": "all", "conditionAction": "show" },
+                { "id": "total", "type": "formula", "label": "Total", "showInSummary": true, "expression": "{rooms}" }
+            ],
+            "values": { "rooms": [ { "r_extra": "1" }, { "r_extra": "1" } ] },
+            "repeater": { "id": "rooms", "sum": "120", "rows": [ { "label": "Room 1", "total": "60" }, { "label": "Room 2", "total": "60" } ] },
+            "expected": { "values": { "rooms": "120" }, "total": "120", "active": { "bulk_note": true } }
+        },
+        {
+            "name": "empty rows array yields zero and no summary lines",
+            "fields": [
+                { "id": "rooms", "type": "repeater", "label": "Rooms", "showInSummary": true, "minRows": 1, "maxRows": 5, "addLabel": "", "rowLabel": "Room {n}", "rowExpression": "{r_qty} * 10", "fields": [
+                    { "id": "r_qty", "type": "number", "label": "Qty", "min": null, "max": null, "step": null, "default": 5 }
+                ] },
+                { "id": "total", "type": "formula", "label": "Total", "showInSummary": true, "expression": "{rooms}" }
+            ],
+            "values": { "rooms": [] },
+            "repeater": { "id": "rooms", "sum": "0", "rows": [] },
+            "expected": {
+                "values": { "rooms": "0", "total": "0" },
+                "total": "0",
+                "lineItems": [ { "id": "total", "label": "Total", "amount": "0", "isCurrency": true } ]
+            }
+        },
+        {
+            "name": "decimal-heavy row math stays exact",
+            "fields": [
+                { "id": "rooms", "type": "repeater", "label": "Rooms", "showInSummary": false, "minRows": 1, "maxRows": 5, "addLabel": "", "rowLabel": "Room {n}", "rowExpression": "{r_a} + {r_b}", "fields": [
+                    { "id": "r_a", "type": "number", "label": "A", "min": null, "max": null, "step": null, "default": 0 },
+                    { "id": "r_b", "type": "number", "label": "B", "min": null, "max": null, "step": null, "default": 0 }
+                ] }
+            ],
+            "values": { "rooms": [ { "r_a": "0.1", "r_b": "0.2" }, { "r_a": "4.1", "r_b": "8.2" } ] },
+            "repeater": { "id": "rooms", "sum": "12.6", "rows": [ { "label": "Room 1", "total": "0.3" }, { "label": "Room 2", "total": "12.3" } ] },
+            "expected": { "values": { "rooms": "12.6" } }
+        },
+        {
+            "name": "rowExpression runtime error zeroes the row",
+            "fields": [
+                { "id": "rooms", "type": "repeater", "label": "Rooms", "showInSummary": false, "minRows": 1, "maxRows": 5, "addLabel": "", "rowLabel": "Room {n}", "rowExpression": "{r_a} / {r_b}", "fields": [
+                    { "id": "r_a", "type": "number", "label": "A", "min": null, "max": null, "step": null, "default": 0 },
+                    { "id": "r_b", "type": "number", "label": "B", "min": null, "max": null, "step": null, "default": 0 }
+                ] }
+            ],
+            "values": { "rooms": [ { "r_a": "10", "r_b": "0" } ] },
+            "repeater": { "id": "rooms", "sum": "0", "rows": [ { "label": "Room 1", "total": "0" } ] },
+            "expected": { "values": { "rooms": "0" } }
+        },
+        {
+            "name": "price mode ignores non-priced children",
+            "fields": [
+                { "id": "rooms", "type": "repeater", "label": "Rooms", "showInSummary": false, "minRows": 1, "maxRows": 5, "addLabel": "", "rowLabel": "Room {n}", "rowExpression": "", "fields": [
+                    { "id": "r_area", "type": "number", "label": "Area", "min": null, "max": null, "step": null, "default": 0 },
+                    { "id": "r_express", "type": "toggle", "label": "Express", "price": 15, "default": false }
+                ] },
+                { "id": "total", "type": "formula", "label": "Total", "showInSummary": true, "expression": "{rooms}" }
+            ],
+            "values": { "rooms": [ { "r_area": "40", "r_express": "1" }, { "r_area": "25" } ] },
+            "repeater": { "id": "rooms", "sum": "15", "rows": [ { "label": "Room 1", "total": "15" }, { "label": "Room 2", "total": "0" } ] },
+            "expected": { "values": { "rooms": "15", "total": "15" }, "total": "15" }
+        },
+        {
+            "name": "compile-broken rowExpression zeroes the sum and surfaces the error",
+            "fields": [
+                { "id": "rooms", "type": "repeater", "label": "Rooms", "showInSummary": false, "minRows": 1, "maxRows": 5, "addLabel": "", "rowLabel": "Room {n}", "rowExpression": "{r_qty} * * 2", "fields": [
+                    { "id": "r_qty", "type": "number", "label": "Qty", "min": null, "max": null, "step": null, "default": 0 }
+                ] },
+                { "id": "total", "type": "formula", "label": "Total", "showInSummary": true, "expression": "{rooms}" }
+            ],
+            "values": { "rooms": [ { "r_qty": "5" } ] },
+            "repeater": { "id": "rooms", "sum": "0", "rows": [], "error": "syntax" },
+            "expected": { "values": { "rooms": "0", "total": "0" }, "total": "0" }
+        },
+        {
+            "name": "non-array raw value falls back to minRows default rows",
+            "fields": [
+                { "id": "rooms", "type": "repeater", "label": "Rooms", "showInSummary": false, "minRows": 2, "maxRows": 5, "addLabel": "", "rowLabel": "Room {n}", "rowExpression": "{r_area} * 2 + 3", "fields": [
+                    { "id": "r_area", "type": "number", "label": "Area", "min": null, "max": null, "step": null, "default": 4 }
+                ] }
+            ],
+            "values": { "rooms": "garbage" },
+            "repeater": { "id": "rooms", "sum": "22", "rows": [ { "label": "Room 1", "total": "11" }, { "label": "Room 2", "total": "11" } ] },
+            "expected": { "values": { "rooms": "22" } }
+        }
+    ]
+}
