@@ -5,6 +5,7 @@ namespace Alovio\Calculator\Admin;
 
 use Alovio\Calculator\Fields\FieldRepository;
 use Alovio\Calculator\Fields\FieldSchema;
+use Alovio\Calculator\Frontend\CalculatorRenderer;
 use Alovio\Calculator\Templates\Presets;
 
 defined( 'ABSPATH' ) || exit;
@@ -84,6 +85,15 @@ final class RestController {
 					'callback'            => array( $this, 'delete_calculator' ),
 					'permission_callback' => array( $this, 'can_manage' ),
 				),
+			)
+		);
+		register_rest_route(
+			'alovio-calc/v1',
+			'/render',
+			array(
+				'methods'             => 'POST',
+				'callback'            => array( $this, 'render_fragment' ),
+				'permission_callback' => array( $this, 'can_manage' ),
 			)
 		);
 		register_rest_route(
@@ -212,6 +222,30 @@ final class RestController {
 				'id'     => $post->ID,
 				'title'  => is_string( $title ) && '' !== $title ? $title : $post->post_title,
 				'config' => $saved, // Normalized — the builder re-hydrates from this (server may rewrite option slugs).
+			)
+		);
+	}
+
+	/**
+	 * Studio live canvas (spec §2.2): renders the UNSAVED config through the one
+	 * canonical renderer. Same FieldSchema::normalize path as /preview; the
+	 * response html is injected inline by the builder and re-initialised by the
+	 * real frontend bundle. manage_options-gated like every builder route.
+	 *
+	 * @param \WP_REST_Request $request Request.
+	 * @return \WP_REST_Response|array
+	 */
+	public function render_fragment( $request ) {
+		$config = FieldSchema::normalize(
+			array(
+				'fields'   => (array) $request->get_param( 'fields' ),
+				'settings' => (array) $request->get_param( 'settings' ),
+			)
+		);
+
+		return rest_ensure_response(
+			array(
+				'html' => CalculatorRenderer::render( absint( $request->get_param( 'calculatorId' ) ), $config ),
 			)
 		);
 	}

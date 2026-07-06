@@ -8,6 +8,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 if ( ! class_exists( 'WP_Post' ) ) {
 	// Minimal stub so classes type-hinting \WP_Post are unit-testable without loading WP.
 	class WP_Post {
-		public $post_title = '';
+		public $ID                = 0;
+		public $post_title        = '';
+		public $post_modified_gmt = '';
 	}
 }
