@@ -79,4 +79,21 @@ class EntryMailerTest extends TestCase {
 		$this->assertSame( array(), $captured['attachments'] );
 		$this->assertSame( array(), $captured['headers'] );
 	}
+
+	public function test_repeater_lines_use_child_labels_and_currency(): void {
+		$snapshot = [
+			'currency'  => [ 'symbol' => '$', 'position' => 'before', 'decimals' => 2, 'thousandSep' => ',', 'decimalSep' => '.' ],
+			'repeaters' => [ [
+				'id' => 'rooms', 'label' => 'Rooms',
+				'children' => [ 'r_area' => 'Area', 'r_express' => 'Express' ],
+				'types'    => [ 'r_area' => 'number', 'r_express' => 'toggle' ],
+				'rows'     => [ [ 'label' => 'Room 1', 'total' => 1200000, 'values' => [ 'r_area' => '20', 'r_express' => '1' ] ] ],
+			] ],
+		];
+		$this->assertSame(
+			[ 'Room 1: Area 20, Express — $120.00' ],
+			EntryMailer::repeater_lines( $snapshot, 'rooms' )
+		);
+		$this->assertSame( [], EntryMailer::repeater_lines( $snapshot, 'ghost' ) );
+	}
 }

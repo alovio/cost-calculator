@@ -28,3 +28,5 @@
 .alc-formula__ok { color: #007017; margin: 4px 0 12px; }
 .alc-pagination { display: flex; align-items: center; gap: 10px; margin-top: 12px; }
 .alc-app--loading { display: flex; justify-content: center; padding: 60px; }
+.alc-entry-repeater { margin: 8px 0 12px; }
+.alc-entry-repeater ul { margin: 4px 0 0 16px; list-style: disc; color: #50575e; }

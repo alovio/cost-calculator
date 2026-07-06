@@ -2,6 +2,7 @@ import { useState, useEffect } from '@wordpress/element';
 import { Button, Spinner, Notice, SelectControl, Modal } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { listEntries, updateEntry, deleteEntry, listCalculators } from './api';
+import { formatCurrency } from '../shared/currency';
 
 const PER_PAGE = 20;
 
@@ -118,10 +119,31 @@ export default function EntriesList( { onBack } ) {
 						{ open.phone && <> · <strong>{ __( 'Phone:', 'alovio-calculator' ) }</strong> { open.phone }</> }
 					</p>
 					{ open.message && <p><strong>{ __( 'Message:', 'alovio-calculator' ) }</strong> { open.message }</p> }
+					{ open.snapshot && Array.isArray( open.snapshot.repeaters ) && open.snapshot.repeaters.map( ( rep ) => (
+						<div key={ rep.id } className="alc-entry-repeater">
+							<strong>{ rep.label }</strong>
+							<ul>
+								{ ( rep.rows || [] ).map( ( row, i ) => (
+									<li key={ i }>
+										{ row.label }
+										{ ': ' }
+										{ Object.entries( row.values || {} )
+											.filter( ( [ , v ] ) => v !== '' )
+											.map( ( [ cid, v ] ) => ( ( rep.types || {} )[ cid ] === 'toggle'
+												? ( rep.children || {} )[ cid ] || cid
+												: `${ ( rep.children || {} )[ cid ] || cid } ${ v }` ) )
+											.join( ', ' ) }
+										{ ' — ' }
+										{ formatCurrency( row.total || 0, open.snapshot.currency ) }
+									</li>
+								) ) }
+							</ul>
+						</div>
+					) ) }
 					{ open.snapshot && Array.isArray( open.snapshot.lineItems ) && (
 						<table className="widefat striped">
 							<tbody>
-								{ open.snapshot.lineItems.map( ( item ) => (
+								{ open.snapshot.lineItems.filter( ( item ) => ! item.repeaterId ).map( ( item ) => (
 									<tr key={ item.id }>
 										<td>{ item.label }</td>
 										<td>{ String( item.amount / 10000 ) }</td>

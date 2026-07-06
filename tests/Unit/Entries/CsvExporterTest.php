@@ -21,7 +21,27 @@ class CsvExporterTest extends TestCase {
 				'calculator_id' => 7,
 			]
 		);
-		$this->assertSame( '3,7,"2026-06-12 10:00:00","A ""B""",a@b.co,,"multi line",175.0000,new,"{""values"":{""area"":""50""}}"', $line );
+		$this->assertSame( '3,7,"2026-06-12 10:00:00","A ""B""",a@b.co,,"multi line",175.0000,new,,"{""values"":{""area"":""50""}}"', $line );
+	}
+
+	public function test_repeater_cell_flattens_rows_per_spec(): void {
+		$snapshot = [
+			'currency'  => [ 'symbol' => '$', 'position' => 'before', 'decimals' => 2, 'thousandSep' => ',', 'decimalSep' => '.' ],
+			'repeaters' => [ [
+				'id' => 'rooms', 'label' => 'Rooms',
+				'children' => [ 'r_area' => 'Area', 'r_rate' => 'Rate' ],
+				'types'    => [ 'r_area' => 'number', 'r_rate' => 'select' ],
+				'rows'     => [
+					[ 'label' => 'Room 1', 'total' => 1200000, 'values' => [ 'r_area' => '20', 'r_rate' => 'Standard' ] ],
+					[ 'label' => 'Room 2', 'total' => 900000, 'values' => [ 'r_area' => '10', 'r_rate' => '' ] ],
+				],
+			] ],
+		];
+		$this->assertSame(
+			'Room 1: r_area=20, r_rate=Standard ($120.00) | Room 2: r_area=10 ($90.00)',
+			CsvExporter::repeater_cell( $snapshot )
+		);
+		$this->assertSame( '', CsvExporter::repeater_cell( [] ) );
 	}
 
 	public function test_formula_injection_guard(): void {
