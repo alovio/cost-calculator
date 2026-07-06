@@ -5,7 +5,6 @@ import { __ } from '@wordpress/i18n';
 import { STORE } from './store';
 import { getCalculator, saveCalculator } from './api';
 import FieldPalette from './FieldPalette';
-import Canvas from './Canvas';
 import LiveCanvas from './LiveCanvas';
 import FieldSettings from './FieldSettings';
 import SettingsTab from './SettingsTab';
@@ -180,9 +179,6 @@ export default function StudioShell( { calculatorId, onBack } ) {
 				     still ship from assets/css/builder.css. */ }
 				<div className="alcb-col alcb-col--left">
 					<FieldPalette />
-					{ /* INTERIM until chunk 3: selection/reorder still lives here. */ }
-					<span className="alcb-sec-label">{ __( 'Structure', 'alovio-calculator' ) }</span>
-					<Canvas />
 				</div>
 				<div className="alcb-col alcb-col--center alcb-col--canvas"><LiveCanvas calculatorId={ calculatorId } /></div>
 				<div className="alcb-col alcb-col--right">

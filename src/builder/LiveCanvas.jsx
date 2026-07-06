@@ -4,6 +4,7 @@ import { __ } from '@wordpress/i18n';
 import { STORE } from './store';
 import { renderCalculator } from './api';
 import CanvasToolbar, { DEVICES } from './CanvasToolbar';
+import CanvasOverlay from './CanvasOverlay';
 
 /**
  * Read a { fieldId: {kind, value} } snapshot off the rendered fragment so
@@ -79,6 +80,7 @@ export default function LiveCanvas( { calculatorId } ) {
 	const [ busy, setBusy ] = useState( false );
 	const [ failed, setFailed ] = useState( false );
 	const [ tick, setTick ] = useState( 0 ); // manual retry / reset trigger
+	const [ appliedTick, setAppliedTick ] = useState( 0 ); // increments after each applied render (overlay re-measure)
 	const hostRef = useRef( null );
 	const scrollRef = useRef( null );
 	const seqRef = useRef( 0 ); // last issued sequence token
@@ -113,6 +115,7 @@ export default function LiveCanvas( { calculatorId } ) {
 						b.disabled = true;
 						b.title = __( 'Disabled in the studio — use "Open full preview" to test quotes.', 'alovio-calculator' );
 					} );
+					setAppliedTick( ( t ) => t + 1 );
 					setFailed( false );
 				} )
 				.catch( () => {
@@ -148,6 +151,7 @@ export default function LiveCanvas( { calculatorId } ) {
 			<div className="alcb-canvas" ref={ scrollRef }>
 				<div className="alcb-sheet" style={ { maxWidth: width } }>
 					<div ref={ hostRef } className="alcb-fragment"></div>
+					<CanvasOverlay hostRef={ hostRef } scrollRef={ scrollRef } renderTick={ appliedTick } />
 				</div>
 			</div>
 		</div>
