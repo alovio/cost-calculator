@@ -1,12 +1,16 @@
 <?php
 namespace Alovio\Calculator\Fields;
 
+use Alovio\Calculator\Formula\Formula;
+use Alovio\Calculator\Formula\FormulaError;
+
 final class FieldSchema {
 
-	public const SCHEMA_VERSION   = 1;
-	public const EXPRESSION_LIMIT = 1000;
-	private const OPERATORS       = [ 'is', 'is_not', 'contains', 'gt', 'gte', 'lt', 'lte', 'is_empty', 'is_not_empty' ];
-	private const THEMES          = [ 'classic', 'minimal', 'midnight', 'soft', 'bold', 'slate' ];
+	public const SCHEMA_VERSION    = 1;
+	public const EXPRESSION_LIMIT  = 1000;
+	public const REPEATER_MAX_ROWS = 50;
+	private const OPERATORS        = [ 'is', 'is_not', 'contains', 'gt', 'gte', 'lt', 'lte', 'is_empty', 'is_not_empty' ];
+	private const THEMES           = [ 'classic', 'minimal', 'midnight', 'soft', 'bold', 'slate' ];
 
 	public static function defaults(): array {
 		return [
@@ -51,7 +55,7 @@ final class FieldSchema {
 				continue;
 			}
 			$seen[ $id ] = true;
-			$fields[]    = self::normalize_field( $field, $id, $type );
+			$fields[]    = self::normalize_field( $field, $id, $type, $seen );
 		}
 
 		// Conditions can only be validated once all ids are known.
@@ -71,7 +75,7 @@ final class FieldSchema {
 		return $out;
 	}
 
-	private static function normalize_field( array $raw, string $id, string $type ): array {
+	private static function normalize_field( array $raw, string $id, string $type, array &$seen ): array {
 		$field = [
 			'id'              => $id,
 			'type'            => $type,
@@ -121,6 +125,20 @@ final class FieldSchema {
 			case 'step':
 				$field['description'] = sanitize_text_field( (string) ( $raw['description'] ?? '' ) );
 				break;
+
+			case 'repeater':
+				$field['fields']        = self::normalize_repeater_children( (array) ( $raw['fields'] ?? [] ), $seen );
+				$min                    = isset( $raw['minRows'] ) && is_numeric( $raw['minRows'] ) ? (int) $raw['minRows'] : 1;
+				$max                    = isset( $raw['maxRows'] ) && is_numeric( $raw['maxRows'] ) ? (int) $raw['maxRows'] : 10;
+				$field['minRows']       = max( 1, min( $min, self::REPEATER_MAX_ROWS ) );
+				$field['maxRows']       = max( $field['minRows'], min( $max, self::REPEATER_MAX_ROWS ) );
+				$field['addLabel']      = sanitize_text_field( (string) ( $raw['addLabel'] ?? '' ) );
+				$field['rowLabel']      = sanitize_text_field( (string) ( $raw['rowLabel'] ?? '' ) );
+				$field['rowExpression'] = self::normalize_row_expression(
+					substr( trim( (string) ( $raw['rowExpression'] ?? '' ) ), 0, self::EXPRESSION_LIMIT ),
+					array_column( $field['fields'], 'id' )
+				);
+				break;
 		}
 
 		return $field;
@@ -158,6 +176,49 @@ final class FieldSchema {
 			unset( $o );
 		}
 		return $options;
+	}
+
+	/**
+	 * Children are restricted to REPEATER_CHILD_TYPES (no nesting) and carry NO
+	 * conditional logic in v2.0 (spec §3.1). $seen is the GLOBAL slug registry —
+	 * uniqueness holds across all levels.
+	 */
+	private static function normalize_repeater_children( array $rawChildren, array &$seen ): array {
+		$children = [];
+		foreach ( $rawChildren as $child ) {
+			if ( ! is_array( $child ) ) {
+				continue;
+			}
+			$type = (string) ( $child['type'] ?? '' );
+			$id   = sanitize_key( (string) ( $child['id'] ?? '' ) );
+			if ( '' === $id || isset( $seen[ $id ] ) || ! FieldTypes::is_repeater_child( $type ) ) {
+				continue;
+			}
+			$seen[ $id ]                   = true;
+			$normalized                    = self::normalize_field( $child, $id, $type, $seen );
+			$normalized['conditions']      = [];
+			$normalized['conditionMatch']  = 'all';
+			$normalized['conditionAction'] = 'show';
+			$children[]                    = $normalized;
+		}
+		return $children;
+	}
+
+	/**
+	 * A rowExpression may reference CHILD ids only (spec §3.1 graph rule). Refs are
+	 * extracted with the real Lexer/Parser. Compile failures are KEPT — they surface
+	 * at runtime exactly like broken formula fields (error badge, sum 0).
+	 */
+	private static function normalize_row_expression( string $expr, array $childIds ): string {
+		if ( '' === $expr ) {
+			return '';
+		}
+		try {
+			$refs = Formula::references( Formula::compile( $expr ) );
+		} catch ( FormulaError $e ) {
+			return $expr;
+		}
+		return array_diff( $refs, $childIds ) ? '' : $expr;
 	}
 
 	private static function generate_slug( array $used ): string {
