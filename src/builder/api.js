@@ -14,3 +14,4 @@ export const deleteEntry = ( id ) => apiFetch( { path: `alovio-calc/v1/entries/$
 export const getSettings = () => apiFetch( { path: 'alovio-calc/v1/settings' } );
 export const saveSettings = ( body ) => apiFetch( { path: 'alovio-calc/v1/settings', method: 'PUT', data: body } );
 export const previewCalculator = ( body ) => apiFetch( { path: 'alovio-calc/v1/preview', method: 'POST', data: body } );
+export const renderCalculator = ( body ) => apiFetch( { path: 'alovio-calc/v1/render', method: 'POST', data: body } );
