@@ -51,7 +51,7 @@
 | 1 | Branch, tokens/`builder.scss`, reducer history (undo/redo/insert), StudioShell header + keyboard + status pill | §2.1, §2.6 |
 | 2 | `POST /render` + `modified`, frontend `init()` refactor, LiveCanvas inject + value persistence + sequence token + toolbar | §2.2 |
 | 3 | CanvasOverlay (selection/ops/IF pills/error badges), DnD insertion line, palette drag `INSERT_AT`, `describe.js` | §2.3 |
-| 4 | PaletteV2 + icons + template insertion, SettingsPanel + all panels (token Logic editor port, options upgrades), draft recovery, Pro panel, retire old components | §2.4–2.6 |
+| 4 | PaletteV2 + icons + template insertion, SettingsPanel + all panels (token Logic editor port, options upgrades), draft recovery, Pro panel, retire old components | §2.1 (entries restyle), §2.4–2.6 |
 | 5 | Repeater schema + engine (row-local evaluation, pre-pass, graph validation) + shared parity fixtures + compute.js engine mirror | §3.1 |
 | 6 | Repeater frontend (template clone, rows UX, quote payload + server recompute) + entries/CSV/email surfaces + builder row-fields UX | §3.1 |
 | 7 | New field types (date/email/phone/url/textarea), slider polish, quote-form file upload (+GC cron, entries surfaces) | §3.2–3.4 |
@@ -3081,7 +3081,7 @@ Note: if `src/builder/builder.scss` exceeds ~1000 lines by the end of this chunk
   ```markdown
   - [ ] Studio: open a calculator → real calculator renders on the canvas; type values → total updates instantly; add a field by click (inserts after selection) and by drag (insertion line); undo/redo via buttons and ⌘Z/⌘⇧Z (suppressed while typing in text inputs); IF pill and formula-error badge appear when applicable; theme quick-switch re-renders; Save → pill flashes green; reload → no draft bar; edit → reload without saving → draft bar restores.
   ```
-- [ ] **Step 4: wp-env end-to-end pass** — run exactly that checklist item manually in the sandbox, plus: create a NEW calculator from the template modal → studio opens with preset fields; entries + list views unaffected.
+- [ ] **Step 4: wp-env end-to-end pass** — run exactly that checklist item manually in the sandbox, plus: create a NEW calculator from the template modal → studio opens with preset fields; entries + list views functionally unaffected (they ARE deliberately restyled by Task 4.7 Step 4).
 - [ ] **Step 5: Commit**
   ```bash
   git add docs/qa-checklist.md
@@ -3452,7 +3452,7 @@ git commit -m "Normalize repeater schema: children, row caps, rowExpression scop
 					}
 ```
 
-  - Restructure the summary loop (lines 82–97): replace the single `if ( empty(...showInSummary...) ... ) { continue; }` + push with:
+  - Restructure the summary loop (lines 82–97): replace the loop body after `$id = $field['id'];` (do not duplicate the pre-existing `totalScaled` guard earlier in the body) with:
 
 ```php
 			if ( 'formula' === $field['type'] && ( $active[ $id ] ?? true ) ) {
@@ -4074,7 +4074,7 @@ export function repeaterResult( field, prepared, raw ) {
 ```
 
 ```js
-		// summary loop: replace the single push block with
+		// summary loop: replace the loop body after `const id = f.id;` (don't duplicate the existing totalScaled guard) with
 		if ( f.type === 'formula' && active[ f.id ] !== false ) {
 			totalScaled = values[ f.id ];
 		}
@@ -4869,7 +4869,7 @@ git commit -m "Surface repeater rows in CSV export, notification email and entry
 - Modify: `src/builder/__tests__/reducer.test.js` (exists since Task 1.3 — append)
 - Create: `src/builder/panels/RepeaterFields.jsx`
 - Modify: `src/builder/reducer.js` (DEFAULTS lines 11–24, switch lines 38–103, actions lines 105–114), `src/builder/builder.scss` (append section 11)
-- Seam note: Chunk 4 owns the panel chrome (`SettingsPanel.jsx` + `panels/OptionsTab.jsx`). This task delivers the repeater-specific panel COMPONENT and reducer actions; the only chrome edit is mounting `<RepeaterFields />` in the Options-tab slot when `field.type === 'repeater'`, and registering the four new action types in Chunk 1's history `remember()` list.
+- Seam note: Chunk 4 owns the panel chrome (`SettingsPanel.jsx` + `panels/OptionsTab.jsx`). This task delivers the repeater-specific panel COMPONENT and reducer actions; the only chrome edit is mounting `<RepeaterFields />` in the Options-tab slot when `field.type === 'repeater'`, and adding the inline `past: remember( state ), future: []` pair to the four new reducer cases (see Step 4).
 
 - [ ] **Step 1: Write the failing reducer tests.** `src/builder/__tests__/reducer.test.js` already exists (Task 1.3) — do NOT create a new file. Merge `REPEATER_CHILD_TYPES` into its existing import line so it reads:
 
@@ -4977,7 +4977,7 @@ function mapParent( state, parentId, fn ) {
 	reorderChild: ( parentId, from, to ) => ( { type: 'REORDER_CHILD', parentId, from, to } ),
 ```
 
-- [ ] **Step 4: Register history.** Locate Chunk 1's `remember()` action list (`grep -n "REMEMBERED\|remember" src/builder/reducer.js`) and add the four types `ADD_CHILD_FIELD`, `UPDATE_CHILD_FIELD`, `REMOVE_CHILD_FIELD`, `REORDER_CHILD` so child edits are undoable. (If Chunk 1 has not landed in this worktree, leave a `// history: added in chunk 1` note is NOT acceptable — coordinate; the branch order guarantees it exists.)
+- [ ] **Step 4: Register history.** Chunk 1 implements history INLINE per case (there is no list constant): each mutating case's returned object spreads `past: remember( state ), future: [],`. Add exactly that pair to the returned state of the four new cases `ADD_CHILD_FIELD`, `UPDATE_CHILD_FIELD`, `REMOVE_CHILD_FIELD`, `REORDER_CHILD` (or once inside `mapParent`'s return if all four route through it) so child edits are undoable. Then append one test to the reducer suite: dispatch `UPDATE_CHILD_FIELD`, assert `UNDO` restores the previous child value (guards against silently shipping non-undoable child edits).
 - [ ] **Step 5: Run and see it PASS.** `npm test -- -t 'repeater child actions'` → green.
 - [ ] **Step 6: Create `src/builder/panels/RepeaterFields.jsx`** (complete component; local child selection, store mutations via the new actions):
 
@@ -6320,13 +6320,13 @@ test "$GZ" -le 30720 && echo "BUDGET OK" || echo "BUDGET EXCEEDED"
 
   Expected: `BUDGET OK` (spec §6: ≤30 KB gz INCLUDING the repeater). If exceeded, trim before proceeding — first candidates: dedupe the row-label helper (repeater.js vs compute.js — import one from the other), shorten error strings, confirm no accidental `@wordpress/*` import leaked into the frontend entry (`grep -rn "@wordpress" src/frontend/ src/shared/`).
 - [ ] **Step 2: Full gates.** `vendor/bin/phpunit` (137 baseline + all new tests) · `npm test` (87 baseline + new) · `vendor/bin/phpcs` → 0 · `npm run build` clean.
-- [ ] **Step 3: wp-env visual spot-check** (spec §6: existing calculators unchanged): load a pre-v2 calculator on the demo content — identical rendering; then one calculator using repeater + date + textarea + slider-with-unit + file upload across at least `classic`, `midnight`, `minimal` themes. Explicitly eyeball a slider INSIDE a repeater row in each theme (bubble, min/max labels and unit suffix render row-scoped, no overflow).
+- [ ] **Step 3: wp-env visual spot-check** (spec §6: existing calculators unchanged): load a pre-v2 calculator on the demo content — identical rendering; then one calculator using repeater + date + textarea + slider-with-unit + file upload across at least `classic`, `midnight`, `minimal` themes. Explicitly eyeball a slider INSIDE a repeater row in each theme: the row keeps the plain inline value output (no bubble/scale overlay bleeding into rows, no overflow), while the top-level slider shows bubble + min/max labels + unit suffix correctly (per Task 7.4 Step 5, rows deliberately have no bubble/scale/unit).
 - [ ] **Step 4: Nothing to commit** — this task only verifies. If trimming was needed in Step 1, commit those trims with their own message (`git add <touched files>` explicitly).
 
 ---
 
 **Cross-chunk seams recap (for the executor):**
-- Chunk 1 owns the reducer history wrapper — Task 6.5 Step 4 registers the four child actions in its `remember()` list.
+- Chunk 1 owns the reducer history wrapper — Task 6.5 Step 4 spreads `past: remember( state ), future: []` into the four child-action cases (history is inline per case, not a list).
 - Chunk 4 owns panel chrome + palette — Tasks 6.5/7.3/7.4/7.6 make small, clearly-scoped edits to `panels/OptionsTab.jsx`, `panels/FieldGeneral.jsx`, `panels/CalcQuote.jsx`, `PaletteV2.jsx`, `icons.js`. If a file is named differently after Chunk 4 lands, grep for where `OptionsEditor`/quote-form settings mount and apply the same edit there.
 - Chunk 9 (readme/screenshots) advertises: 18 field types, free repeater, file upload — no readme edits in chunks 5–7.
 
@@ -7758,7 +7758,7 @@ final class Onboarding {
 - [ ] **Step 5: Commit.**
   ```bash
   git add src/builder/CalculatorList.jsx src/builder/builder.scss
-  git commit -m "Rich empty state: template cards + start blank on the calculator list"
+  git commit -m "Rich empty state: template cards + start blank on the calculator list + export schemaVersion 2"
   ```
 
 ### Task 9.3: 3-step Studio pointer tour (TDD on the pure sequencing)
