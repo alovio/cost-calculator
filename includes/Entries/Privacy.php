@@ -72,7 +72,11 @@ final class Privacy {
 	}
 
 	public function erase( string $email_address ): array {
-		$removed = ( new EntriesRepository() )->delete_by_email( $email_address );
+		$repo = new EntriesRepository();
+		foreach ( $repo->get_by_email( $email_address ) as $row ) {
+			FileUploads::delete_entry_file( $row );
+		}
+		$removed = $repo->delete_by_email( $email_address );
 		return array(
 			'items_removed'  => $removed,
 			'items_retained' => false,

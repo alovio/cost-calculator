@@ -238,4 +238,21 @@ class FieldSchemaTest extends TestCase {
 		$this->assertSame( 'm² x', $out['fields'][0]['unit'] ); // sanitized
 		$this->assertArrayNotHasKey( 'unit', $out['fields'][1] ); // slider-only setting
 	}
+
+	public function test_quote_form_file_settings(): void {
+		$out = FieldSchema::normalize( [ 'fields' => [], 'settings' => [ 'quoteForm' => [
+			'enabled' => 1,
+			'file'    => [ 'enabled' => 1, 'label' => ' <b>Plan</b> ', 'types' => [ 'jpg', 'exe', 'pdf' ], 'maxMb' => 99 ],
+		] ] ] );
+		$file = $out['settings']['quoteForm']['file'];
+		$this->assertTrue( $file['enabled'] );
+		$this->assertSame( 'Plan', $file['label'] );
+		$this->assertSame( [ 'jpg', 'pdf' ], $file['types'] );  // allowlist intersect
+		$this->assertSame( 20, $file['maxMb'] );                 // clamped 1..20
+
+		$d = FieldSchema::normalize( [] )['settings']['quoteForm']['file'];
+		$this->assertFalse( $d['enabled'] );                     // off by default (spec §3.3)
+		$this->assertSame( [ 'jpg', 'png', 'webp', 'pdf' ], $d['types'] );
+		$this->assertSame( 5, $d['maxMb'] );
+	}
 }

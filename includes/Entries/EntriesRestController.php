@@ -104,10 +104,12 @@ final class EntriesRestController {
 
 	/** @param \WP_REST_Request $request */
 	public function delete_entry( $request ) {
-		$id = (int) $request['id'];
-		if ( null === $this->repo->find( $id ) ) {
+		$id  = (int) $request['id'];
+		$row = $this->repo->find( $id );
+		if ( null === $row ) {
 			return $this->not_found();
 		}
+		FileUploads::delete_entry_file( $row );
 		$this->repo->delete( $id );
 		return rest_ensure_response( array( 'deleted' => true ) );
 	}

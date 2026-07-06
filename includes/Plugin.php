@@ -38,6 +38,7 @@ final class Plugin {
 		( new Admin\RestController() )->register();
 		( new Admin\Preview() )->register();
 		( new Entries\QuoteController() )->register();
+		( new Entries\FileUploads() )->register();
 		( new Entries\EntriesRestController() )->register();
 		( new Entries\CsvExporter() )->register();
 		( new Entries\Privacy() )->register();

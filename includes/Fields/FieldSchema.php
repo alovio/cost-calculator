@@ -34,6 +34,12 @@ final class FieldSchema {
 					'fields'         => [ 'name', 'email' ],
 					'notifyEmail'    => '',
 					'successMessage' => '',
+					'file'           => [
+						'enabled' => false,
+						'label'   => '',
+						'types'   => [ 'jpg', 'png', 'webp', 'pdf' ],
+						'maxMb'   => 5,
+					],
 				],
 			],
 		];
@@ -282,6 +288,10 @@ final class FieldSchema {
 		$layout = (string) ( $raw['theme']['layout'] ?? '' );
 		$layout = in_array( $layout, [ 'single', 'wizard' ], true ) ? $layout : $d['theme']['layout'];
 
+		$file  = (array) ( $quote['file'] ?? [] );
+		$types = array_values( array_intersect( [ 'jpg', 'png', 'webp', 'pdf' ], array_map( 'strval', (array) ( $file['types'] ?? [] ) ) ) );
+		$maxMb = isset( $file['maxMb'] ) && is_numeric( $file['maxMb'] ) ? (int) $file['maxMb'] : 5;
+
 		return [
 			'currency'  => [
 				'symbol'      => '' !== $symbol ? $symbol : $d['currency']['symbol'],
@@ -300,6 +310,12 @@ final class FieldSchema {
 				'fields'         => $fields,
 				'notifyEmail'    => sanitize_email( (string) ( $quote['notifyEmail'] ?? '' ) ),
 				'successMessage' => sanitize_text_field( (string) ( $quote['successMessage'] ?? '' ) ),
+				'file'           => [
+					'enabled' => ! empty( $file['enabled'] ),
+					'label'   => sanitize_text_field( (string) ( $file['label'] ?? '' ) ),
+					'types'   => $types ? $types : $d['quoteForm']['file']['types'],
+					'maxMb'   => max( 1, min( 20, $maxMb ) ),
+				],
 			],
 		];
 	}
