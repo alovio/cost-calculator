@@ -97,7 +97,7 @@ The old `Preview.jsx` tab becomes unreachable at chunk 1 (the canvas replaces it
   ```bash
   cd /Users/tahir/alovio-calculator && git checkout main && git checkout -b feat/v2-studio
   ```
-- [ ] **Step 2: Confirm baseline gates** — `vendor/bin/phpunit` (expect `OK (137 tests`…`)`), `npm test` (expect `Tests: 87 passed`), `vendor/bin/phpcs` (expect no output, exit 0). Do not proceed on any failure — the baseline must be green before the first change.
+- [ ] **Step 2: Confirm baseline gates** — `vendor/bin/phpunit` (expect `OK (137 tests`…`)`), `npm test` (expect `Tests: 87 passed`), `vendor/bin/phpcs` (expect no output, exit 0), and working tree clean (`git status --short` shows only known local files: the `package-lock.json` modification + the untracked `.wp-env.override.json`). Do not proceed on any failure — the baseline must be green before the first change.
 
 ### Task 1.2: `builder.scss` — flame design tokens + wp-admin integration
 
@@ -146,6 +146,7 @@ The file is organised into numbered sections; **each section is appended by the 
 | 07 | palette v2 | Task 4.1 |
 | 08 | settings panel + logic tokens + options rows | Tasks 4.3–4.5 |
 | 09 | draft-restore bar | Task 4.6 |
+| 10 | surviving list/entries chrome (light token restyle) | Task 4.7 |
 
 - [ ] **Step 1: Create `src/builder/builder.scss` with sections 01–02**
   ```scss
@@ -669,14 +670,14 @@ Donor: `/Users/tahir/woo-checkout-fields/src/builder/AppShell.jsx`. Deltas vs do
   				<span className={ statusCls }><span className="alcb-dot"></span>{ statusTxt }</span>
   				<button className="alcb-btn-ghost" disabled={ ! canUndo } onClick={ undo }>⟲ { __( 'Undo', 'alovio-calculator' ) }</button>
   				<button className="alcb-btn-ghost" disabled={ ! canRedo } onClick={ redo }>⟳ { __( 'Redo', 'alovio-calculator' ) }</button>
+  				<button className="alcb-btn-primary" disabled={ saving } onClick={ save }>
+  					{ saving ? __( 'Saving…', 'alovio-calculator' ) : __( 'Save', 'alovio-calculator' ) }
+  				</button>
   				{ ! isPro && (
   					<button className={ 'alcb-btn-ghost alcb-btn-pro' + ( proOpen ? ' is-on' : '' ) } aria-pressed={ proOpen } onClick={ () => setProOpen( ! proOpen ) }>
   						{ __( 'Pro', 'alovio-calculator' ) }
   					</button>
   				) }
-  				<button className="alcb-btn-primary" disabled={ saving } onClick={ save }>
-  					{ saving ? __( 'Saving…', 'alovio-calculator' ) : __( 'Save', 'alovio-calculator' ) }
-  				</button>
   			</div>
   			<div className="alcb-work">
   				{ /* INTERIM (see plan header table): v1 components run inside the new
@@ -929,7 +930,7 @@ No RestController test exists today — this suite follows `CalculatorRendererTe
   	}
   }
   ```
-- [ ] **Step 3: Run and watch it fail** — `vendor/bin/phpunit --filter RestControllerTest` → expected: `Error: Call to undefined method ...RestController::render_fragment()` (3 failures/errors).
+- [ ] **Step 3: Run and watch it fail** — `vendor/bin/phpunit --filter RestControllerTest` → expected: `Error: Call to undefined method ...RestController::render_fragment()` (2 errors, 1 pass — `test_can_manage_gates_on_manage_options` passes immediately because `can_manage()` already exists).
 - [ ] **Step 4: Implement** — in `includes/Admin/RestController.php`:
   1. Add the import after line 8 (`use Alovio\Calculator\Templates\Presets;`):
      ```php
@@ -1621,6 +1622,9 @@ Architecture (all new logic — full code): the overlay is an absolutely-positio
   				return; // hidden by conditions — no box, no ops (spec §2.3)
   			}
   			const r = el.getBoundingClientRect();
+  			if ( ! r.width && ! r.height ) {
+  				return; // zero-size = hidden by a display:none ancestor (e.g. an inactive wizard step) — same treatment as el.hidden
+  			}
   			next[ el.getAttribute( 'data-alc-field' ) ] = {
   				top: r.top - base.top,
   				left: r.left - base.left,
@@ -1901,7 +1905,7 @@ Architecture (all new logic — full code): the overlay is an absolutely-positio
   }
   ```
   Note the overlay `inset` mirrors `.alcb-sheet`'s `26px 30px` padding so overlay coordinates (measured relative to `.alcb-fragment`) line up — if the sheet padding ever changes, change both.
-- [ ] **Step 5: Verify** — `npm run build` clean; `npm test` green; wp-env manual pass: click a field in the canvas → flame outline + right panel shows it while the input still receives focus/typing; hover shows ⠿/↑/↓/⧉/✕ (also visible on the selected field for keyboard users, buttons tabbable); ⧉ duplicates, ✕ deletes, ↑↓ reorder — all undoable; grip-drag shows the insertion line between fields and drops reorder correctly (including drag-below-last); a conditioned field shows the `IF · … → SHOW` pill matching its rules; typing an unknown `{ref}` into a formula shows the red `!` badge at the field's top-right (tooltip = validator message); resize the window / switch device widths → overlays track their fields.
+- [ ] **Step 5: Verify** — `npm run build` clean; `npm test` green; wp-env manual pass: click a field in the canvas → flame outline + right panel shows it while the input still receives focus/typing; hover shows ⠿/↑/↓/⧉/✕ (also visible on the selected field for keyboard users, buttons tabbable); ⧉ duplicates, ✕ deletes, ↑↓ reorder — all undoable; grip-drag shows the insertion line between fields and drops reorder correctly (including drag-below-last); a conditioned field shows the `IF · … → SHOW` pill matching its rules; typing an unknown `{ref}` into a formula shows the red `!` badge at the field's top-right (tooltip = validator message); resize the window / switch device widths → overlays track their fields; click-selecting several fields adds no undo steps (⌘Z still undoes the last real edit).
 - [ ] **Step 6: Commit**
   ```bash
   git add src/builder/CanvasOverlay.jsx src/builder/LiveCanvas.jsx src/builder/StudioShell.jsx src/builder/builder.scss
@@ -2647,7 +2651,8 @@ Donor: `/Users/tahir/woo-checkout-fields/src/builder/panels/Logic.jsx`. Deltas v
   .alcb-seg button { flex: 1; text-align: center; padding: 8px 0; font-size: 12.5px; font-weight: 800; color: var(--alcb-ink-3); background: #fff; border: none; cursor: pointer; }
   .alcb-seg button.is-on { background: linear-gradient(135deg, var(--alcb-flame), var(--alcb-flame-deep)); color: #fff; }
   ```
-- [ ] **Step 3: Commit**
+- [ ] **Step 3: Verify** — `npm run build` compiles clean. (LogicTokens.jsx is unreferenced until Task 4.5 wires it into SettingsPanel — without this build a syntax error would land undetected.)
+- [ ] **Step 4: Commit**
   ```bash
   git add src/builder/panels/LogicTokens.jsx src/builder/builder.scss
   git commit -m "studio: sentence-token Logic editor (our operators, opt_ slug values, empty-ops hide value)"
@@ -2682,7 +2687,7 @@ The three calc panels split `src/builder/SettingsTab.jsx` (this repo) 1:1: **Cal
   	);
   }
   ```
-  CalcDesign: same prelude + `import { THEME_PRESETS } from '../CanvasToolbar';`, body = SettingsTab lines 53–92 verbatim except the `options={ [ …inline preset array… ] }` becomes `options={ THEME_PRESETS }` and the two section labels become `alcb-sec-label` spans (`Appearance`, `Layout`). The `isPro` gate line (SettingsTab line 14) moves in unchanged. CalcQuote: prelude + `quoteFields`/`toggleQuoteField` helpers (lines 19–23), body = lines 97–123 verbatim. The calculator NAME is edited in the studio header (chunk 1) — deliberately not duplicated in CalcGeneral.
+  CalcDesign: same prelude + `import { THEME_PRESETS } from '../CanvasToolbar';`, body = SettingsTab lines 53–92 verbatim except the `options={ [ …inline preset array… ] }` becomes `options={ THEME_PRESETS }`, the two section labels become `alcb-sec-label` spans (`Appearance`, `Layout`), and `alc-hint → alcb-hint` (the verbatim range includes `<p className="alc-hint">` on SettingsTab line 67, and `.alc-hint` is on the Task 4.7 CSS delete list). The `isPro` gate line (SettingsTab line 14) moves in unchanged. CalcQuote: prelude + `quoteFields`/`toggleQuoteField` helpers (lines 19–23), body = lines 97–123 verbatim. The calculator NAME is edited in the studio header (chunk 1) — deliberately not duplicated in CalcGeneral.
 - [ ] **Step 2: Create `src/builder/panels/ProPanel.jsx`** (full code — still the plugin's single upsell surface, guideline 11):
   ```jsx
   import { ExternalLink } from '@wordpress/components';
@@ -3012,7 +3017,7 @@ The three calc panels split `src/builder/SettingsTab.jsx` (this repo) 1:1: **Cal
 
 **Files:**
 - Delete: `src/builder/Canvas.jsx`, `src/builder/Preview.jsx`, `src/builder/FieldSettings.jsx`, `src/builder/ConditionEditor.jsx`, `src/builder/OptionsEditor.jsx`, `src/builder/SettingsTab.jsx`, `src/builder/ProTab.jsx`, `src/builder/FieldPalette.jsx`
-- Modify: `assets/css/builder.css` (prune dead blocks)
+- Modify: `assets/css/builder.css` (prune dead blocks), `src/builder/builder.scss` (append section 10 — list/entries chrome restyle)
 
 By this point nothing imports the eight files (palette swapped in 4.1, canvas unmounted in 3.2, right column swapped in 4.5, Preview unreferenced since chunk 1). `FormulaPanel.jsx`, `CalculatorList.jsx`, `EntriesList.jsx`, `TemplatePicker.jsx` survive.
 
@@ -3026,17 +3031,42 @@ By this point nothing imports the eight files (palette swapped in 4.1, canvas un
   git rm src/builder/Canvas.jsx src/builder/Preview.jsx src/builder/FieldSettings.jsx src/builder/ConditionEditor.jsx src/builder/OptionsEditor.jsx src/builder/SettingsTab.jsx src/builder/ProTab.jsx src/builder/FieldPalette.jsx
   ```
 - [ ] **Step 3: Prune `assets/css/builder.css`** — delete exactly the rule blocks for: `.alc-build`, `.alc-palette` (+ `h3`, `__btn`), `.alc-canvas` and every `.alc-canvas*` selector (incl. the shared `.alc-canvas--empty, .alc-settings--empty` rule), `.alc-settings`, `.alc-row3`, `.alc-condition`, `.alc-rule`, `.alc-actions`, `.alc-options*`, `.alc-row4`, `.alc-hint`, `.alc-settings-tab*`, `.alc-narrow`. KEEP (verified in use by surviving components): `.alc-app*`, `.alc-topbar*`, `.alc-title-input`, `.alc-unsaved`, `.alc-table*`, `.alc-row--new`, `.alc-badge*`, `.alc-empty`, `.alc-danger-zone*`, `.alc-template-*`, `.alc-modal-actions`, `.alc-formula__ok`, `.alc-pagination`, `.alc-app--loading`.
-- [ ] **Step 4: Verify** — `npm run build` clean; `npm test` green; wp-env: list view, entries view, New Calculator template modal, and the full studio all render/style correctly.
-- [ ] **Step 5: Commit**
+- [ ] **Step 4: Light token restyle of the surviving list/entries chrome (spec §2.1)** — append builder.scss section 10. Class names stay (`.alc-topbar` + WP `Button` classes in `CalculatorList.jsx`/`EntriesList.jsx`), style only; the section loads after `assets/css/builder.css` in `build/index.css`, so these overrides win:
+  ```scss
+  // ── 10 · Surviving list/entries chrome — light token restyle (spec §2.1).
+  // Class names unchanged (CalculatorList/EntriesList keep .alc-topbar); style only.
+  .alc-app .alc-topbar {
+  	margin: 16px 0;
+  	padding: 14px 18px;
+  	background: var(--alcb-panel);
+  	border: 1px solid var(--alcb-line);
+  	border-radius: var(--alcb-r);
+  	box-shadow: var(--alcb-shadow);
+  }
+  .alc-app .alc-topbar .alc-heading { font-size: 15px; font-weight: 800; color: var(--alcb-ink); }
+  .alc-app .alc-topbar .components-button { border-radius: var(--alcb-r-sm); }
+  .alc-app .alc-topbar .components-button.is-primary {
+  	background: linear-gradient(135deg, var(--alcb-flame), var(--alcb-flame-deep));
+  }
+  .alc-app .alc-topbar .components-button.is-secondary {
+  	color: var(--alcb-ink-2);
+  	box-shadow: inset 0 0 0 1px var(--alcb-line-2);
+  }
+  .alc-app .alc-topbar .components-button.is-tertiary { color: var(--alcb-ink-2); }
+  ```
+- [ ] **Step 5: Verify** — `npm run build` clean; `npm test` green; wp-env: list view, entries view, New Calculator template modal, and the full studio all render/style correctly; the list/entries `.alc-topbar` shows the token restyle (panel card, flame primary button) with all header buttons still functional.
+- [ ] **Step 6: Commit**
   ```bash
-  git add assets/css/builder.css
-  git commit -m "studio: retire v1 builder components (canvas/palette/settings/preview tabs) + prune dead CSS"
+  git add assets/css/builder.css src/builder/builder.scss
+  git commit -m "studio: retire v1 builder components (canvas/palette/settings/preview tabs) + prune dead CSS + token restyle of list/entries chrome"
   ```
 
 ### Task 4.8: Chunk 4 gates, builder bundle budget, studio smoke checklist
 
 **Files:**
 - Modify: `docs/qa-checklist.md` (budget line + studio smoke items)
+
+Note: if `src/builder/builder.scss` exceeds ~1000 lines by the end of this chunk, split it into per-section partials via `@use` as a follow-up — not now.
 
 - [ ] **Step 1: Run all gates** — `vendor/bin/phpunit`, `npm test`, `vendor/bin/phpcs`, `npm run build` — all green/clean.
 - [ ] **Step 2: Measure and record the builder budget** (spec §6: "builder bundle measured at the first Studio chunk group, then enforced"):
@@ -3070,6 +3100,7 @@ By this point nothing imports the eight files (palette swapped in 4.1, canvas un
 - Raw repeater value semantics (identical PHP/JS): value **absent or non-array** ⇒ `minRows` rows of child defaults (matches what the renderer shows initially — no-FOUC parity); **empty array** ⇒ zero rows ⇒ sum 0; rows beyond `maxRows` (hard-capped 50) are **sliced off** at the engine, and additionally **rejected with 400** at the quote endpoint (defense in depth).
 - Row label rule (identical PHP/JS): `rowLabel` with `{n}` replaced by the 1-based row number; empty `rowLabel` falls back to `<repeater label> <n>`.
 - `rowExpression` that fails to **compile** is kept in the config and surfaces at runtime as `errors[repeaterId]` with sum 0 (same convention as formula fields — the builder badge shows it). A rowExpression that compiles but references a **non-child id** is blanked to `''` by `FieldSchema` (price mode) — cross-scope data flow is structurally impossible.
+- Price mode (empty `rowExpression`), identical PHP/JS: a row's total sums ONLY priced children — choice types' selected option prices + toggle price (spec §3.1 "ordinary price contributions: option prices, toggle price"). `number`/`slider`/`quantity` children contribute 0 in price mode; their raw values are never currency and exist to feed `{refs}` once a `rowExpression` is set.
 - Summary: one line item per row — `{ id: '<repId>__<n>', label: rowLabel, amount: rowTotal, isCurrency: true, repeaterId: '<repId>' }`. The `repeaterId` key lets entries surfaces group rows without string parsing; it exists on BOTH sides (parity fixtures assert it).
 - Note (deviation from the chunk table): the compute.js engine mirror lands in **Chunk 5**, not 6 — the chunk-5 Jest parity gate cannot pass without it. Chunk 6 keeps all DOM/quote/entries/builder work.
 
@@ -3077,7 +3108,7 @@ By this point nothing imports the eight files (palette swapped in 4.1, canvas un
 
 ## Chunk 5: Repeater schema + engine + shared parity fixtures
 
-**Spec:** §3.1 (schema, aggregation, validation). Everything in this chunk is pure logic — no DOM, no REST, no SCSS. Gates green at the end (renderer emits nothing for an unknown-to-it `repeater` type until Chunk 6, which is harmless).
+**Spec:** §3.1 (schema, aggregation, validation). Everything in this chunk is pure logic — no DOM, no REST, no SCSS. Gates green at the end (for a `repeater` the renderer emits only an empty `.alc-field--repeater` wrapper — `render_input()` has no case for it — until Chunk 6, which is harmless). Note the interim UI state this creates: because `PaletteV2` filters by `ALOVIO_CALC_BUILDER.fieldTypes`, the palette exposes `repeater` as soon as Task 5.1 registers it, while the canvas shows just that empty wrapper until Chunk 6 — accepted interim state on the branch.
 
 ### Task 5.1: `repeater` type flags in FieldTypes
 
@@ -3106,7 +3137,14 @@ By this point nothing imports the eight files (palette swapped in 4.1, canvas un
 	}
 ```
 
-- [ ] **Step 2: Run and see it FAIL.** `vendor/bin/phpunit --filter FieldTypesTest` → expect `Error: Call to undefined method ...is_repeater_child()` / assertion failure on `all()`.
+- [ ] **Step 1b: Update the existing FREE-list expectation.** In the same file, `test_free_list_matches_spec_section_6` (lines 10–16) does an exact 12-element `assertSame` on `FieldTypes::all()` — it breaks the moment Step 3 appends `'repeater'` to `FREE`. Update its expected array to the 13-entry list (repeater appended at the end, matching Step 3's edit):
+
+```php
+			[ 'number', 'slider', 'select', 'radio', 'checkbox_group', 'toggle', 'quantity', 'text', 'heading', 'html', 'formula', 'step', 'repeater' ],
+```
+
+  (Part of the red phase — this test fails until Step 3 lands.)
+- [ ] **Step 2: Run and see it FAIL.** `vendor/bin/phpunit --filter FieldTypesTest` → expect `Error: Call to undefined method ...is_repeater_child()` + the `test_free_list_matches_spec_section_6` assertSame failure.
 - [ ] **Step 3: Implement.** In `includes/Fields/FieldTypes.php`:
   - Line 11: append `'repeater'` to `FREE`.
   - Line 19: append `'repeater'` to `REFERENCEABLE` (spec §3.1: `{repeater_id}` usable in formulas).
@@ -3127,7 +3165,7 @@ By this point nothing imports the eight files (palette swapped in 4.1, canvas un
 		return self::is_input( $type ) || 'formula' === $type || 'repeater' === $type;
 ```
 
-- [ ] **Step 4: Run and see it PASS.** `vendor/bin/phpunit --filter FieldTypesTest` → all green; then `vendor/bin/phpunit` → full suite green (repeater has no behavior yet).
+- [ ] **Step 4: Run and see it PASS.** `vendor/bin/phpunit --filter FieldTypesTest` → all green (incl. the 13-entry FREE list from Step 1b); then `vendor/bin/phpunit` → full suite green (repeater has no behavior yet).
 - [ ] **Step 5: Commit.**
 
 ```bash
@@ -3463,7 +3501,9 @@ git commit -m "Normalize repeater schema: children, row caps, rowExpression scop
 	/**
 	 * Row math for one repeater (spec §3.1). Absent/non-array raw ⇒ minRows default
 	 * rows (renderer parity); rows past maxRows sliced; rowExpression evaluated
-	 * row-locally with the SAME Evaluator, or children's price contributions when empty.
+	 * row-locally with the SAME Evaluator, or — when empty (price mode) — the sum of
+	 * PRICED children only (option prices, toggle price, per spec §3.1 "ordinary price
+	 * contributions"); number/slider/quantity children feed {refs} and contribute 0.
 	 *
 	 * @param mixed $raw Array of row objects { childId: value } or anything else.
 	 * @return array{sum:int, rows: array<int, array{label:string, total:int, values:array<string,string>}>, error:string}
@@ -3497,11 +3537,15 @@ git commit -m "Normalize repeater schema: children, row caps, rowExpression scop
 			$display  = [];
 			$priceSum = 0;
 			foreach ( $children as $child ) {
-				$cid              = $child['id'];
-				$v                = $rowRaw[ $cid ] ?? null;
-				$rowMap[ $cid ]   = self::input_amount( $child, $v );
-				$priceSum         = DecimalMath::add( $priceSum, $rowMap[ $cid ] );
-				$display[ $cid ]  = self::display_value( $child, $v );
+				$cid             = $child['id'];
+				$v               = $rowRaw[ $cid ] ?? null;
+				$rowMap[ $cid ]  = self::input_amount( $child, $v );
+				$display[ $cid ] = self::display_value( $child, $v );
+				if ( self::is_priced( $child ) ) {
+					// Price mode counts ONLY priced children — a number/slider/quantity
+					// raw value is NOT currency (it is only a {ref} for rowExpression).
+					$priceSum = DecimalMath::add( $priceSum, $rowMap[ $cid ] );
+				}
 			}
 			if ( null !== $ast ) {
 				try {
@@ -3726,10 +3770,48 @@ git commit -m "Compute repeater sums in an Evaluation pre-pass with per-row summ
             "values": { "rooms": [ { "r_a": "10", "r_b": "0" } ] },
             "repeater": { "id": "rooms", "sum": "0", "rows": [ { "label": "Room 1", "total": "0" } ] },
             "expected": { "values": { "rooms": "0" } }
+        },
+        {
+            "name": "price mode ignores non-priced children",
+            "fields": [
+                { "id": "rooms", "type": "repeater", "label": "Rooms", "showInSummary": false, "minRows": 1, "maxRows": 5, "addLabel": "", "rowLabel": "Room {n}", "rowExpression": "", "fields": [
+                    { "id": "r_area", "type": "number", "label": "Area", "min": null, "max": null, "step": null, "default": 0 },
+                    { "id": "r_express", "type": "toggle", "label": "Express", "price": 15, "default": false }
+                ] },
+                { "id": "total", "type": "formula", "label": "Total", "showInSummary": true, "expression": "{rooms}" }
+            ],
+            "values": { "rooms": [ { "r_area": "40", "r_express": "1" }, { "r_area": "25" } ] },
+            "repeater": { "id": "rooms", "sum": "15", "rows": [ { "label": "Room 1", "total": "15" }, { "label": "Room 2", "total": "0" } ] },
+            "expected": { "values": { "rooms": "15", "total": "15" }, "total": "15" }
+        },
+        {
+            "name": "compile-broken rowExpression zeroes the sum and surfaces the error",
+            "fields": [
+                { "id": "rooms", "type": "repeater", "label": "Rooms", "showInSummary": false, "minRows": 1, "maxRows": 5, "addLabel": "", "rowLabel": "Room {n}", "rowExpression": "{r_qty} * * 2", "fields": [
+                    { "id": "r_qty", "type": "number", "label": "Qty", "min": null, "max": null, "step": null, "default": 0 }
+                ] },
+                { "id": "total", "type": "formula", "label": "Total", "showInSummary": true, "expression": "{rooms}" }
+            ],
+            "values": { "rooms": [ { "r_qty": "5" } ] },
+            "repeater": { "id": "rooms", "sum": "0", "rows": [], "error": "syntax" },
+            "expected": { "values": { "rooms": "0", "total": "0" }, "total": "0" }
+        },
+        {
+            "name": "non-array raw value falls back to minRows default rows",
+            "fields": [
+                { "id": "rooms", "type": "repeater", "label": "Rooms", "showInSummary": false, "minRows": 2, "maxRows": 5, "addLabel": "", "rowLabel": "Room {n}", "rowExpression": "{r_area} * 2 + 3", "fields": [
+                    { "id": "r_area", "type": "number", "label": "Area", "min": null, "max": null, "step": null, "default": 4 }
+                ] }
+            ],
+            "values": { "rooms": "garbage" },
+            "repeater": { "id": "rooms", "sum": "22", "rows": [ { "label": "Room 1", "total": "11" }, { "label": "Room 2", "total": "11" } ] },
+            "expected": { "values": { "rooms": "22" } }
         }
     ]
 }
 ```
+
+  Case notes: "price mode ignores non-priced children" pins the Engine-decisions bullet (row 1 = toggle 15, the number 40 contributes 0; row 2 = toggle off ⇒ 0); the `repeater.error` key is OPTIONAL and asserted only when present (compile-broken case: PHP `error` is `'syntax'`, rows empty).
 
 - [ ] **Step 2: Create the PHP parity test.** Write `tests/Unit/Logic/RepeaterCasesTest.php` (mirrors `FormulaCasesTest`'s fixture wiring — one JSON, dataProvider, expected strings compared via `fromScaled`):
 
@@ -3790,6 +3872,10 @@ class RepeaterCasesTest extends TestCase {
 			];
 		}
 		$this->assertSame( $case['repeater']['rows'], $rows );
+		if ( isset( $case['repeater']['error'] ) ) {
+			$this->assertSame( $case['repeater']['error'], $rep['error'] );
+			$this->assertSame( $case['repeater']['error'], $r['errors'][ $case['repeater']['id'] ] );
+		}
 	}
 
 	public function casesProvider(): iterable {
@@ -3801,7 +3887,7 @@ class RepeaterCasesTest extends TestCase {
 }
 ```
 
-- [ ] **Step 3: Run and see it PASS** (engine landed in 5.3): `vendor/bin/phpunit --filter RepeaterCasesTest` → 10 tests green. If any case fails, the ENGINE is wrong (fixture numbers above are hand-derived) — fix the engine, never the fixture.
+- [ ] **Step 3: Run and see it PASS** (engine landed in 5.3): `vendor/bin/phpunit --filter RepeaterCasesTest` → 13 tests green. If any case fails, the ENGINE is wrong (fixture numbers above are hand-derived) — fix the engine, never the fixture.
 - [ ] **Step 4: Commit.**
 
 ```bash
@@ -3858,6 +3944,10 @@ describe( 'repeater PHP/JS parity fixtures', () => {
 			const rep = repeaterResult( field, prepared.repeaters[ field.id ], c.values[ field.id ] );
 			expect( fromScaled( rep.sum ) ).toBe( c.repeater.sum );
 			expect( rep.rows.map( ( row ) => ( { label: row.label, total: fromScaled( row.total ) } ) ) ).toEqual( c.repeater.rows );
+			if ( c.repeater.error ) {
+				expect( rep.error ).toBe( c.repeater.error );
+				expect( prepared.errors[ field.id ] ).toBe( c.repeater.error );
+			}
 		} );
 	} );
 } );
@@ -3884,10 +3974,13 @@ describe( 'repeater PHP/JS parity fixtures', () => {
 					throw e;
 				}
 				repeaters[ f.id ] = { ast: null, error: e.code };
+				errors[ f.id ] = e.code; // uniform badge source: the chunk-3 overlay reads prepared.errors
 			}
 		} );
 	return { asts, errors, order: graph.order, repeaters };
 ```
+
+  (Writing `errors[ f.id ]` is safe — a repeater id never appears in `prepared.order`, which lists formula fields only, so there is no conflict; it just gives the CanvasOverlay error badge one uniform source for formula AND repeater compile errors.)
 
   - Below `isPriced()` (line 133), add the mirror of `Evaluation::repeater_result` (JS skips the PHP-only `values` display map):
 
@@ -3920,7 +4013,11 @@ export function repeaterResult( field, prepared, raw ) {
 		let priceSum = 0;
 		children.forEach( ( child ) => {
 			rowMap[ child.id ] = inputAmount( child, source[ child.id ] );
-			priceSum = add( priceSum, rowMap[ child.id ] );
+			if ( isPriced( child ) ) {
+				// Price mode counts ONLY priced children — a number/slider/quantity
+				// raw value is NOT currency (it is only a {ref} for rowExpression).
+				priceSum = add( priceSum, rowMap[ child.id ] );
+			}
 		} );
 		let total;
 		if ( prepared.ast ) {
@@ -3958,7 +4055,7 @@ export function repeaterResult( field, prepared, raw ) {
 	} );
 ```
 
-  - In `run()` (line 172): after `const baseCond = ...` add the pre-pass; thread `reps` through all three `computeValues` calls; extend the `nextCond` loop and the summary loop:
+  - In `run()` (line 172): after `const baseCond = ...` add the pre-pass; thread `reps` through both `computeValues` calls (lines 179 and 193 — the in-loop one and the final pass); extend the `nextCond` loop and the summary loop:
 
 ```js
 	const reps = {};
@@ -4002,7 +4099,7 @@ export function repeaterResult( field, prepared, raw ) {
 		lineItems.push( { id: f.id, label: f.label, amount: values[ f.id ], isCurrency: f.type === 'formula' || isPriced( f ) } );
 ```
 
-- [ ] **Step 4: Run and see it PASS.** `npm test -- -t 'repeater PHP/JS parity'` → 10 green. Then `npm test` → full Jest suite green (87 baseline + new), `vendor/bin/phpunit` → green, `npm run build` → compiles.
+- [ ] **Step 4: Run and see it PASS.** `npm test -- -t 'repeater PHP/JS parity'` → 13 green. Then `npm test` → full Jest suite green (87 baseline + new), `vendor/bin/phpunit` → green, `npm run build` → compiles.
 - [ ] **Step 5: Chunk gate.** Run all four gates from the Conventions block; all green.
 - [ ] **Step 6: Commit.**
 
@@ -4593,6 +4690,7 @@ git commit -m "Guard repeater quote payloads and snapshot grouped rows"
 - Modify: `includes/Entries/CsvExporter.php` (COLUMNS line 10, `handle()` lines 33–49, new `repeater_cell()`)
 - Modify: `includes/Entries/EntryMailer.php` (line-items loop lines 24–27, new `repeater_lines()`)
 - Modify: `src/builder/EntriesList.jsx` (imports line 4, modal lines 114–144)
+- Modify: `assets/css/builder.css` (append `.alc-entry-repeater` rules)
 
 - [ ] **Step 1: Write the failing PHP tests.** Append to `CsvExporterTest`:
 
@@ -4641,7 +4739,7 @@ git commit -m "Guard repeater quote payloads and snapshot grouped rows"
 
 - [ ] **Step 2: Run and see it FAIL.** `vendor/bin/phpunit --filter 'CsvExporterTest|EntryMailerTest'` → undefined methods.
 - [ ] **Step 3: Implement `CsvExporter`.**
-  - Line 10: `private const COLUMNS = array( 'id', 'calculator_id', 'created_at', 'name', 'email', 'phone', 'message', 'total', 'status', 'repeaters', 'snapshot' );` — then check this test file for a hard-coded header expectation and update it to the new column list.
+  - Line 10: `private const COLUMNS = array( 'id', 'calculator_id', 'created_at', 'name', 'email', 'phone', 'message', 'total', 'status', 'repeaters', 'snapshot' );` — growing COLUMNS affects the THREE existing full-row `csv_row()` assertions in `tests/Unit/Entries/CsvExporterTest.php`, not just a header expectation: `test_csv_line_escapes_and_orders_columns` (csv_row at line 10 — its exact `assertSame` on line 24 gains an empty `repeaters` cell between `new` and the quoted snapshot), `test_formula_injection_guard` (line 28) and `test_purely_numeric_cells_stay_unguarded` (line 49) — every emitted row now carries the extra (empty) cell; update the expected strings/row arrays so all three stay green.
   - In `handle()`, inside the `foreach ( $rows as $row )` loop (line 45), before echoing: `$row['repeaters'] = self::repeater_cell( (array) ( json_decode( (string) ( $row['snapshot'] ?? '' ), true ) ?: array() ) );`
   - Append (uses `Alovio\Calculator\Frontend\CurrencyFormatter` — add the `use` import at the top):
 
@@ -4751,26 +4849,37 @@ git commit -m "Guard repeater quote payloads and snapshot grouped rows"
 					) ) }
 ```
 
+  - Append to the surviving `assets/css/builder.css` (modest list styling for the new block):
+
+```css
+.alc-entry-repeater { margin: 8px 0 12px; }
+.alc-entry-repeater ul { margin: 4px 0 0 16px; list-style: disc; color: #50575e; }
+```
+
 - [ ] **Step 7: Verify + commit.** `npm test` green, `npm run build` compiles.
 
 ```bash
-git add includes/Entries/CsvExporter.php includes/Entries/EntryMailer.php src/builder/EntriesList.jsx tests/Unit/Entries/CsvExporterTest.php tests/Unit/Entries/EntryMailerTest.php
+git add includes/Entries/CsvExporter.php includes/Entries/EntryMailer.php src/builder/EntriesList.jsx assets/css/builder.css tests/Unit/Entries/CsvExporterTest.php tests/Unit/Entries/EntryMailerTest.php
 git commit -m "Surface repeater rows in CSV export, notification email and entry detail"
 ```
 
 ### Task 6.5: Builder — child-aware reducer actions + "Row fields" panel
 
 **Files:**
-- Create: `src/builder/__tests__/reducer.test.js`
+- Modify: `src/builder/__tests__/reducer.test.js` (exists since Task 1.3 — append)
 - Create: `src/builder/panels/RepeaterFields.jsx`
-- Modify: `src/builder/reducer.js` (DEFAULTS lines 11–24, switch lines 38–103, actions lines 105–114)
+- Modify: `src/builder/reducer.js` (DEFAULTS lines 11–24, switch lines 38–103, actions lines 105–114), `src/builder/builder.scss` (append section 11)
 - Seam note: Chunk 4 owns the panel chrome (`SettingsPanel.jsx` + `panels/OptionsTab.jsx`). This task delivers the repeater-specific panel COMPONENT and reducer actions; the only chrome edit is mounting `<RepeaterFields />` in the Options-tab slot when `field.type === 'repeater'`, and registering the four new action types in Chunk 1's history `remember()` list.
 
-- [ ] **Step 1: Write the failing reducer tests.** Create `src/builder/__tests__/reducer.test.js`:
+- [ ] **Step 1: Write the failing reducer tests.** `src/builder/__tests__/reducer.test.js` already exists (Task 1.3) — do NOT create a new file. Merge `REPEATER_CHILD_TYPES` into its existing import line so it reads:
 
 ```js
-import { reducer, actions, initialState, REPEATER_CHILD_TYPES } from '../reducer';
+import { reducer, actions, selectors, initialState, HISTORY_LIMIT, remapFields, REPEATER_CHILD_TYPES } from '../reducer';
+```
 
+  then append the following at the end of the file:
+
+```js
 const withRepeater = () => reducer( initialState, { type: 'ADD_FIELD', fieldType: 'repeater', id: 'rep1' } );
 
 describe( 'repeater child actions', () => {
@@ -4879,7 +4988,7 @@ import { Button, TextControl, SelectControl, ToggleControl } from '@wordpress/co
 import { __ } from '@wordpress/i18n';
 import { STORE } from '../store';
 import { REPEATER_CHILD_TYPES } from '../reducer';
-import OptionsEditor from '../OptionsEditor';
+import OptionsTab from './OptionsTab'; // Chunk-4 successor of the retired OptionsEditor (same { field, set } contract)
 
 const TYPE_LABELS = {
 	number: __( 'Number', 'alovio-calculator' ),
@@ -4909,7 +5018,7 @@ export default function RepeaterFields( { field } ) {
 
 	return (
 		<div className="alc-repeater-panel">
-			<span className="alc-options__title">{ __( 'Row fields', 'alovio-calculator' ) }</span>
+			<span className="alcb-sec-label">{ __( 'Row fields', 'alovio-calculator' ) }</span>
 			{ children.map( ( c, i ) => (
 				<div className={ `alc-repeater-panel__row${ c.id === childId ? ' is-selected' : '' }` } key={ c.id }>
 					<button type="button" className="alc-repeater-panel__pick" onClick={ () => setChildId( c.id ) }>
@@ -4937,7 +5046,7 @@ export default function RepeaterFields( { field } ) {
 				<div className="alc-repeater-panel__editor">
 					<TextControl label={ __( 'Label', 'alovio-calculator' ) } value={ child.label || '' } onChange={ ( label ) => setChild( { label } ) } />
 					{ HAS_RANGE.includes( child.type ) && (
-						<div className="alc-row4">
+						<div className="alcb-row4">
 							<TextControl type="number" label={ __( 'Min', 'alovio-calculator' ) } value={ child.min ?? '' } onChange={ ( v ) => setChild( { min: num( v ) } ) } />
 							<TextControl type="number" label={ __( 'Max', 'alovio-calculator' ) } value={ child.max ?? '' } onChange={ ( v ) => setChild( { max: num( v ) } ) } />
 							<TextControl type="number" label={ __( 'Step', 'alovio-calculator' ) } value={ child.step ?? '' } onChange={ ( v ) => setChild( { step: num( v ) } ) } />
@@ -4950,12 +5059,17 @@ export default function RepeaterFields( { field } ) {
 							<ToggleControl label={ __( 'On by default', 'alovio-calculator' ) } checked={ !! child.default } onChange={ ( on ) => setChild( { default: on } ) } />
 						</>
 					) }
-					{ HAS_OPTIONS.includes( child.type ) && <OptionsEditor field={ child } set={ setChild } /> }
+					{ HAS_OPTIONS.includes( child.type ) && (
+						<>
+							<OptionsTab field={ child } set={ setChild } />
+							<p className="alcb-hint">{ __( 'Option images are stored but never shown inside repeater rows.', 'alovio-calculator' ) }</p>
+						</>
+					) }
 				</div>
 			) }
 
-			<span className="alc-options__title">{ __( 'Rows', 'alovio-calculator' ) }</span>
-			<div className="alc-row4">
+			<span className="alcb-sec-label">{ __( 'Rows', 'alovio-calculator' ) }</span>
+			<div className="alcb-row4">
 				<TextControl type="number" label={ __( 'Min rows', 'alovio-calculator' ) } value={ field.minRows ?? 1 } onChange={ ( v ) => set( { minRows: num( v ) } ) } />
 				<TextControl type="number" label={ __( 'Max rows', 'alovio-calculator' ) } value={ field.maxRows ?? 10 } onChange={ ( v ) => set( { maxRows: num( v ) } ) } />
 			</div>
@@ -4972,11 +5086,57 @@ export default function RepeaterFields( { field } ) {
 }
 ```
 
-- [ ] **Step 7: Mount in the Options-tab slot.** In Chunk 4's `src/builder/panels/OptionsTab.jsx` (or `SettingsPanel.jsx` if the slot lives there — grep for where choice types mount `OptionsEditor`), render `<RepeaterFields field={ field } />` when `field.type === 'repeater'`, and make the third tab visible for `repeater` (spec §2.4 already lists it).
-- [ ] **Step 8: Verify + commit.** `npm test` green; `npm run build` compiles.
+- [ ] **Step 7: Mount in the Options-tab slot.** In Chunk 4's `src/builder/SettingsPanel.jsx` (the tab slots live there — OptionsTab itself stays field-agnostic), render `<RepeaterFields field={ field } />` when `field.type === 'repeater'`, and make the third tab visible for `repeater` (spec §2.4 already lists it).
+- [ ] **Step 8: Styles.** Append builder.scss section 11 (the panel classes are new — nothing in chunk 4 styles them):
+
+```scss
+// ── 11 · Repeater "Row fields" panel
+.alc-repeater-panel__row {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	padding: 6px 8px;
+	border: 1px solid var(--alcb-line);
+	border-radius: var(--alcb-r-sm);
+	margin-bottom: 6px;
+	background: var(--alcb-panel);
+}
+.alc-repeater-panel__row.is-selected {
+	border-color: var(--alcb-flame-border);
+	background: var(--alcb-flame-soft);
+}
+.alc-repeater-panel__pick {
+	flex: 1;
+	text-align: start;
+	border: none;
+	background: none;
+	cursor: pointer;
+	font-size: 12.5px;
+	font-weight: 700;
+	color: var(--alcb-ink);
+	padding: 2px 0;
+}
+.alc-repeater-panel__pick em { font-style: normal; font-weight: 600; color: var(--alcb-ink-3); }
+.alc-repeater-panel__add {
+	display: flex;
+	align-items: flex-end;
+	gap: 8px;
+	margin: 8px 0 16px;
+}
+.alc-repeater-panel__add .components-base-control { flex: 1; margin-bottom: 0; }
+.alc-repeater-panel__editor {
+	border: 1px solid var(--alcb-line);
+	border-radius: var(--alcb-r-sm);
+	padding: 12px;
+	margin-bottom: 16px;
+	background: #fafaf9;
+}
+```
+
+- [ ] **Step 9: Verify + commit.** `npm test` green; `npm run build` compiles; wp-env: select a repeater → Row fields panel lists/edits children with the section-11 styling (selected row highlighted flame-soft).
 
 ```bash
-git add src/builder/reducer.js src/builder/__tests__/reducer.test.js src/builder/panels/RepeaterFields.jsx src/builder/panels/OptionsTab.jsx
+git add src/builder/reducer.js src/builder/__tests__/reducer.test.js src/builder/panels/RepeaterFields.jsx src/builder/SettingsPanel.jsx src/builder/builder.scss
 git commit -m "Add repeater row-fields editor with child-aware reducer actions"
 ```
 
@@ -5105,9 +5265,15 @@ git commit -m "Style repeater rows across base and six themes"
 	}
 ```
 
-- [ ] **Step 2: FAIL.** `vendor/bin/phpunit --filter 'FieldTypesTest|FieldSchemaTest'` → unknown types stripped.
+  Also update the existing FREE-list expectation in `FieldTypesTest`: `test_free_list_matches_spec_section_6` does an exact `assertSame` on `FieldTypes::all()` (13 entries since Task 5.1) — it breaks when Step 3 appends the five types. Update its expected array to the final 18-entry list (five appended at the end, matching Step 3's FREE edit):
+
+```php
+			[ 'number', 'slider', 'select', 'radio', 'checkbox_group', 'toggle', 'quantity', 'text', 'heading', 'html', 'formula', 'step', 'repeater', 'date', 'email', 'phone', 'url', 'textarea' ],
+```
+
+- [ ] **Step 2: FAIL.** `vendor/bin/phpunit --filter 'FieldTypesTest|FieldSchemaTest'` → unknown types stripped + the FREE-list `assertSame` failure.
 - [ ] **Step 3: Implement.** `FieldTypes.php` line 11: append `'date', 'email', 'phone', 'url', 'textarea'` to `FREE`; line 16: append the same five to `INPUT` (controllers come free via `is_condition_controller`). `FieldSchema.php` line ~116: extend the placeholder case to `case 'text': case 'heading': case 'date': case 'email': case 'phone': case 'url': case 'textarea':`.
-- [ ] **Step 4: PASS + commit.** Both filters green, full suite green.
+- [ ] **Step 4: PASS + commit.** Both filters green (incl. the 18-entry FREE list), full suite green.
 
 ```bash
 git add includes/Fields/FieldTypes.php includes/Fields/FieldSchema.php tests/Unit/Fields/FieldTypesTest.php tests/Unit/Fields/FieldSchemaTest.php
@@ -5858,9 +6024,10 @@ final class FileUploads {
 ```
 
   - `Privacy::erase()` (lines 74–82): before `delete_by_email`, loop `( new EntriesRepository() )->get_by_email( $email_address )` and call `FileUploads::delete_entry_file( $row )` for each.
-  - `uninstall.php` (inside `alovio_calc_uninstall_site()`, after the transient sweep line 27): purge tokens, files and the cron:
+  - `uninstall.php` (inside `alovio_calc_uninstall_site()`, after the transient sweep line 27): purge tokens, upload rate-limit transients (`alovio_calc_uplrl_*` — same pattern as the existing `alovio_calc_rl_` sweep), files and the cron:
 
 ```php
+	$wpdb->query( "DELETE FROM {$wpdb->options} WHERE option_name LIKE '\\_transient%alovio\\_calc\\_uplrl\\_%'" ); // phpcs:ignore WordPress.DB
 	$wpdb->query( "DELETE FROM {$wpdb->options} WHERE option_name LIKE 'alovio\\_calc\\_upload\\_%'" ); // phpcs:ignore WordPress.DB
 	wp_clear_scheduled_hook( 'alovio_calc_file_gc' );
 	$alovio_calc_uploads = wp_upload_dir();
@@ -5886,7 +6053,7 @@ git commit -m "Add hardened quote-file upload pipeline with token lifecycle"
 
 **Files:**
 - Modify: `includes/Frontend/CalculatorRenderer.php` (payload lines 36–42; `render_quote_form()` lines 207–241), `src/frontend/quote-form.js`, `src/frontend/calculator.js` (i18n block line ~102), `includes/Entries/QuoteController.php` (`handle()` before the snapshot), `includes/Entries/CsvExporter.php` (COLUMNS + `handle()`), `includes/Entries/EntryMailer.php` (after the Total line), `src/builder/EntriesList.jsx` (modal)
-- Modify tests: `tests/Unit/Frontend/CalculatorRendererTest.php`, `tests/Unit/Entries/CsvExporterTest.php`, `tests/Unit/Entries/EntryMailerTest.php`
+- Modify tests: `tests/Unit/Frontend/CalculatorRendererTest.php`, `tests/Unit/Entries/QuoteControllerTest.php`, `tests/Unit/Entries/CsvExporterTest.php`, `tests/Unit/Entries/EntryMailerTest.php`
 - Builder seam: file settings controls (enabled/label/types/maxMb) belong to Chunk 4's `panels/CalcQuote.jsx` — add them there (four controls bound to `settings.quoteForm.file`).
 
 - [ ] **Step 1: Failing renderer test.** Append to `CalculatorRendererTest` (extend `config()` locally):
@@ -5910,7 +6077,7 @@ git commit -m "Add hardened quote-file upload pipeline with token lifecycle"
 	}
 ```
 
-- [ ] **Step 2: FAIL, then implement renderer.**
+- [ ] **Step 2: FAIL, then implement renderer.** FAIL first: `vendor/bin/phpunit --filter CalculatorRendererTest` → `test_quote_form_file_block_when_enabled` fails (no `alc-quote__file` block, no `file` payload key). Then:
   - Payload `quoteForm` block (lines 36–42) gains:
 
 ```php
@@ -5991,20 +6158,58 @@ function wireFileUpload( form, config, state ) {
 ```
 
   In `calculator.js`'s `config.i18n` block (line ~102), add `fileUploading: 'Uploading…', fileTooLarge: 'File is too large (max %d MB).',` (frontend bundle ships no wp-i18n — same convention as the neighbours).
-- [ ] **Step 4: Token consumption.** In `QuoteController::handle()`, after required-validation passes and BEFORE `$snapshot` is built, add (+ nothing to import — same namespace):
+- [ ] **Step 4: Token consumption (tests first).** The gate is a pure static method so it stays unit-testable — same static-helper convention as the rest of `QuoteControllerTest`. Append to `tests/Unit/Entries/QuoteControllerTest.php`:
 
 ```php
-		$fileMeta = null;
-		if ( ! empty( $config['settings']['quoteForm']['file']['enabled'] ) ) {
-			$fileToken = (string) $request->get_param( 'fileToken' );
-			if ( '' !== $fileToken ) {
-				$fileMeta = FileUploads::consume( $fileToken );
-				if ( null === $fileMeta ) {
-					return $this->bad_request( 'file_invalid', __( 'The uploaded file could not be verified — please upload it again.', 'alovio-calculator' ) );
-				}
-			}
+	public function test_resolve_file_gates_tokens(): void {
+		$cfg_on = [ 'settings' => [ 'quoteForm' => [ 'file' => [ 'enabled' => true ] ] ] ];
+		// Feature off or no token sent ⇒ null (no file — not an error).
+		$this->assertNull( QuoteController::resolve_file( [ 'settings' => [ 'quoteForm' => [] ] ], str_repeat( 'a', 32 ) ) );
+		$this->assertNull( QuoteController::resolve_file( $cfg_on, '' ) );
+		// Malformed / unknown tokens ⇒ false (handle() maps this to 400 file_invalid).
+		$this->assertFalse( QuoteController::resolve_file( $cfg_on, 'not-a-token' ) );
+		Functions\when( 'get_option' )->justReturn( false );
+		$this->assertFalse( QuoteController::resolve_file( $cfg_on, str_repeat( 'a', 32 ) ) );
+	}
+
+	public function test_resolve_file_returns_consumed_meta(): void {
+		$cfg_on = [ 'settings' => [ 'quoteForm' => [ 'file' => [ 'enabled' => true ] ] ] ];
+		Functions\when( 'get_option' )->justReturn( [ 'name' => 'roof.jpg', 'stored' => '3f2ab.jpg' ] );
+		Functions\expect( 'delete_option' )->once(); // one-time token
+		$this->assertSame(
+			[ 'name' => 'roof.jpg', 'stored' => '3f2ab.jpg' ],
+			QuoteController::resolve_file( $cfg_on, str_repeat( 'a', 32 ) )
+		);
+	}
+```
+
+  FAIL first: `vendor/bin/phpunit --filter QuoteControllerTest` → `Error: Call to undefined method ...resolve_file()`. Then implement in `QuoteController` (+ nothing to import — same namespace):
+
+```php
+	/**
+	 * File-token gate (spec §3.3). null ⇒ no file expected/sent; array ⇒ consumed
+	 * meta; false ⇒ token invalid (handle() answers 400 file_invalid).
+	 *
+	 * @return array|false|null
+	 */
+	public static function resolve_file( array $config, string $fileToken ) {
+		if ( empty( $config['settings']['quoteForm']['file']['enabled'] ) || '' === $fileToken ) {
+			return null;
+		}
+		return FileUploads::consume( $fileToken ) ?? false;
+	}
+```
+
+  and in `handle()`, after required-validation passes and BEFORE `$snapshot` is built:
+
+```php
+		$fileMeta = self::resolve_file( $config, (string) $request->get_param( 'fileToken' ) );
+		if ( false === $fileMeta ) {
+			return $this->bad_request( 'file_invalid', __( 'The uploaded file could not be verified — please upload it again.', 'alovio-calculator' ) );
 		}
 ```
+
+  PASS: `vendor/bin/phpunit --filter QuoteControllerTest` → green.
 
   and after the `$snapshot = array( ... );` literal:
 
@@ -6018,7 +6223,29 @@ function wireFileUpload( form, config, state ) {
 ```
 
 - [ ] **Step 5: Entries surfaces.**
-  - `CsvExporter`: COLUMNS gains `'file'` between `'repeaters'` and `'snapshot'`; in `handle()` set `$row['file'] = (string) ( $snap['file']['name'] ?? '' );` (reuse the decoded `$snap` from Task 6.4 — refactor so the snapshot is decoded once per row). Test: append to `CsvExporterTest` a `csv_row` case asserting the original FILENAME (never a URL/path) lands in the cell.
+  - `CsvExporter`: COLUMNS gains `'file'` between `'repeaters'` and `'snapshot'`; in `handle()` set `$row['file'] = (string) ( $snap['file']['name'] ?? '' );` (reuse the decoded `$snap` from Task 6.4 — refactor so the snapshot is decoded once per row). Test first — append to `CsvExporterTest` (FAIL: `vendor/bin/phpunit --filter CsvExporterTest` → no `file` column emitted yet):
+
+```php
+	public function test_file_column_carries_original_filename_only(): void {
+		$line = CsvExporter::csv_row(
+			[
+				'id'            => 9,
+				'calculator_id' => 7,
+				'created_at'    => 'x',
+				'name'          => 'T',
+				'email'         => 'a@b.co',
+				'phone'         => '',
+				'message'       => '',
+				'total'         => '10.0000',
+				'status'        => 'new',
+				'repeaters'     => '',
+				'file'          => 'roof photo.jpg',
+				'snapshot'      => '{}',
+			]
+		);
+		$this->assertStringContainsString( ',new,,"roof photo.jpg",', $line ); // original filename, never a URL/stored path
+	}
+```
   - `EntryMailer::notify()`: after the Total line (line ~27), add:
 
 ```php
@@ -6031,7 +6258,32 @@ function wireFileUpload( form, config, state ) {
 		}
 ```
 
-  (spec §3.3: the file itself is NOT attached). Test in `EntryMailerTest` with `Functions\when( 'admin_url' )` stubbed: message contains the filename and the dashboard URL, `attachments` stays empty.
+  (spec §3.3: the file itself is NOT attached). Test first — append to `EntryMailerTest` (FAIL: `vendor/bin/phpunit --filter EntryMailerTest` → filename absent from the message):
+
+```php
+	public function test_file_name_and_dashboard_link_in_email_without_attachment(): void {
+		Functions\when( 'apply_filters' )->returnArg( 2 );
+		Functions\when( 'admin_url' )->alias( static fn( $path = '' ) => 'https://site.test/wp-admin/' . $path );
+
+		$captured = null;
+		Functions\when( 'wp_mail' )->alias(
+			static function ( $to, $subject, $message, $headers, $attachments ) use ( &$captured ) {
+				$captured = compact( 'to', 'subject', 'message', 'headers', 'attachments' );
+				return true;
+			}
+		);
+
+		$snapshot         = $this->snapshot();
+		$snapshot['file'] = array( 'name' => 'roof.jpg', 'stored' => '3f2ab.jpg' );
+
+		( new EntryMailer() )->notify( $this->post(), $this->config(), array( 'name' => 'T' ), $snapshot, 3 );
+
+		$this->assertStringContainsString( 'roof.jpg', $captured['message'] );
+		$this->assertStringContainsString( 'https://site.test/wp-admin/admin.php?page=alovio-calculator', $captured['message'] );
+		$this->assertStringNotContainsString( '3f2ab.jpg', $captured['message'] ); // stored name never leaks
+		$this->assertSame( array(), $captured['attachments'] ); // spec §3.3: the file itself is not attached
+	}
+```
   - `EntriesList.jsx` modal, above the repeater block:
 
 ```jsx
@@ -6049,7 +6301,7 @@ function wireFileUpload( form, config, state ) {
 - [ ] **Step 6: PASS + commit.** All PHP filters green, `npm test` green, `npm run build` compiles. wp-env round-trip: enable the file block, upload a jpg + a fake `.pdf` (renamed .txt — expect 415), submit, download from the entry modal, delete the entry and confirm the file is gone.
 
 ```bash
-git add includes/Frontend/CalculatorRenderer.php src/frontend/quote-form.js src/frontend/calculator.js includes/Entries/QuoteController.php includes/Entries/CsvExporter.php includes/Entries/EntryMailer.php src/builder/EntriesList.jsx src/builder/panels/CalcQuote.jsx src/frontend/frontend-style.scss tests/Unit/Frontend/CalculatorRendererTest.php tests/Unit/Entries/CsvExporterTest.php tests/Unit/Entries/EntryMailerTest.php
+git add includes/Frontend/CalculatorRenderer.php src/frontend/quote-form.js src/frontend/calculator.js includes/Entries/QuoteController.php includes/Entries/CsvExporter.php includes/Entries/EntryMailer.php src/builder/EntriesList.jsx src/builder/panels/CalcQuote.jsx src/frontend/frontend-style.scss tests/Unit/Frontend/CalculatorRendererTest.php tests/Unit/Entries/QuoteControllerTest.php tests/Unit/Entries/CsvExporterTest.php tests/Unit/Entries/EntryMailerTest.php
 git commit -m "Wire quote-file upload through form, quote flow and entries surfaces"
 ```
 
@@ -6068,7 +6320,7 @@ test "$GZ" -le 30720 && echo "BUDGET OK" || echo "BUDGET EXCEEDED"
 
   Expected: `BUDGET OK` (spec §6: ≤30 KB gz INCLUDING the repeater). If exceeded, trim before proceeding — first candidates: dedupe the row-label helper (repeater.js vs compute.js — import one from the other), shorten error strings, confirm no accidental `@wordpress/*` import leaked into the frontend entry (`grep -rn "@wordpress" src/frontend/ src/shared/`).
 - [ ] **Step 2: Full gates.** `vendor/bin/phpunit` (137 baseline + all new tests) · `npm test` (87 baseline + new) · `vendor/bin/phpcs` → 0 · `npm run build` clean.
-- [ ] **Step 3: wp-env visual spot-check** (spec §6: existing calculators unchanged): load a pre-v2 calculator on the demo content — identical rendering; then one calculator using repeater + date + textarea + slider-with-unit + file upload across at least `classic`, `midnight`, `minimal` themes.
+- [ ] **Step 3: wp-env visual spot-check** (spec §6: existing calculators unchanged): load a pre-v2 calculator on the demo content — identical rendering; then one calculator using repeater + date + textarea + slider-with-unit + file upload across at least `classic`, `midnight`, `minimal` themes. Explicitly eyeball a slider INSIDE a repeater row in each theme (bubble, min/max labels and unit suffix render row-scoped, no overflow).
 - [ ] **Step 4: Nothing to commit** — this task only verifies. If trimming was needed in Step 1, commit those trims with their own message (`git add <touched files>` explicitly).
 
 ---
@@ -6186,6 +6438,11 @@ use Alovio\Calculator\Tests\TestCase;
 use Brain\Monkey\Functions;
 
 class CcbDetectorTest extends TestCase {
+
+	protected function tearDown(): void {
+		unset( $GLOBALS['wpdb'] ); // don't leak the fake wpdb into other tests
+		parent::tearDown();
+	}
 
 	private function wpdb_returning( $var ): object {
 		return new class( $var ) {
@@ -6691,14 +6948,14 @@ final class CcbMapper {
 		}
 
 		foreach ( $totals as $f ) {
-			$label      = (string) ( '' !== (string) ( $f['label'] ?? '' ) ? $f['label'] : $f['alias'] );
+			$label      = (string) ( '' !== (string) ( $f['label'] ?? '' ) ? $f['label'] : ( $f['alias'] ?? '' ) );
 			$raw        = (string) ( $f['formula'] ?? '' );
 			$translated = self::translate_formula( $raw, $ref_ids );
 			if ( ! $translated['ok'] ) {
 				/* translators: 1: formula field label, 2: the original CCB formula */
 				$warnings[] = sprintf( __( 'The formula for “%1$s” could not be translated automatically and was imported empty — rebuild it in the builder. Original: %2$s', 'alovio-calculator' ), $label, $raw );
 			}
-			$id         = self::unique_id( (string) $f['alias'], $used_ids );
+			$id         = self::unique_id( (string) ( $f['alias'] ?? '' ), $used_ids );
 			$used_ids[ $id ] = true;
 			$fields[]   = array(
 				'id'            => $id,
@@ -6855,6 +7112,11 @@ class ImportControllerTest extends TestCase {
 		Functions\when( 'get_post_field' )->justReturn( 'CCB Basic' );
 	}
 
+	protected function tearDown(): void {
+		unset( $GLOBALS['wpdb'] ); // don't leak the fake wpdb into other tests
+		parent::tearDown();
+	}
+
 	/** One stored CCB calc (id 5): a quantity field. Raw format per fixtures. */
 	private function stub_ccb_storage(): void {
 		$GLOBALS['wpdb'] = new class() {
@@ -6904,6 +7166,18 @@ class ImportControllerTest extends TestCase {
 		Functions\expect( 'update_post_meta' )->never();
 		$res = ( new ImportController() )->import( $this->request( array( 'ids' => array( 5 ) ) ) );
 		$this->assertNull( $res['results'][0]['created'] );
+	}
+
+	public function test_save_failure_rolls_back_created_post(): void {
+		$this->stub_ccb_storage();
+		Functions\expect( 'wp_insert_post' )->once()->andReturn( 79 );
+		Functions\when( 'update_post_meta' )->alias( static function () {
+			throw new \RuntimeException( 'meta write failed' ); // repo->save() blows up AFTER the post exists
+		} );
+		Functions\expect( 'wp_delete_post' )->once()->with( 79, true );
+		$res = ( new ImportController() )->import( $this->request( array( 'ids' => array( 5 ) ) ) );
+		$this->assertNull( $res['results'][0]['created'] );
+		$this->assertNotSame( '', $res['results'][0]['error'] );
 	}
 
 	public function test_permission_is_manage_options(): void {
@@ -7011,6 +7285,7 @@ final class ImportController {
 
 	/** Isolation boundary: everything for ONE calculator happens inside this try/catch. */
 	private function import_one( int $ccb_id ): array {
+		$post_id = 0;
 		try {
 			$calc = $this->reader->read( $ccb_id );
 			if ( null === $calc ) {
@@ -7028,6 +7303,7 @@ final class ImportController {
 				true
 			);
 			if ( is_wp_error( $post_id ) ) {
+				$post_id = 0;
 				return $this->failure( $ccb_id, __( 'Could not create the calculator post.', 'alovio-calculator' ) );
 			}
 			$this->repo->save( (int) $post_id, $mapped['config'] );
@@ -7040,6 +7316,9 @@ final class ImportController {
 				'warnings' => $mapped['warnings'],
 			);
 		} catch ( \Throwable $e ) {
+			if ( $post_id ) {
+				wp_delete_post( (int) $post_id, true ); // clean failure path — no orphan post (spec §4.1: no partial writes)
+			}
 			return $this->failure( $ccb_id, __( 'Import failed for this calculator.', 'alovio-calculator' ) );
 		}
 	}
@@ -7057,7 +7336,7 @@ final class ImportController {
 }
 ```
 
-- [ ] **Step 4: Run — expect PASS**: `vendor/bin/phpunit --filter ImportControllerTest` → 4 green. Full suite green.
+- [ ] **Step 4: Run — expect PASS**: `vendor/bin/phpunit --filter ImportControllerTest` → 5 green. Full suite green.
 - [ ] **Step 5: Register the service.** In `includes/Plugin.php` `boot()`, after the anchor line `( new Admin\ProLink() )->register();` add:
 
 ```php
@@ -7092,7 +7371,7 @@ export const listCcbImport = () => apiFetch( { path: 'alovio-calc/v1/import/ccb'
 export const runCcbImport = ( ids ) => apiFetch( { path: 'alovio-calc/v1/import/ccb', method: 'POST', data: { ids } } );
 ```
 
-- [ ] **Step 2: Swap the Import button for a menu.** In `src/builder/CalculatorList.jsx`: extend the `@wordpress/components` import line with `DropdownMenu, MenuGroup, MenuItem, Modal, CheckboxControl`; extend the `./api` import with `listCcbImport, runCcbImport`; add state `const [ ccbOpen, setCcbOpen ] = useState( false );` beside the other `useState` calls; then replace the single Import `<Button …>{ __( 'Import', 'alovio-calculator' ) }</Button>` (keep the hidden `<input type="file">` right after it) with:
+- [ ] **Step 2: Swap the Import button for a menu.** In `src/builder/CalculatorList.jsx`: extend the `@wordpress/components` import line with `DropdownMenu, MenuGroup, MenuItem, Modal, CheckboxControl`; extend the `@wordpress/i18n` import to `import { __, _n, sprintf } from '@wordpress/i18n';` (the modal's field-count label uses `_n`/`sprintf`); extend the `./api` import with `listCcbImport, runCcbImport`; add state `const [ ccbOpen, setCcbOpen ] = useState( false );` beside the other `useState` calls; then replace the single Import `<Button …>{ __( 'Import', 'alovio-calculator' ) }</Button>` (keep the hidden `<input type="file">` right after it) with:
 
 ```jsx
 				<DropdownMenu text={ __( 'Import', 'alovio-calculator' ) } icon={ null } label={ __( 'Import', 'alovio-calculator' ) } toggleProps={ { variant: 'secondary' } }>
@@ -7174,7 +7453,7 @@ function CcbImportModal( { onClose } ) {
 					{ items.map( ( it ) => (
 						<CheckboxControl
 							key={ it.id }
-							label={ `${ it.title || __( '(untitled)', 'alovio-calculator' ) } — ${ it.fieldCount } ${ __( 'fields', 'alovio-calculator' ) }` }
+							label={ `${ it.title || __( '(untitled)', 'alovio-calculator' ) } — ${ sprintf( _n( '%d field', '%d fields', it.fieldCount, 'alovio-calculator' ), it.fieldCount ) }` }
 							checked={ !! checked[ it.id ] }
 							onChange={ ( on ) => setChecked( { ...checked, [ it.id ]: on } ) }
 						/>
@@ -7237,7 +7516,7 @@ function CcbImportModal( { onClose } ) {
 
 - [ ] **Step 1: Full gate run** from `/Users/tahir/alovio-calculator`:
   ```bash
-  vendor/bin/phpunit          # green (baseline 137 + new Import tests)
+  vendor/bin/phpunit          # green (current suite — the 137 baseline grown by chunks 1–7 — plus the new Import tests)
   npm test                    # green (baseline 87+)
   vendor/bin/phpcs            # 0 errors
   npm run build               # clean
@@ -7255,6 +7534,7 @@ function CcbImportModal( { onClose } ) {
 - Create: `includes/Admin/Onboarding.php`
 - Create: `tests/Unit/Admin/OnboardingTest.php` (new `tests/Unit/Admin/` dir — phpunit scans `tests/Unit` recursively)
 - Modify: `includes/Plugin.php` — `activate()` (currently lines 54–57, anchor `update_option( 'alovio_calc_version'`) and `boot()` service list (anchor `( new Admin\ProLink() )->register();`)
+- Modify: `uninstall.php` (options list, currently line 23 — anchor `alovio_calc_review_dismissed`)
 
 Design (guideline-safe, NO activation redirect): two one-time dismissible notices driven by two option flags. Fresh install → `alovio_calc_welcome_notice` (set inside the activation hook only when no version option existed before). Update crossing the 2.0.0 line → `alovio_calc_whatsnew_notice` (set by an `admin_init` version compare — activation hooks never fire on updates). Both link to the builder; visiting the builder page auto-clears both (goal achieved). Dismiss uses the same `admin_post_` pattern as `ReviewNudge`.
 
@@ -7400,18 +7680,24 @@ final class Onboarding {
 	}
 ```
 
+- [ ] **Step 4b: Uninstall coverage (self-contained — this task owns both options).** In `uninstall.php`, extend the options array (anchor `'alovio_calc_delete_on_uninstall'`) to:
+
+```php
+	foreach ( array( 'alovio_calc_version', 'alovio_calc_entry_count', 'alovio_calc_review_dismissed', 'alovio_calc_delete_on_uninstall', 'alovio_calc_welcome_notice', 'alovio_calc_whatsnew_notice' ) as $opt ) {
+```
+
 - [ ] **Step 5: Run — expect PASS**: `vendor/bin/phpunit --filter OnboardingTest` → 2 tests / 8 assertions green; full suite green.
-- [ ] **Step 6: WPCS**: `vendor/bin/phpcs includes/Admin/Onboarding.php includes/Plugin.php` → 0.
+- [ ] **Step 6: WPCS**: `vendor/bin/phpcs includes/Admin/Onboarding.php includes/Plugin.php uninstall.php` → 0.
 - [ ] **Step 7: Commit.**
   ```bash
-  git add includes/Admin/Onboarding.php tests/Unit/Admin/OnboardingTest.php includes/Plugin.php
+  git add includes/Admin/Onboarding.php tests/Unit/Admin/OnboardingTest.php includes/Plugin.php uninstall.php
   git commit -m "Onboarding: welcome + what's-new notices (dismissible, no redirect, builder visit clears)"
   ```
 
 ### Task 9.2: Rich empty state in the calculator list
 
 **Files:**
-- Modify: `src/builder/CalculatorList.jsx` (empty-state block, v1.4.1 lines 126–128 — anchor `alc-empty`)
+- Modify: `src/builder/CalculatorList.jsx` (empty-state block, v1.4.1 lines 126–128 — anchor `alc-empty`; plus the `exportCalculator` schemaVersion bump)
 - Modify: `src/builder/builder.scss` (append)
 
 - [ ] **Step 1: Replace the empty paragraph.** In `CalculatorList.jsx`, add `const templates = ( window.ALOVIO_CALC_BUILDER && window.ALOVIO_CALC_BUILDER.templates ) || [];` at the top of the component (after the `useRef` line), then replace the `{ ! items.length && ( <p className="alc-empty">…</p> ) }` block with:
@@ -7466,6 +7752,7 @@ final class Onboarding {
 .alc-start__card-desc { font-size: 12px; opacity: 0.7; }
 ```
 
+- [ ] **Step 2b: Export schemaVersion → 2.** In the same file's `exportCalculator()` (anchor `plugin: 'alovio-calculator', schemaVersion: 1`, v1.4.1 line 54), bump the written payload to `schemaVersion: 2` — this backs the Task 9.6 readme changelog line. `importFile()` never reads the field (it just unwraps `data.config`), so schemaVersion-1 files still import unchanged. No test asserts the export shape, so no test edit.
 - [ ] **Step 3: Verify in wp-env.** `npm run build`; temporarily empty the list on the sandbox: `npx wp-env run cli wp post list --post_type=alovio_calculator --format=ids` then `npx wp-env run cli wp post delete <ids> --force` (sandbox data only!). Reload Calculator admin → start screen shows Blank + 11 template cards; clicking "Cleaning Price Calculator" creates it and opens the Studio.
 - [ ] **Step 4: Jest/build green**: `npm test`, `npm run build`.
 - [ ] **Step 5: Commit.**
@@ -7737,7 +8024,7 @@ with `import { shouldStartTour, startTour } from './tour';`. (Exact insertion po
 - Create: `includes/Analytics/Counter.php` (new `includes/Analytics/` dir)
 - Create: `tests/Unit/Analytics/CounterTest.php`
 - Modify: `includes/Plugin.php` (boot() service list)
-- Modify: `uninstall.php` (options list, currently line 23 — anchor `alovio_calc_review_dismissed`)
+- Modify: `tests/bootstrap.php` (`WP_REST_Response` stub + `MINUTE_IN_SECONDS` — unit-test infra)
 
 - [ ] **Step 1: Write the failing test.** Create `tests/Unit/Analytics/CounterTest.php`:
 
@@ -7776,6 +8063,66 @@ class CounterTest extends TestCase {
 		Actions\expectDone( 'alovio_calc_event_recorded' )->once();
 		( new Counter() )->record( 7, 'interact', '2026-07-05' );
 	}
+
+	// ---- callback-level handle() coverage (QuoteControllerTest conventions: plain get_param stub, no WP_REST_Request) ----
+
+	private function request( array $params ): object {
+		return new class( $params ) {
+			private $p;
+			public function __construct( $p ) { $this->p = $p; }
+			public function get_param( $k ) { return $this->p[ $k ] ?? null; }
+		};
+	}
+
+	public function test_handle_rejects_unknown_event_with_400(): void {
+		Functions\when( 'get_transient' )->justReturn( 0 );
+		Functions\when( 'set_transient' )->justReturn( true );
+		Functions\when( 'absint' )->alias( static fn( $v ) => abs( (int) $v ) );
+		Functions\expect( 'update_post_meta' )->never();
+		$res = ( new Counter() )->handle( $this->request( array( 'calc' => 7, 'event' => 'boom' ) ) );
+		$this->assertSame( 400, $res->get_status() );
+	}
+
+	public function test_handle_rejects_unknown_calculator_with_400(): void {
+		Functions\when( 'get_transient' )->justReturn( 0 );
+		Functions\when( 'set_transient' )->justReturn( true );
+		Functions\when( 'absint' )->alias( static fn( $v ) => abs( (int) $v ) );
+		Functions\when( 'get_post_type' )->justReturn( 'post' ); // not alovio_calculator
+		Functions\expect( 'update_post_meta' )->never();
+		$res = ( new Counter() )->handle( $this->request( array( 'calc' => 999999, 'event' => 'view' ) ) );
+		$this->assertSame( 400, $res->get_status() );
+	}
+
+	public function test_handle_rate_limited_with_429(): void {
+		Functions\when( 'get_transient' )->justReturn( 20 ); // bucket already at RATE_LIMIT
+		$res = ( new Counter() )->handle( $this->request( array( 'calc' => 7, 'event' => 'view' ) ) );
+		$this->assertSame( 429, $res->get_status() );
+	}
+}
+```
+
+  The handle() tests need two unit-test-infra stubs in `tests/bootstrap.php` (same precedent as the Task 2.1 `WP_Post` additions — not shipped code). Append after the `WP_Post` stub:
+
+```php
+if ( ! class_exists( 'WP_REST_Response' ) ) {
+	// Minimal stub — enough for callback-level endpoint tests (data + status only).
+	class WP_REST_Response {
+		public $data;
+		public $status;
+		public function __construct( $data = null, $status = 200 ) {
+			$this->data   = $data;
+			$this->status = $status;
+		}
+		public function get_status() {
+			return $this->status;
+		}
+		public function get_data() {
+			return $this->data;
+		}
+	}
+}
+if ( ! defined( 'MINUTE_IN_SECONDS' ) ) {
+	define( 'MINUTE_IN_SECONDS', 60 );
 }
 ```
 
@@ -7893,18 +8240,12 @@ final class Counter {
 }
 ```
 
-- [ ] **Step 4: Run — expect PASS**: `vendor/bin/phpunit --filter CounterTest` → 3 green; full suite green.
-- [ ] **Step 5: Register + uninstall coverage.** (a) `includes/Plugin.php` `boot()`: add `( new Analytics\Counter() )->register();` after the Onboarding line. (b) `uninstall.php`: extend the options array (anchor `'alovio_calc_delete_on_uninstall'`) to:
-
-```php
-	foreach ( array( 'alovio_calc_version', 'alovio_calc_entry_count', 'alovio_calc_review_dismissed', 'alovio_calc_delete_on_uninstall', 'alovio_calc_welcome_notice', 'alovio_calc_whatsnew_notice' ) as $opt ) {
-```
-
-  (The `_alovio_calc_views`/`_alovio_calc_interactions` postmeta needs no extra sweep — `wp_delete_post( $id, true )` in the loop above already deletes each calculator's meta; the track rate-limit transients are caught by the existing `alovio_calc_rl_` LIKE sweep by construction.)
-- [ ] **Step 6: WPCS**: `vendor/bin/phpcs includes/Analytics/Counter.php includes/Plugin.php uninstall.php` → 0.
+- [ ] **Step 4: Run — expect PASS**: `vendor/bin/phpunit --filter CounterTest` → 6 green; full suite green.
+- [ ] **Step 5: Register + uninstall coverage.** (a) `includes/Plugin.php` `boot()`: add `( new Analytics\Counter() )->register();` after the Onboarding line. (b) Verify uninstall coverage — NO `uninstall.php` edit is needed here: the welcome/whatsnew options were already added to its options array in Task 9.1; the `_alovio_calc_views`/`_alovio_calc_interactions` postmeta needs no extra sweep (`wp_delete_post( $id, true )` in the loop above already deletes each calculator's meta); the track rate-limit transients are caught by the existing `alovio_calc_rl_` LIKE sweep by construction.
+- [ ] **Step 6: WPCS**: `vendor/bin/phpcs includes/Analytics/Counter.php includes/Plugin.php` → 0.
 - [ ] **Step 7: Commit.**
   ```bash
-  git add includes/Analytics/Counter.php tests/Unit/Analytics/CounterTest.php includes/Plugin.php uninstall.php
+  git add includes/Analytics/Counter.php tests/Unit/Analytics/CounterTest.php includes/Plugin.php tests/bootstrap.php
   git commit -m "Add /track beacon endpoint: per-day view/interaction buckets with prune-on-write"
   ```
 
@@ -7958,14 +8299,15 @@ function createTracker( config ) {
 }
 ```
 
-- [ ] **Step 4: Wire it.** Inside `initCalculator`, after the config JSON parse add `const tracker = createTracker( config );`. In BOTH the `input` and `change` listeners, immediately after the `if ( e.target.closest( '.alc-quote' ) ) { return; }` guard add `tracker.interact();` (the `sent` map dedupes across the two listeners). After the initial `recompute();` call add `tracker.view();`.
+- [ ] **Step 4: Wire it.** Inside `initCalculator`, after the config JSON parse add `const tracker = createTracker( config );`. In the `input` listener, add `tracker.interact();` immediately after its `if ( e.target.closest( '.alc-quote' ) ) { return; }` guard. The `change` listener uses the INVERTED guard — `if ( ! e.target.closest( '.alc-quote' ) ) { recompute(); }` — so there add `tracker.interact();` inside that non-quote branch, next to `recompute()` (the `sent` map dedupes across the two listeners). After the initial `recompute();` call add `tracker.view();`.
 - [ ] **Step 5: Verify end-to-end in wp-env.** `npm run build`, view a published calculator page **logged out**, then:
   ```bash
   npx wp-env run cli wp post meta get <CALC_ID> _alovio_calc_views --format=json          # {"<today>":1}
   # change an input on the page, then:
   npx wp-env run cli wp post meta get <CALC_ID> _alovio_calc_interactions --format=json   # {"<today>":1}
   # reloading fires exactly one more view; typing more does NOT add interactions this pageload.
-  # rate limit:
+  # rate limit — wait ~1 minute after the browser test first: all host traffic reaches wp-env
+  # through the same Docker gateway IP, so the browser hits share this transient bucket:
   for i in $(seq 1 25); do curl -s -o /dev/null -w '%{http_code} ' -X POST 'http://localhost:8888/?rest_route=/alovio-calc/v1/track' -H 'Content-Type: application/json' -d '{"calc":<CALC_ID>,"event":"view"}'; done; echo
   # → twenty 200s then 429s. Bad event / unknown calc → 400 (repeat with "event":"x" and "calc":999999).
   ```
@@ -8129,9 +8471,9 @@ Major update: new Builder Studio, free repeater, 18 field types, Cost Calculator
 12. [ ] **CCB import (real install)**: with `cost-calculator-builder` active and the 3 Task-8.1 samples present → Import → From Cost Calculator Builder → all 3 listed → import → report: 2 clean creates, 1 with skipped items + a formula warning → each imported calculator opens in the Studio and computes on the front end. Deactivate CCB → the menu entry STILL appears (storage detection).
 13. [ ] **6 themes on canvas**: in the Studio, switch the theme quick-switcher through all 6 presets → canvas restyles each time, values survive, browser console stays clean.
 14. [ ] **Wizard on canvas**: set layout=wizard (Pro sandbox or filter) → step navigation works INSIDE the canvas (Next/Back, per-step validation).
-15. [ ] **Onboarding**: fresh sandbox (`npx wp-env clean all` + activate) → welcome notice on the dashboard, Dismiss removes it permanently; visiting the Calculator page also clears it. Simulate an update: `npx wp-env run cli wp option update alovio_calc_version 1.4.1` → reload wp-admin → "What's new in 2.0" notice appears once. Empty list shows the template start screen. First Studio open plays the 3-step tour; Done/Skip writes `alovio_calc_tour_done` and it never replays.
+15. [ ] **Onboarding**: fresh sandbox (`npx wp-env clean all` + activate) → welcome notice on the dashboard, Dismiss removes it permanently; visiting the Calculator page also clears it. Simulate an update: `npx wp-env run cli wp option update alovio_calc_version 1.4.1` → reload wp-admin → "What's new in 2.0" notice appears once. Empty list shows the template start screen. First Studio open plays the 3-step tour; Done/Skip writes `alovio_calc_tour_done` and it never replays. The `wp-env clean` wiped all content — re-create and publish a calculator (template card is fine, put its shortcode on a page) before items 16–17.
 16. [ ] **Beacon**: logged-out view increments `_alovio_calc_views` (today bucket, `wp post meta get`); first input change increments `_alovio_calc_interactions`; more typing does NOT double-count; the Studio canvas records NOTHING; 25 rapid curl posts → 200×20 then 429s; bad event/calc → 400.
-17. [ ] **v1 config regression**: a calculator created on 1.4.1 (import the JSON export fixture) renders IDENTICALLY on the front end (visual spot-check) and opens cleanly in the Studio.
+17. [ ] **v1 config regression**: on `main` (1.4.1 — `git stash` if needed, `npm run build`) create a calculator from a template and export it as JSON; switch back to the branch build and import that file; verify fields/settings arrive intact, the calculator renders IDENTICALLY on the front end (visual spot-check) and opens cleanly in the Studio.
 ```
 
 - [ ] **Step 2: Run the ENTIRE checklist** (sections 1–17) top to bottom in wp-env. Fix + re-run anything red before proceeding; fixes get their own commits with explicit paths.
