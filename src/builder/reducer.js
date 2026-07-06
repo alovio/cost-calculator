@@ -21,7 +21,10 @@ export const DEFAULTS = {
 	html: { label: 'Content', content: '', showInSummary: false },
 	formula: { label: 'Total', expression: '', showInSummary: true },
 	step: { label: 'Step', description: '', showInSummary: false },
+	repeater: { label: 'Repeater', fields: [], minRows: 1, maxRows: 10, addLabel: '', rowLabel: 'Row {n}', rowExpression: '', showInSummary: true },
 };
+
+export const REPEATER_CHILD_TYPES = [ 'number', 'slider', 'select', 'radio', 'checkbox_group', 'toggle', 'quantity' ];
 
 let counter = 0;
 export function makeId() {
@@ -68,6 +71,16 @@ function clampIndex( index, length ) {
 /** Keep the selection only if the restored snapshot still contains that field. */
 function keepSelection( fields, selectedId ) {
 	return fields.some( ( f ) => f.id === selectedId ) ? selectedId : null;
+}
+
+/** Apply fn to one repeater parent's field, recording history (child edits are undoable). */
+function mapParent( state, parentId, fn ) {
+	return {
+		...state,
+		past: remember( state ),
+		future: [],
+		fields: state.fields.map( ( f ) => ( f.id === parentId && f.type === 'repeater' ? fn( f ) : f ) ),
+	};
 }
 
 export function reducer( state = initialState, action = {} ) {
@@ -176,6 +189,37 @@ export function reducer( state = initialState, action = {} ) {
 				past: [],
 				future: [],
 			};
+		case 'ADD_CHILD_FIELD': {
+			if ( ! REPEATER_CHILD_TYPES.includes( action.fieldType ) ) {
+				return state;
+			}
+			const defaults = DEFAULTS[ action.fieldType ];
+			const child = { id: action.id, type: action.fieldType, ...defaults };
+			if ( defaults.options ) {
+				child.options = cloneOptions( defaults.options );
+			}
+			return mapParent( state, action.parentId, ( p ) => ( { ...p, fields: [ ...( p.fields || [] ), child ] } ) );
+		}
+		case 'UPDATE_CHILD_FIELD':
+			return mapParent( state, action.parentId, ( p ) => ( {
+				...p,
+				fields: ( p.fields || [] ).map( ( c ) => ( c.id === action.id ? { ...c, ...action.patch } : c ) ),
+			} ) );
+		case 'REMOVE_CHILD_FIELD':
+			return mapParent( state, action.parentId, ( p ) => ( {
+				...p,
+				fields: ( p.fields || [] ).filter( ( c ) => c.id !== action.id ),
+			} ) );
+		case 'REORDER_CHILD':
+			return mapParent( state, action.parentId, ( p ) => {
+				const children = [ ...( p.fields || [] ) ];
+				if ( action.to < 0 || action.to >= children.length || action.from < 0 || action.from >= children.length ) {
+					return p;
+				}
+				const [ moved ] = children.splice( action.from, 1 );
+				children.splice( action.to, 0, moved );
+				return { ...p, fields: children };
+			} );
 		default:
 			return state;
 	}
@@ -216,6 +260,10 @@ export const actions = {
 	redo: () => ( { type: 'REDO' } ),
 	setName: ( name ) => ( { type: 'SET_NAME', name } ),
 	hydrate: ( fields, settings, name ) => ( { type: 'HYDRATE', fields, settings, name } ),
+	addChildField: ( parentId, fieldType ) => ( { type: 'ADD_CHILD_FIELD', parentId, fieldType, id: makeId() } ),
+	updateChildField: ( parentId, id, patch ) => ( { type: 'UPDATE_CHILD_FIELD', parentId, id, patch } ),
+	removeChildField: ( parentId, id ) => ( { type: 'REMOVE_CHILD_FIELD', parentId, id } ),
+	reorderChild: ( parentId, from, to ) => ( { type: 'REORDER_CHILD', parentId, from, to } ),
 };
 
 export const selectors = {

@@ -1,4 +1,4 @@
-import { reducer, actions, selectors, initialState, HISTORY_LIMIT, remapFields } from '../reducer';
+import { reducer, actions, selectors, initialState, HISTORY_LIMIT, remapFields, REPEATER_CHILD_TYPES } from '../reducer';
 
 const run = ( list, start = initialState ) => list.reduce( ( s, a ) => reducer( s, a ), start );
 
@@ -113,5 +113,50 @@ describe( 'INSERT_FIELDS + remapFields', () => {
 	it( 'is a state no-op for an empty list', () => {
 		const s = run( [ actions.addField( 'number' ) ] );
 		expect( reducer( s, { type: 'INSERT_FIELDS', fields: [], index: 0 } ) ).toBe( s );
+	} );
+} );
+
+const withRepeater = () => reducer( initialState, { type: 'ADD_FIELD', fieldType: 'repeater', id: 'rep1' } );
+
+describe( 'repeater child actions', () => {
+	it( 'exposes the restricted child type list', () => {
+		expect( REPEATER_CHILD_TYPES ).toEqual( [ 'number', 'slider', 'select', 'radio', 'checkbox_group', 'toggle', 'quantity' ] );
+	} );
+
+	it( 'ADD_CHILD_FIELD appends a typed child to the parent only', () => {
+		let s = withRepeater();
+		s = reducer( s, { type: 'ADD_CHILD_FIELD', parentId: 'rep1', fieldType: 'number', id: 'c1' } );
+		const rep = s.fields.find( ( f ) => f.id === 'rep1' );
+		expect( rep.fields ).toHaveLength( 1 );
+		expect( rep.fields[ 0 ] ).toMatchObject( { id: 'c1', type: 'number', label: 'Number' } );
+		expect( s.fields ).toHaveLength( 1 ); // child did NOT land at the top level
+	} );
+
+	it( 'UPDATE_CHILD_FIELD patches one child in place', () => {
+		let s = withRepeater();
+		s = reducer( s, { type: 'ADD_CHILD_FIELD', parentId: 'rep1', fieldType: 'number', id: 'c1' } );
+		s = reducer( s, { type: 'UPDATE_CHILD_FIELD', parentId: 'rep1', id: 'c1', patch: { label: 'Area', default: 5 } } );
+		expect( s.fields[ 0 ].fields[ 0 ] ).toMatchObject( { label: 'Area', default: 5 } );
+	} );
+
+	it( 'REMOVE_CHILD_FIELD and REORDER_CHILD manage the child list', () => {
+		let s = withRepeater();
+		s = reducer( s, { type: 'ADD_CHILD_FIELD', parentId: 'rep1', fieldType: 'number', id: 'c1' } );
+		s = reducer( s, { type: 'ADD_CHILD_FIELD', parentId: 'rep1', fieldType: 'toggle', id: 'c2' } );
+		s = reducer( s, { type: 'REORDER_CHILD', parentId: 'rep1', from: 1, to: 0 } );
+		expect( s.fields[ 0 ].fields.map( ( c ) => c.id ) ).toEqual( [ 'c2', 'c1' ] );
+		s = reducer( s, { type: 'REORDER_CHILD', parentId: 'rep1', from: 0, to: 5 } );
+		expect( s.fields[ 0 ].fields.map( ( c ) => c.id ) ).toEqual( [ 'c2', 'c1' ] ); // out of range ignored
+		s = reducer( s, { type: 'REMOVE_CHILD_FIELD', parentId: 'rep1', id: 'c2' } );
+		expect( s.fields[ 0 ].fields.map( ( c ) => c.id ) ).toEqual( [ 'c1' ] );
+	} );
+
+	it( 'child edits are undoable', () => {
+		let s = withRepeater();
+		s = reducer( s, { type: 'ADD_CHILD_FIELD', parentId: 'rep1', fieldType: 'number', id: 'c1' } );
+		s = reducer( s, { type: 'UPDATE_CHILD_FIELD', parentId: 'rep1', id: 'c1', patch: { label: 'Area' } } );
+		expect( s.fields[ 0 ].fields[ 0 ].label ).toBe( 'Area' );
+		s = reducer( s, actions.undo() );
+		expect( s.fields[ 0 ].fields[ 0 ].label ).toBe( 'Number' );
 	} );
 } );

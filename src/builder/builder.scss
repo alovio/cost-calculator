@@ -285,6 +285,48 @@ body.alcb-builder-page #wpbody-content > .error { display: none; }
 .alcb-draftbar__restore { background: var(--alcb-flame-deep); color: #fff; }
 .alcb-draftbar__discard { background: transparent; color: var(--alcb-ink-2); }
 
+// ── 11 · Repeater "Row fields" panel
+.alc-repeater-panel__row {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	padding: 6px 8px;
+	border: 1px solid var(--alcb-line);
+	border-radius: var(--alcb-r-sm);
+	margin-bottom: 6px;
+	background: var(--alcb-panel);
+}
+.alc-repeater-panel__row.is-selected {
+	border-color: var(--alcb-flame-border);
+	background: var(--alcb-flame-soft);
+}
+.alc-repeater-panel__pick {
+	flex: 1;
+	text-align: start;
+	border: none;
+	background: none;
+	cursor: pointer;
+	font-size: 12.5px;
+	font-weight: 700;
+	color: var(--alcb-ink);
+	padding: 2px 0;
+}
+.alc-repeater-panel__pick em { font-style: normal; font-weight: 600; color: var(--alcb-ink-3); }
+.alc-repeater-panel__add {
+	display: flex;
+	align-items: flex-end;
+	gap: 8px;
+	margin: 8px 0 16px;
+}
+.alc-repeater-panel__add .components-base-control { flex: 1; margin-bottom: 0; }
+.alc-repeater-panel__editor {
+	border: 1px solid var(--alcb-line);
+	border-radius: var(--alcb-r-sm);
+	padding: 12px;
+	margin-bottom: 16px;
+	background: #fafaf9;
+}
+
 // ── 10 · Surviving list/entries chrome — light token restyle (spec §2.1).
 // Class names unchanged (CalculatorList/EntriesList keep .alc-topbar); style only.
 .alc-app .alc-topbar {
