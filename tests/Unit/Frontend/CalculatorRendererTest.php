@@ -98,4 +98,20 @@ class CalculatorRendererTest extends TestCase {
 		$html = CalculatorRenderer::render( 7, $this->config( false ) );
 		$this->assertStringNotContainsString( '<form', $html );
 	}
+
+	public function test_option_defaults_render_selected_and_checked(): void {
+		$config = FieldSchema::normalize( [ 'fields' => [
+			[ 'id' => 'size', 'type' => 'select', 'label' => 'Size', 'options' => [
+				[ 'value' => 'opt_s', 'label' => 'S' ],
+				[ 'value' => 'opt_m', 'label' => 'M', 'default' => true ],
+			] ],
+			[ 'id' => 'extras', 'type' => 'checkbox_group', 'label' => 'Extras', 'options' => [
+				[ 'value' => 'opt_x', 'label' => 'X', 'default' => true ],
+			] ],
+		], 'settings' => [] ] );
+		$html = CalculatorRenderer::render( 7, $config );
+		$this->assertMatchesRegularExpression( '/<option value="opt_m"[^>]*selected>/', $html );
+		$this->assertMatchesRegularExpression( '/<option value="opt_s">/', $html );
+		$this->assertMatchesRegularExpression( '/<input type="checkbox"[^>]*value="opt_x"[^>]*checked>/', $html );
+	}
 }

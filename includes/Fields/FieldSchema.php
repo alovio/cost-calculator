@@ -102,7 +102,7 @@ final class FieldSchema {
 			case 'select':
 			case 'radio':
 			case 'checkbox_group':
-				$field['options'] = self::normalize_options( (array) ( $raw['options'] ?? [] ) );
+				$field['options'] = self::normalize_options( (array) ( $raw['options'] ?? [] ), $type );
 				break;
 
 			case 'formula':
@@ -126,7 +126,7 @@ final class FieldSchema {
 		return $field;
 	}
 
-	private static function normalize_options( array $rawOptions ): array {
+	private static function normalize_options( array $rawOptions, string $type ): array {
 		$options = [];
 		$used    = [];
 		foreach ( $rawOptions as $opt ) {
@@ -139,11 +139,23 @@ final class FieldSchema {
 			}
 			$used[ $value ] = true;
 			$options[]      = [
-				'value' => $value,
-				'label' => sanitize_text_field( (string) ( $opt['label'] ?? '' ) ),
-				'price' => isset( $opt['price'] ) && is_numeric( $opt['price'] ) ? (float) $opt['price'] : 0.0,
-				'image' => isset( $opt['image'] ) ? max( 0, (int) $opt['image'] ) : 0,
+				'value'   => $value,
+				'label'   => sanitize_text_field( (string) ( $opt['label'] ?? '' ) ),
+				'price'   => isset( $opt['price'] ) && is_numeric( $opt['price'] ) ? (float) $opt['price'] : 0.0,
+				'image'   => isset( $opt['image'] ) ? max( 0, (int) $opt['image'] ) : 0,
+				'default' => ! empty( $opt['default'] ),
 			];
+		}
+		// Single-choice fields keep at most ONE default (first wins) — spec §2.4.
+		if ( in_array( $type, [ 'select', 'radio' ], true ) ) {
+			$found = false;
+			foreach ( $options as &$o ) {
+				if ( $o['default'] && $found ) {
+					$o['default'] = false;
+				}
+				$found = $found || $o['default'];
+			}
+			unset( $o );
 		}
 		return $options;
 	}

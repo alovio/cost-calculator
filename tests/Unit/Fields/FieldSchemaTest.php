@@ -127,4 +127,23 @@ class FieldSchemaTest extends TestCase {
 		$this->assertSame( 'single', $bad['settings']['theme']['layout'] ); // invalid ⇒ single
 		$this->assertSame( 'single', FieldSchema::normalize( [] )['settings']['theme']['layout'] ); // default
 	}
+
+	public function test_option_default_flag_is_stored(): void {
+		$out = FieldSchema::normalize( [ 'fields' => [ [ 'id' => 'g', 'type' => 'checkbox_group', 'label' => 'G', 'options' => [
+			[ 'value' => 'opt_a', 'label' => 'A', 'default' => true ],
+			[ 'value' => 'opt_b', 'label' => 'B', 'default' => true ],
+			[ 'value' => 'opt_c', 'label' => 'C' ],
+		] ] ] ] );
+		$this->assertSame( [ true, true, false ], array_column( $out['fields'][0]['options'], 'default' ) );
+	}
+
+	public function test_single_choice_types_keep_at_most_one_default(): void {
+		foreach ( [ 'select', 'radio' ] as $type ) {
+			$out = FieldSchema::normalize( [ 'fields' => [ [ 'id' => 'f', 'type' => $type, 'label' => 'F', 'options' => [
+				[ 'value' => 'opt_a', 'label' => 'A', 'default' => true ],
+				[ 'value' => 'opt_b', 'label' => 'B', 'default' => true ],
+			] ] ] ] );
+			$this->assertSame( [ true, false ], array_column( $out['fields'][0]['options'], 'default' ), $type );
+		}
+	}
 }

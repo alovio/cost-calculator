@@ -110,7 +110,7 @@ final class CalculatorRenderer {
 			case 'select':
 				$options = '<option value="">' . esc_html__( '— select —', 'alovio-calculator' ) . '</option>';
 				foreach ( $field['options'] as $opt ) {
-					$options .= sprintf( '<option value="%s">%s</option>', esc_attr( $opt['value'] ), esc_html( $opt['label'] ) );
+					$options .= sprintf( '<option value="%s"%s>%s</option>', esc_attr( $opt['value'] ), ! empty( $opt['default'] ) ? ' selected' : '', esc_html( $opt['label'] ) );
 				}
 				return sprintf( '<label for="alc-%1$s">%2$s</label><select id="alc-%1$s">%3$s</select>', $id, $label, $options );
 
@@ -131,12 +131,13 @@ final class CalculatorRenderer {
 						$image = '<span class="alc-choice__image">' . wp_get_attachment_image( (int) $opt['image'], $has_images ? 'medium' : 'thumbnail' ) . '</span>';
 					}
 					$items .= sprintf(
-						'<label class="alc-choice"><input type="%1$s" name="alc_%2$s" value="%3$s">%4$s<span class="alc-choice__label">%5$s</span></label>',
+						'<label class="alc-choice"><input type="%1$s" name="alc_%2$s" value="%3$s"%6$s>%4$s<span class="alc-choice__label">%5$s</span></label>',
 						$type,
 						$id,
 						esc_attr( $opt['value'] ),
 						$image,
-						esc_html( $opt['label'] )
+						esc_html( $opt['label'] ),
+						! empty( $opt['default'] ) ? ' checked' : ''
 					);
 				}
 				return sprintf( '<fieldset class="alc-choices%3$s"><legend>%1$s</legend>%2$s</fieldset>', $label, $items, $has_images ? ' alc-choices--cards' : '' );
