@@ -190,9 +190,10 @@ final class RestController {
 		}
 		return rest_ensure_response(
 			array(
-				'id'     => $post->ID,
-				'title'  => $post->post_title,
-				'config' => $this->repo->get( $post->ID ),
+				'id'       => $post->ID,
+				'title'    => $post->post_title,
+				'modified' => (string) $post->post_modified_gmt,
+				'config'   => $this->repo->get( $post->ID ),
 			)
 		);
 	}
@@ -204,24 +205,25 @@ final class RestController {
 			return $this->not_found();
 		}
 
-		$title = $request->get_param( 'title' );
+		$title  = $request->get_param( 'title' );
+		$update = array( 'ID' => $post->ID );
 		if ( is_string( $title ) && '' !== $title ) {
-			wp_update_post(
-				array(
-					'ID'         => $post->ID,
-					'post_title' => $title,
-				)
-			);
+			$update['post_title'] = $title;
 		}
+		// Always runs — even config-only saves must bump post_modified, or the
+		// studio's draft-recovery comparison (spec §2.6) sees a stale timestamp
+		// (FieldRepository::save touches meta only).
+		wp_update_post( $update );
 
 		$config = $request->get_param( 'config' );
 		$saved  = is_array( $config ) ? $this->repo->save( $post->ID, $config ) : $this->repo->get( $post->ID );
 
 		return rest_ensure_response(
 			array(
-				'id'     => $post->ID,
-				'title'  => is_string( $title ) && '' !== $title ? $title : $post->post_title,
-				'config' => $saved, // Normalized — the builder re-hydrates from this (server may rewrite option slugs).
+				'id'       => $post->ID,
+				'title'    => is_string( $title ) && '' !== $title ? $title : $post->post_title,
+				'config'   => $saved, // Normalized — the builder re-hydrates from this (server may rewrite option slugs).
+				'modified' => (string) get_post_field( 'post_modified_gmt', $post->ID ),
 			)
 		);
 	}

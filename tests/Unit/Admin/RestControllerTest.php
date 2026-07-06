@@ -86,4 +86,37 @@ class RestControllerTest extends TestCase {
 		Functions\when( 'current_user_can' )->justReturn( false );
 		$this->assertFalse( ( new RestController() )->can_manage() );
 	}
+
+	public function test_get_calculator_includes_modified(): void {
+		$post                    = new \WP_Post();
+		$post->ID                = 12;
+		$post->post_title        = 'Roof quote';
+		$post->post_modified_gmt = '2026-07-05 09:30:00';
+		Functions\when( 'get_post' )->justReturn( $post );
+		Functions\when( 'get_post_type' )->justReturn( FieldRepository::POST_TYPE );
+		Functions\when( 'get_post_meta' )->justReturn( '' );
+
+		$res = ( new RestController() )->get_calculator( new FakeRequest( array( 'id' => 12 ) ) );
+		$this->assertSame( '2026-07-05 09:30:00', $res['modified'] );
+		$this->assertSame( 'Roof quote', $res['title'] );
+	}
+
+	public function test_update_calculator_always_bumps_and_returns_modified(): void {
+		$post             = new \WP_Post();
+		$post->ID         = 12;
+		$post->post_title = 'Roof quote';
+		Functions\when( 'get_post' )->justReturn( $post );
+		Functions\when( 'get_post_type' )->justReturn( FieldRepository::POST_TYPE );
+		Functions\when( 'get_post_meta' )->justReturn( '' );
+		Functions\when( 'update_post_meta' )->justReturn( true );
+		Functions\when( 'wp_slash' )->returnArg();
+		Functions\when( 'get_post_field' )->justReturn( '2026-07-05 10:00:00' );
+		// The essential contract: post_modified moves even on a config-only save.
+		Functions\expect( 'wp_update_post' )->once()->with( array( 'ID' => 12 ) );
+
+		$res = ( new RestController() )->update_calculator(
+			new FakeRequest( array( 'id' => 12, 'config' => array( 'fields' => array(), 'settings' => array() ) ) )
+		);
+		$this->assertSame( '2026-07-05 10:00:00', $res['modified'] );
+	}
 }
