@@ -11,7 +11,8 @@ import { activeMap, fieldRequired } from './conditional-logic';
 const MAX_PASSES = 8;
 
 const REFERENCEABLE_INPUTS = [ 'number', 'slider', 'select', 'radio', 'checkbox_group', 'toggle', 'quantity' ];
-const CONTROLLERS = [ 'number', 'slider', 'select', 'radio', 'checkbox_group', 'toggle', 'quantity', 'text' ];
+const TEXT_LIKE = [ 'text', 'date', 'email', 'phone', 'url', 'textarea' ];
+const CONTROLLERS = [ ...REFERENCEABLE_INPUTS, ...TEXT_LIKE ];
 const NUMERIC = [ 'number', 'slider', 'quantity' ];
 
 /** Compile every formula once at init. */
@@ -115,7 +116,7 @@ export function conditionValues( fields, rawValues ) {
 				case 'toggle':
 					out[ f.id ] = toggleOn( f, v ) ? '1' : '';
 					break;
-				case 'text':
+				default: // text-like: text/date/email/phone/url/textarea (filtered to CONTROLLERS above)
 					out[ f.id ] = typeof v === 'string' ? v.trim() : '';
 					break;
 			}
@@ -298,6 +299,13 @@ export function run( fields, prepared, rawValues ) {
 					repeaterId: f.id,
 				} );
 			} );
+			return;
+		}
+		if ( TEXT_LIKE.includes( f.type ) ) {
+			const text = condValues[ f.id ] || '';
+			if ( text !== '' ) {
+				lineItems.push( { id: f.id, label: f.label, amount: 0, isCurrency: false, display: text } );
+			}
 			return;
 		}
 		if ( ! ( f.id in values ) ) {

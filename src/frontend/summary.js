@@ -16,9 +16,7 @@ export function updateSummary( root, result, currency ) {
 				list.appendChild( row );
 			}
 			row.querySelector( '.alc-line-label' ).textContent = item.label;
-			row.querySelector( '.alc-line-value' ).textContent = item.isCurrency
-				? formatCurrency( item.amount, currency )
-				: fromScaled( item.amount );
+			row.querySelector( '.alc-line-value' ).textContent = item.display !== undefined ? item.display : ( item.isCurrency ? formatCurrency( item.amount, currency ) : fromScaled( item.amount ) );
 		} );
 		list.querySelectorAll( '[data-alc-line]' ).forEach( ( row ) => {
 			if ( ! seen.has( row.getAttribute( 'data-alc-line' ) ) ) {

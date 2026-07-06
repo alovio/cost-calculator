@@ -10,9 +10,17 @@ function readValue( scope, type ) {
 		case 'number':
 		case 'slider':
 		case 'quantity':
-		case 'text': {
+		case 'text':
+		case 'date':
+		case 'email':
+		case 'phone':
+		case 'url': {
 			const input = scope.querySelector( 'input' );
 			return input ? input.value : '';
+		}
+		case 'textarea': {
+			const ta = scope.querySelector( 'textarea' );
+			return ta ? ta.value : '';
 		}
 		case 'select': {
 			const select = scope.querySelector( 'select' );

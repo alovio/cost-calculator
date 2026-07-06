@@ -95,4 +95,20 @@ describe( 'compute (parity with PHP Evaluation)', () => {
 		expect( above.totalScaled ).toBe( 12000000 );
 		expect( above.active.bulk_note ).toBe( true );
 	} );
+
+	it( 'text-like fields feed conditions and emit display line items (PHP parity)', () => {
+		const fields = [
+			norm( { id: 'visit', type: 'date', label: 'Visit date', showInSummary: true, placeholder: '' } ),
+			norm( { id: 'mail', type: 'email', label: 'Email', placeholder: '' } ),
+			norm( { id: 'note', type: 'heading', label: 'Thanks!', conditions: [
+				{ field: 'mail', operator: 'is_not_empty', value: '' },
+			] } ),
+		];
+		const r = run( fields, prepare( fields ), { visit: ' 2026-08-01 ', mail: 'a@b.co' } );
+		expect( r.active.note ).toBe( true );
+		expect( r.lineItems ).toEqual( [
+			{ id: 'visit', label: 'Visit date', amount: 0, isCurrency: false, display: '2026-08-01' },
+		] );
+		expect( run( fields, prepare( fields ), {} ).lineItems ).toEqual( [] );
+	} );
 } );

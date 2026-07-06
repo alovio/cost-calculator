@@ -146,7 +146,7 @@ export default function EntriesList( { onBack } ) {
 								{ open.snapshot.lineItems.filter( ( item ) => ! item.repeaterId ).map( ( item ) => (
 									<tr key={ item.id }>
 										<td>{ item.label }</td>
-										<td>{ String( item.amount / 10000 ) }</td>
+										<td>{ item.display !== undefined ? item.display : String( item.amount / 10000 ) }</td>
 									</tr>
 								) ) }
 								<tr>

@@ -2,6 +2,7 @@ import { TextControl, ToggleControl, TextareaControl } from '@wordpress/componen
 import { __ } from '@wordpress/i18n';
 
 const HAS_RANGE = [ 'number', 'slider', 'quantity' ];
+const HAS_PLACEHOLDER = [ 'text', 'date', 'email', 'phone', 'url', 'textarea' ];
 
 function num( v ) {
 	return '' === v || null === v || undefined === v ? null : v;
@@ -56,7 +57,7 @@ export default function FieldGeneral( { field, set } ) {
 				value={ field.help || '' }
 				onChange={ ( help ) => set( { help } ) }
 			/>
-			{ 'text' === field.type && (
+			{ HAS_PLACEHOLDER.indexOf( field.type ) !== -1 && (
 				<TextControl label={ __( 'Placeholder', 'alovio-calculator' ) } value={ field.placeholder || '' } onChange={ ( placeholder ) => set( { placeholder } ) } />
 			) }
 			{ HAS_RANGE.indexOf( field.type ) !== -1 && (
