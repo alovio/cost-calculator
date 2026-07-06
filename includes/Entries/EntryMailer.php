@@ -35,7 +35,7 @@ final class EntryMailer {
 				}
 				continue;
 			}
-			$lines[] = $item['label'] . ': ' . DecimalMath::fromScaled( $item['amount'] );
+			$lines[] = $item['label'] . ': ' . ( isset( $item['display'] ) ? (string) $item['display'] : DecimalMath::fromScaled( $item['amount'] ) );
 		}
 		$lines[] = __( 'Total', 'alovio-calculator' ) . ': ' . DecimalMath::fromScaled( $snapshot['totalScaled'] );
 

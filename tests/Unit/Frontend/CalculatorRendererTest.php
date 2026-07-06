@@ -141,4 +141,21 @@ class CalculatorRendererTest extends TestCase {
 		$this->assertStringContainsString( 'Rooms &lt;b&gt;x&lt;/b&gt;', $html );      // legend escaped
 		$this->assertStringNotContainsString( '<b>x</b>', $html );
 	}
+
+	public function test_new_types_render_native_controls_and_display_summary(): void {
+		$config = FieldSchema::normalize( [ 'fields' => [
+			[ 'id' => 'visit', 'type' => 'date', 'label' => 'Visit date' ],
+			[ 'id' => 'mail', 'type' => 'email', 'label' => 'Email', 'placeholder' => 'you@example.com' ],
+			[ 'id' => 'cell', 'type' => 'phone', 'label' => 'Phone' ],
+			[ 'id' => 'site', 'type' => 'url', 'label' => 'Site' ],
+			[ 'id' => 'notes', 'type' => 'textarea', 'label' => 'Notes', 'placeholder' => 'Tell us more' ],
+		] ] );
+		$html = CalculatorRenderer::render( 7, $config );
+		$this->assertStringContainsString( 'type="date"', $html );
+		$this->assertStringContainsString( 'type="email"', $html );
+		$this->assertStringContainsString( 'type="tel"', $html );
+		$this->assertStringContainsString( 'type="url"', $html );
+		$this->assertStringContainsString( '<textarea id="alc-notes" rows="3" placeholder="Tell us more">', $html );
+		$this->assertStringContainsString( 'placeholder="you@example.com"', $html );
+	}
 }

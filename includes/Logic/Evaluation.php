@@ -17,6 +17,13 @@ final class Evaluation {
 	/** Fixed-point cap: bounds the formula↔condition feedback loop (cycle safety). */
 	private const MAX_PASSES = 8;
 
+	/** Informational fields: string value maps + display-only summary lines (never priced). */
+	private const TEXT_LIKE = [ 'text', 'date', 'email', 'phone', 'url', 'textarea' ];
+
+	private static function is_text_like( string $type ): bool {
+		return in_array( $type, self::TEXT_LIKE, true );
+	}
+
 	public static function run( array $config, array $rawValues ): array {
 		$fields = $config['fields'];
 
@@ -118,6 +125,19 @@ final class Evaluation {
 				}
 				continue;
 			}
+			if ( self::is_text_like( $field['type'] ) ) {
+				$text = (string) ( $conditionValues[ $id ] ?? '' );
+				if ( '' !== $text ) {
+					$lineItems[] = [
+						'id'         => $id,
+						'label'      => $field['label'],
+						'amount'     => 0,
+						'isCurrency' => false,
+						'display'    => $text,
+					];
+				}
+				continue;
+			}
 			if ( ! isset( $values[ $id ] ) ) {
 				continue;
 			}
@@ -206,6 +226,11 @@ final class Evaluation {
 					$out[ $id ] = self::toggle_on( $field, $v ) ? '1' : '';
 					break;
 				case 'text':
+				case 'date':
+				case 'email':
+				case 'phone':
+				case 'url':
+				case 'textarea':
 					$out[ $id ] = is_string( $v ) ? trim( $v ) : '';
 					break;
 			}

@@ -188,4 +188,23 @@ class EvaluationTest extends TestCase {
 		$this->assertSame( 1200000, $on['values']['rooms'] );
 		$this->assertTrue( $on['active']['bulk'] ); // 120 ≥ 100, via the fixed-point
 	}
+
+	public function test_text_like_fields_feed_conditions_and_summary_display(): void {
+		$config = FieldSchema::normalize( [ 'fields' => [
+			[ 'id' => 'visit', 'type' => 'date', 'label' => 'Visit date', 'showInSummary' => true ],
+			[ 'id' => 'mail', 'type' => 'email', 'label' => 'Email' ],
+			[ 'id' => 'note', 'type' => 'heading', 'label' => 'Thanks!', 'conditions' => [
+				[ 'field' => 'mail', 'operator' => 'is_not_empty', 'value' => '' ],
+			] ],
+		] ] );
+		$r = Evaluation::run( $config, [ 'visit' => ' 2026-08-01 ', 'mail' => 'a@b.co' ] );
+		$this->assertSame( '2026-08-01', $r['conditionValues']['visit'] ); // trimmed, text semantics
+		$this->assertTrue( $r['active']['note'] );
+		$this->assertSame(
+			[ [ 'id' => 'visit', 'label' => 'Visit date', 'amount' => 0, 'isCurrency' => false, 'display' => '2026-08-01' ] ],
+			$r['lineItems']
+		);
+		$empty = Evaluation::run( $config, [] );
+		$this->assertSame( [], $empty['lineItems'] ); // empty text-like values emit no line
+	}
 }

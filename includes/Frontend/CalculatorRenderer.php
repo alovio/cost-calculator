@@ -159,6 +159,32 @@ final class CalculatorRenderer {
 					esc_attr( $field['placeholder'] ?? '' )
 				);
 
+			case 'date':
+			case 'email':
+			case 'phone':
+			case 'url':
+				$types = array(
+					'date'  => 'date',
+					'email' => 'email',
+					'phone' => 'tel',
+					'url'   => 'url',
+				);
+				return sprintf(
+					'<label for="alc-%1$s">%2$s</label><input type="%3$s" id="alc-%1$s" placeholder="%4$s">',
+					$id,
+					$label,
+					$types[ $field['type'] ],
+					esc_attr( $field['placeholder'] ?? '' )
+				);
+
+			case 'textarea':
+				return sprintf(
+					'<label for="alc-%1$s">%2$s</label><textarea id="alc-%1$s" rows="3" placeholder="%3$s"></textarea>',
+					$id,
+					$label,
+					esc_attr( $field['placeholder'] ?? '' )
+				);
+
 			case 'heading':
 				return sprintf( '<h3 class="alc-heading">%s</h3>', $label );
 
@@ -278,9 +304,9 @@ final class CalculatorRenderer {
 	private static function render_summary( array $result, array $currency ): string {
 		$rows = '';
 		foreach ( $result['lineItems'] as $item ) {
-			$value = $item['isCurrency']
-				? CurrencyFormatter::format( $item['amount'], $currency )
-				: DecimalMath::fromScaled( $item['amount'] );
+			$value = isset( $item['display'] )
+				? (string) $item['display']
+				: ( $item['isCurrency'] ? CurrencyFormatter::format( $item['amount'], $currency ) : DecimalMath::fromScaled( $item['amount'] ) );
 			$rows .= sprintf(
 				'<li data-alc-line="%s"><span class="alc-line-label">%s</span><span class="alc-line-value">%s</span></li>',
 				esc_attr( $item['id'] ),
