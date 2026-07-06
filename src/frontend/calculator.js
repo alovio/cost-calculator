@@ -88,7 +88,8 @@ function updateInlineLines( root, fields, values ) {
 		} );
 }
 
-function initCalculator( root ) {
+/** Initialise ONE rendered calculator root (`.alc-calculator` element). Idempotent per fresh fragment; the studio canvas calls this after each inject (spec §2.2). */
+export function init( root ) {
 	const configEl = root.querySelector( '.alc-config' );
 	if ( ! configEl ) {
 		return;
@@ -171,5 +172,5 @@ function initCalculator( root ) {
 }
 
 export function initCalculators( doc ) {
-	doc.querySelectorAll( '.alc-calculator' ).forEach( initCalculator );
+	doc.querySelectorAll( '.alc-calculator' ).forEach( init );
 }

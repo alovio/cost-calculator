@@ -4,6 +4,7 @@ declare( strict_types=1 );
 namespace Alovio\Calculator\Admin;
 
 use Alovio\Calculator\Fields\FieldTypes;
+use Alovio\Calculator\Frontend\FrontendAssets;
 use Alovio\Calculator\Templates\Presets;
 
 defined( 'ABSPATH' ) || exit;
@@ -38,6 +39,12 @@ final class BuilderAssets {
 			wp_enqueue_style( 'alovio-calc-builder', ALOVIO_CALC_URL . 'build/index.css', array(), $asset['version'] );
 			wp_style_add_data( 'alovio-calc-builder', 'rtl', 'replace' );
 		}
+
+		// The studio canvas runs the REAL frontend engine against server-rendered
+		// fragments (spec §2.2) — same handles the Preview page uses.
+		( new FrontendAssets() )->register_assets();
+		wp_enqueue_script( 'alovio-calc-frontend' );
+		wp_enqueue_style( 'alovio-calc-frontend' );
 
 		$presets   = Presets::all();
 		$templates = array();
