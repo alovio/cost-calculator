@@ -53,6 +53,7 @@ final class BuilderAssets {
 				'key'         => $key,
 				'title'       => $preset['title'],
 				'description' => $preset['description'],
+				'fields'      => $preset['config']['fields'],
 			);
 		}
 

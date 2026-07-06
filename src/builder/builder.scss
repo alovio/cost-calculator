@@ -196,3 +196,25 @@ body.alcb-builder-page #wpbody-content > .error { display: none; }
 	position: absolute; left: -10px; right: -10px; height: 3px; border-radius: 2px;
 	background: var(--alcb-flame); box-shadow: 0 0 0 2px rgba(249, 115, 22, 0.25);
 }
+
+// ── 07 · Palette v2
+.alcb-ptypes { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 18px; }
+.alcb-ptype {
+	min-height: 64px; border: 1px solid var(--alcb-line); border-radius: var(--alcb-r);
+	display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px;
+	background: #fff; font-size: 11.5px; font-weight: 700; color: var(--alcb-ink-2); cursor: pointer;
+}
+.alcb-ptype:hover { border-color: var(--alcb-flame-border); box-shadow: var(--alcb-shadow); }
+.alcb-ic {
+	width: 26px; height: 26px; border-radius: 7px; background: var(--alcb-flame-soft);
+	display: inline-flex; align-items: center; justify-content: center; color: var(--alcb-flame-deep); flex: none;
+}
+.alcb-tpl { border: 1px dashed var(--alcb-line-2); border-radius: var(--alcb-r); padding: 12px; }
+.alcb-tpl p { font-size: 11.5px; color: var(--alcb-ink-3); line-height: 1.45; margin: 0 0 9px; }
+.alcb-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.alcb-chip {
+	font-size: 11px; font-weight: 700; color: var(--alcb-flame-deep);
+	background: var(--alcb-flame-soft); border: 1px solid var(--alcb-flame-border);
+	padding: 4px 9px; border-radius: 999px; cursor: pointer;
+}
+.alcb-chip:hover { background: #fee7cd; }

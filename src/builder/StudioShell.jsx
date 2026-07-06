@@ -4,7 +4,7 @@ import { Spinner, Notice } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { STORE } from './store';
 import { getCalculator, saveCalculator } from './api';
-import FieldPalette from './FieldPalette';
+import PaletteV2 from './PaletteV2';
 import LiveCanvas from './LiveCanvas';
 import FieldSettings from './FieldSettings';
 import SettingsTab from './SettingsTab';
@@ -177,9 +177,7 @@ export default function StudioShell( { calculatorId, onBack } ) {
 				{ /* INTERIM (see plan header table): v1 components run inside the new
 				     shell until chunks 2–4 replace each column. Their alc-* styles
 				     still ship from assets/css/builder.css. */ }
-				<div className="alcb-col alcb-col--left">
-					<FieldPalette />
-				</div>
+				<div className="alcb-col alcb-col--left"><PaletteV2 /></div>
 				<div className="alcb-col alcb-col--center alcb-col--canvas"><LiveCanvas calculatorId={ calculatorId } /></div>
 				<div className="alcb-col alcb-col--right">
 					{ proOpen ? <ProTab /> : ( selected ? <FieldSettings /> : <SettingsTab /> ) }
