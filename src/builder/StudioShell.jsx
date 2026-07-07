@@ -8,6 +8,7 @@ import PaletteV2 from './PaletteV2';
 import LiveCanvas from './LiveCanvas';
 import SettingsPanel from './SettingsPanel';
 import { saveDraft, loadDraft, clearDraft, isDraftNewer, DRAFT_DEBOUNCE_MS } from './draft';
+import { shouldStartTour, startTour } from './tour';
 
 /**
  * True when the event target edits text — undo/redo shortcuts must never
@@ -78,6 +79,13 @@ export default function StudioShell( { calculatorId, onBack } ) {
 		const t = window.setTimeout( () => saveDraft( calculatorId, { name, fields, settings } ), DRAFT_DEBOUNCE_MS );
 		return () => window.clearTimeout( t );
 	}, [ calculatorId, name, fields, settings, dirty, loading ] );
+
+	useEffect( () => {
+		if ( ! loading && shouldStartTour() ) {
+			startTour();
+		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [ loading ] );
 
 	const save = useCallback( async () => {
 		setSaving( true );
@@ -177,7 +185,7 @@ export default function StudioShell( { calculatorId, onBack } ) {
 				<span className={ statusCls }><span className="alcb-dot"></span>{ statusTxt }</span>
 				<button className="alcb-btn-ghost" disabled={ ! canUndo } onClick={ undo }>⟲ { __( 'Undo', 'alovio-calculator' ) }</button>
 				<button className="alcb-btn-ghost" disabled={ ! canRedo } onClick={ redo }>⟳ { __( 'Redo', 'alovio-calculator' ) }</button>
-				<button className="alcb-btn-primary" disabled={ saving } onClick={ save }>
+				<button className="alcb-btn-primary" data-tour="save" disabled={ saving } onClick={ save }>
 					{ saving ? __( 'Saving…', 'alovio-calculator' ) : __( 'Save', 'alovio-calculator' ) }
 				</button>
 				{ ! isPro && (

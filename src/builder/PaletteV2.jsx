@@ -47,7 +47,7 @@ export default function PaletteV2() {
 	};
 
 	return (
-		<div className="alcb-palette" aria-label={ __( 'Field types', 'alovio-calculator' ) }>
+		<div className="alcb-palette" data-tour="palette" aria-label={ __( 'Field types', 'alovio-calculator' ) }>
 			{ CATEGORIES().map( ( cat ) => {
 				const types = cat.types.filter( ( t ) => available.indexOf( t ) !== -1 );
 				if ( ! types.length ) {

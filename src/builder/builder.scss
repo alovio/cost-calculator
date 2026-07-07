@@ -371,3 +371,17 @@ body.alcb-builder-page #wpbody-content > .error { display: none; }
 .alc-start__card--blank { border-style: dashed; }
 .alc-start__card-title { font-weight: 600; }
 .alc-start__card-desc { font-size: 12px; opacity: 0.7; }
+
+/* First-open pointer tour */
+.alcb-tour {
+	position: fixed; z-index: 100000; max-width: 300px; padding: 14px 16px;
+	background: var( --alcb-coal, #1c1917 ); color: #fff;
+	border-radius: var( --alcb-radius, 8px ); box-shadow: 0 8px 30px rgba( 0, 0, 0, 0.35 );
+}
+.alcb-tour__title { display: block; margin-bottom: 4px; }
+.alcb-tour__body { margin: 0 0 8px; font-size: 12px; opacity: 0.85; }
+.alcb-tour__meta { font-size: 11px; opacity: 0.6; }
+.alcb-tour__actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 8px; }
+.alcb-tour__btn { background: transparent; border: 0; color: #fff; opacity: 0.7; cursor: pointer; }
+.alcb-tour__btn--primary { opacity: 1; color: var( --alcb-flame, #f97316 ); font-weight: 600; }
+.alcb-tour-target { outline: 2px solid var( --alcb-flame, #f97316 ); outline-offset: 2px; border-radius: 4px; }

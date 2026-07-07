@@ -137,7 +137,7 @@ export default function LiveCanvas( { calculatorId } ) {
 	const width = ( DEVICES.find( ( d ) => d.id === device ) || DEVICES[ 0 ] ).width;
 
 	return (
-		<div className="alcb-canvas-col">
+		<div className="alcb-canvas-col" data-tour="canvas">
 			<CanvasToolbar device={ device } onDevice={ setDevice } onResetValues={ resetValues } busy={ busy } />
 			{ failed && (
 				<div className="alcb-render-error" role="alert">
