@@ -29,6 +29,7 @@ final class CalculatorRenderer {
 		$payload = array(
 			'calculatorId'  => $id,
 			'quoteEndpoint' => esc_url( rest_url( 'alovio-calc/v1/quote' ) ),
+			'trackEndpoint' => esc_url( rest_url( 'alovio-calc/v1/track' ) ),
 			'fields'        => $config['fields'],
 			'settings'      => array(
 				'currency'  => $currency,

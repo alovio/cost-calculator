@@ -132,6 +132,31 @@ function updateInlineLines( root, fields, values ) {
 		} );
 }
 
+/**
+ * Anonymous funnel beacon: at most ONE view + ONE interact per calculator per
+ * pageload. Disabled inside wp-admin (the Studio canvas runs this same
+ * bundle). sendBeacon survives navigation; fetch(keepalive) is the fallback.
+ * No cookies, no PII — the payload is { calc, event } only.
+ */
+function createTracker( config ) {
+	const url = config.trackEndpoint;
+	const disabled = ! url || ! config.calculatorId || document.body.classList.contains( 'wp-admin' );
+	const sent = {};
+	const send = ( event ) => {
+		if ( disabled || sent[ event ] ) {
+			return;
+		}
+		sent[ event ] = true;
+		const body = JSON.stringify( { calc: config.calculatorId, event } );
+		if ( window.navigator && window.navigator.sendBeacon ) {
+			window.navigator.sendBeacon( url, new window.Blob( [ body ], { type: 'application/json' } ) );
+		} else if ( window.fetch ) {
+			window.fetch( url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body, keepalive: true } ).catch( () => {} );
+		}
+	};
+	return { view: () => send( 'view' ), interact: () => send( 'interact' ) };
+}
+
 /** Initialise ONE rendered calculator root (`.alc-calculator` element). Idempotent per fresh fragment; the studio canvas calls this after each inject (spec §2.2). */
 export function init( root ) {
 	const configEl = root.querySelector( '.alc-config' );
@@ -152,6 +177,7 @@ export function init( root ) {
 		wizard: { back: 'Back', next: 'Next', step: 'Step', of: 'of' },
 	};
 
+	const tracker = createTracker( config );
 	const fields = config.fields || [];
 	const prepared = prepare( fields );
 
@@ -195,6 +221,7 @@ export function init( root ) {
 		if ( e.target.closest( '.alc-quote' ) ) {
 			return; // Contact inputs don't affect the math.
 		}
+		tracker.interact();
 		if ( e.target.type === 'range' ) {
 			updateSliderUi( e.target );
 		}
@@ -202,6 +229,7 @@ export function init( root ) {
 	} );
 	root.addEventListener( 'change', ( e ) => {
 		if ( ! e.target.closest( '.alc-quote' ) ) {
+			tracker.interact();
 			recompute();
 		}
 	} );
@@ -209,6 +237,7 @@ export function init( root ) {
 	wireQuoteForm( root, config, () => collectRawValues( root, fields ), validateRequired );
 	setupRepeaters( root, fields, recompute );
 	recompute(); // Sync once on init (server already rendered defaults; this is idempotent).
+	tracker.view();
 
 	if ( config.settings && config.settings.layout === 'wizard' ) {
 		setupWizard( root, config, validateStep );
