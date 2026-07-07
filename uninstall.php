@@ -20,7 +20,7 @@ function alovio_calc_uninstall_site(): void {
 	foreach ( $ids as $id ) {
 		wp_delete_post( (int) $id, true );
 	}
-	foreach ( array( 'alovio_calc_version', 'alovio_calc_entry_count', 'alovio_calc_review_dismissed', 'alovio_calc_delete_on_uninstall' ) as $opt ) {
+	foreach ( array( 'alovio_calc_version', 'alovio_calc_entry_count', 'alovio_calc_review_dismissed', 'alovio_calc_delete_on_uninstall', 'alovio_calc_welcome_notice', 'alovio_calc_whatsnew_notice' ) as $opt ) {
 		delete_option( $opt );
 	}
 	// Sweep any not-yet-expired rate-limiter transients.
