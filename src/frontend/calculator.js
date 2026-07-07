@@ -2,45 +2,89 @@ import { prepare, run } from './compute';
 import { updateSummary } from './summary';
 import { wireQuoteForm } from './quote-form';
 import { setupWizard } from './wizard';
+import { setupRepeaters } from './repeater';
 
-/** Collect raw values from the DOM, scoped by [data-alc-field] wrappers. */
-function collectRawValues( root, fields ) {
+/** Read one field-shaped value from a scope element (a field wrapper or a repeater child cell). */
+function readValue( scope, type ) {
+	switch ( type ) {
+		case 'number':
+		case 'slider':
+		case 'quantity':
+		case 'text':
+		case 'date':
+		case 'email':
+		case 'phone':
+		case 'url': {
+			const input = scope.querySelector( 'input' );
+			return input ? input.value : '';
+		}
+		case 'textarea': {
+			const ta = scope.querySelector( 'textarea' );
+			return ta ? ta.value : '';
+		}
+		case 'select': {
+			const select = scope.querySelector( 'select' );
+			return select ? select.value : '';
+		}
+		case 'radio': {
+			const checked = scope.querySelector( 'input:checked' );
+			return checked ? checked.value : '';
+		}
+		case 'checkbox_group':
+			return Array.from( scope.querySelectorAll( 'input:checked' ) ).map( ( i ) => i.value );
+		case 'toggle': {
+			const box = scope.querySelector( 'input[type="checkbox"]' );
+			return box && box.checked ? '1' : '';
+		}
+	}
+	return undefined;
+}
+
+/** Collect raw values from the DOM, scoped by [data-alc-field] wrappers. Exported for tests. */
+export function collectRawValues( root, fields ) {
 	const raw = {};
 	fields.forEach( ( f ) => {
 		const wrap = root.querySelector( `[data-alc-field="${ f.id }"]` );
 		if ( ! wrap ) {
 			return;
 		}
-		switch ( f.type ) {
-			case 'number':
-			case 'slider':
-			case 'quantity':
-			case 'text': {
-				const input = wrap.querySelector( 'input' );
-				raw[ f.id ] = input ? input.value : '';
-				break;
-			}
-			case 'select': {
-				const select = wrap.querySelector( 'select' );
-				raw[ f.id ] = select ? select.value : '';
-				break;
-			}
-			case 'radio': {
-				const checked = wrap.querySelector( 'input:checked' );
-				raw[ f.id ] = checked ? checked.value : '';
-				break;
-			}
-			case 'checkbox_group':
-				raw[ f.id ] = Array.from( wrap.querySelectorAll( 'input:checked' ) ).map( ( i ) => i.value );
-				break;
-			case 'toggle': {
-				const box = wrap.querySelector( 'input[type="checkbox"]' );
-				raw[ f.id ] = box && box.checked ? '1' : '';
-				break;
-			}
+		if ( f.type === 'repeater' ) {
+			const rows = [];
+			wrap.querySelectorAll( '[data-alc-rows] [data-alc-row]' ).forEach( ( rowEl ) => {
+				const row = {};
+				( f.fields || [] ).forEach( ( child ) => {
+					const cell = rowEl.querySelector( `[data-alc-child="${ child.id }"]` );
+					const v = cell ? readValue( cell, child.type ) : undefined;
+					if ( v !== undefined ) {
+						row[ child.id ] = v;
+					}
+				} );
+				rows.push( row );
+			} );
+			raw[ f.id ] = rows;
+			return;
+		}
+		const v = readValue( wrap, f.type );
+		if ( v !== undefined ) {
+			raw[ f.id ] = v;
 		}
 	} );
 	return raw;
+}
+
+/** Bubble text (+unit) and thumb-tracking position. Works for top-level and repeater-row sliders. */
+export function updateSliderUi( input ) {
+	const holder = input.closest( '.alc-slider' );
+	const out = holder && holder.querySelector( 'output' );
+	if ( ! out ) {
+		return;
+	}
+	const unit = holder.getAttribute( 'data-alc-unit' ) || '';
+	out.textContent = input.value + ( unit ? ' ' + unit : '' );
+	const min = parseFloat( input.min || '0' );
+	const max = parseFloat( input.max || '100' );
+	const pct = max > min ? ( ( parseFloat( input.value ) - min ) / ( max - min ) ) * 100 : 0;
+	holder.style.setProperty( '--alc-pos', `${ pct }%` );
 }
 
 function applyVisibility( root, active ) {
@@ -88,7 +132,33 @@ function updateInlineLines( root, fields, values ) {
 		} );
 }
 
-function initCalculator( root ) {
+/**
+ * Anonymous funnel beacon: at most ONE view + ONE interact per calculator per
+ * pageload. Disabled inside wp-admin (the Studio canvas runs this same
+ * bundle). sendBeacon survives navigation; fetch(keepalive) is the fallback.
+ * No cookies, no PII — the payload is { calc, event } only.
+ */
+function createTracker( config ) {
+	const url = config.trackEndpoint;
+	const disabled = ! url || ! config.calculatorId || document.body.classList.contains( 'wp-admin' );
+	const sent = {};
+	const send = ( event ) => {
+		if ( disabled || sent[ event ] ) {
+			return;
+		}
+		sent[ event ] = true;
+		const body = JSON.stringify( { calc: config.calculatorId, event } );
+		if ( window.navigator && window.navigator.sendBeacon ) {
+			window.navigator.sendBeacon( url, new window.Blob( [ body ], { type: 'application/json' } ) );
+		} else if ( window.fetch ) {
+			window.fetch( url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body, keepalive: true } ).catch( () => {} );
+		}
+	};
+	return { view: () => send( 'view' ), interact: () => send( 'interact' ) };
+}
+
+/** Initialise ONE rendered calculator root (`.alc-calculator` element). Idempotent per fresh fragment; the studio canvas calls this after each inject (spec §2.2). */
+export function init( root ) {
 	const configEl = root.querySelector( '.alc-config' );
 	if ( ! configEl ) {
 		return;
@@ -102,9 +172,12 @@ function initCalculator( root ) {
 	config.i18n = {
 		networkError: 'Something went wrong. Please try again.',
 		requiredError: 'Please fill in the required fields.',
+		fileUploading: 'Uploading…',
+		fileTooLarge: 'File is too large (max %d MB).',
 		wizard: { back: 'Back', next: 'Next', step: 'Step', of: 'of' },
 	};
 
+	const tracker = createTracker( config );
 	const fields = config.fields || [];
 	const prepared = prepare( fields );
 
@@ -148,22 +221,23 @@ function initCalculator( root ) {
 		if ( e.target.closest( '.alc-quote' ) ) {
 			return; // Contact inputs don't affect the math.
 		}
+		tracker.interact();
 		if ( e.target.type === 'range' ) {
-			const out = e.target.parentElement.querySelector( 'output' );
-			if ( out ) {
-				out.textContent = e.target.value;
-			}
+			updateSliderUi( e.target );
 		}
 		recompute();
 	} );
 	root.addEventListener( 'change', ( e ) => {
 		if ( ! e.target.closest( '.alc-quote' ) ) {
+			tracker.interact();
 			recompute();
 		}
 	} );
 
 	wireQuoteForm( root, config, () => collectRawValues( root, fields ), validateRequired );
+	setupRepeaters( root, fields, recompute );
 	recompute(); // Sync once on init (server already rendered defaults; this is idempotent).
+	tracker.view();
 
 	if ( config.settings && config.settings.layout === 'wizard' ) {
 		setupWizard( root, config, validateStep );
@@ -171,5 +245,5 @@ function initCalculator( root ) {
 }
 
 export function initCalculators( doc ) {
-	doc.querySelectorAll( '.alc-calculator' ).forEach( initCalculator );
+	doc.querySelectorAll( '.alc-calculator' ).forEach( init );
 }

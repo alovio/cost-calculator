@@ -23,6 +23,7 @@ class CalculatorRendererTest extends TestCase {
 		Functions\when( 'wp_json_encode' )->alias( static fn( $data, $flags = 0 ) => json_encode( $data, $flags ) );
 		Functions\when( '__' )->returnArg();
 		Functions\when( 'esc_html__' )->alias( static fn( $s ) => htmlspecialchars( (string) $s, ENT_QUOTES ) );
+		Functions\when( 'esc_attr__' )->alias( static fn( $s ) => htmlspecialchars( (string) $s, ENT_QUOTES ) );
 		Functions\when( 'wp_get_attachment_image' )->justReturn( '<img src="thumb.jpg" alt="" />' );
 	}
 
@@ -53,6 +54,7 @@ class CalculatorRendererTest extends TestCase {
 		$payload = $this->payload( $html );
 		$this->assertSame( 7, $payload['calculatorId'] );
 		$this->assertSame( 'https://example.test/wp-json/alovio-calc/v1/quote', $payload['quoteEndpoint'] );
+		$this->assertSame( 'https://example.test/wp-json/alovio-calc/v1/track', $payload['trackEndpoint'] );
 		$this->assertArrayHasKey( 'currency', $payload['settings'] );
 		$this->assertSame( [ 'name', 'email', 'phone' ], $payload['settings']['quoteForm']['fields'] );
 		$this->assertNotSame( '', $payload['settings']['quoteForm']['successMessage'] ); // default resolved (no wp-i18n in the frontend bundle)
@@ -97,5 +99,92 @@ class CalculatorRendererTest extends TestCase {
 	public function test_no_form_when_quotes_disabled(): void {
 		$html = CalculatorRenderer::render( 7, $this->config( false ) );
 		$this->assertStringNotContainsString( '<form', $html );
+	}
+
+	public function test_option_defaults_render_selected_and_checked(): void {
+		$config = FieldSchema::normalize( [ 'fields' => [
+			[ 'id' => 'size', 'type' => 'select', 'label' => 'Size', 'options' => [
+				[ 'value' => 'opt_s', 'label' => 'S' ],
+				[ 'value' => 'opt_m', 'label' => 'M', 'default' => true ],
+			] ],
+			[ 'id' => 'extras', 'type' => 'checkbox_group', 'label' => 'Extras', 'options' => [
+				[ 'value' => 'opt_x', 'label' => 'X', 'default' => true ],
+			] ],
+		], 'settings' => [] ] );
+		$html = CalculatorRenderer::render( 7, $config );
+		$this->assertMatchesRegularExpression( '/<option value="opt_m"[^>]*selected>/', $html );
+		$this->assertMatchesRegularExpression( '/<option value="opt_s">/', $html );
+		$this->assertMatchesRegularExpression( '/<input type="checkbox"[^>]*value="opt_x"[^>]*checked>/', $html );
+	}
+
+	public function test_repeater_renders_rows_template_and_controls(): void {
+		$config = FieldSchema::normalize( [ 'fields' => [
+			[ 'id' => 'rooms', 'type' => 'repeater', 'label' => 'Rooms <b>x</b>', 'minRows' => 2, 'maxRows' => 5,
+				'rowLabel' => 'Room {n}', 'addLabel' => 'Add room', 'rowExpression' => '', 'fields' => [
+				[ 'id' => 'r_rate', 'type' => 'radio', 'label' => 'Rate', 'options' => [
+					[ 'value' => 'opt_a', 'label' => 'A', 'price' => 1 ],
+				] ],
+				[ 'id' => 'r_area', 'type' => 'number', 'label' => 'Area', 'default' => 3 ],
+			] ],
+		] ] );
+		$html = CalculatorRenderer::render( 7, $config );
+
+		// 2 server-rendered initial rows (minRows) + 1 inert copy inside <template>.
+		$this->assertSame( 3, substr_count( $html, '<div class="alc-repeater__row" data-alc-row>' ) );
+		$this->assertStringContainsString( '<template data-alc-row-template>', $html );
+		$this->assertStringContainsString( 'name="alc_rooms_r_rate_1"', $html );      // row-scoped radio names
+		$this->assertStringContainsString( 'name="alc_rooms_r_rate_2"', $html );
+		$this->assertStringContainsString( 'name="alc_rooms_r_rate___ROW__"', $html ); // template placeholder
+		$this->assertStringContainsString( 'data-alc-child="r_area"', $html );
+		$this->assertStringContainsString( 'data-alc-add', $html );
+		$this->assertStringContainsString( 'Add room', $html );
+		$this->assertStringContainsString( 'data-alc-row-label>Room 1<', $html );
+		$this->assertStringContainsString( 'Rooms &lt;b&gt;x&lt;/b&gt;', $html );      // legend escaped
+		$this->assertStringNotContainsString( '<b>x</b>', $html );
+	}
+
+	public function test_new_types_render_native_controls_and_display_summary(): void {
+		$config = FieldSchema::normalize( [ 'fields' => [
+			[ 'id' => 'visit', 'type' => 'date', 'label' => 'Visit date' ],
+			[ 'id' => 'mail', 'type' => 'email', 'label' => 'Email', 'placeholder' => 'you@example.com' ],
+			[ 'id' => 'cell', 'type' => 'phone', 'label' => 'Phone' ],
+			[ 'id' => 'site', 'type' => 'url', 'label' => 'Site' ],
+			[ 'id' => 'notes', 'type' => 'textarea', 'label' => 'Notes', 'placeholder' => 'Tell us more' ],
+		] ] );
+		$html = CalculatorRenderer::render( 7, $config );
+		$this->assertStringContainsString( 'type="date"', $html );
+		$this->assertStringContainsString( 'type="email"', $html );
+		$this->assertStringContainsString( 'type="tel"', $html );
+		$this->assertStringContainsString( 'type="url"', $html );
+		$this->assertStringContainsString( '<textarea id="alc-notes" rows="3" placeholder="Tell us more">', $html );
+		$this->assertStringContainsString( 'placeholder="you@example.com"', $html );
+	}
+
+	public function test_slider_bubble_scale_and_unit(): void {
+		$config = FieldSchema::normalize( [ 'fields' => [
+			[ 'id' => 'area', 'type' => 'slider', 'label' => 'Area', 'min' => 10, 'max' => 110, 'default' => 35, 'unit' => 'm2' ],
+		] ] );
+		$html = CalculatorRenderer::render( 7, $config );
+		$this->assertStringContainsString( 'class="alc-slider" data-alc-unit="m2"', $html );
+		$this->assertStringContainsString( '--alc-pos:25%', $html );                       // (35-10)/(110-10)
+		$this->assertStringContainsString( 'class="alc-slider__bubble">35 m2<', $html );   // unit suffix
+		$this->assertStringContainsString( '<div class="alc-slider__scale" aria-hidden="true"><span>10</span><span>110</span></div>', $html );
+	}
+
+	public function test_quote_form_file_block_when_enabled(): void {
+		$config = $this->config();
+		$config['settings']['quoteForm']['file'] = [ 'enabled' => true, 'label' => '', 'types' => [ 'jpg', 'pdf' ], 'maxMb' => 5 ];
+		$html = CalculatorRenderer::render( 7, $config );
+		$this->assertStringContainsString( 'class="alc-quote__file"', $html );
+		$this->assertStringContainsString( 'accept=".jpg,.pdf"', $html );
+		$this->assertStringContainsString( 'name="alc_file_token"', $html );
+		$this->assertStringContainsString( 'alc-quote__file-status', $html );
+		$payload = $this->payload( $html );
+		$this->assertTrue( $payload['settings']['quoteForm']['file']['enabled'] );
+		$this->assertStringContainsString( '/quote-file', $payload['settings']['quoteForm']['file']['endpoint'] );
+
+		$off = CalculatorRenderer::render( 7, $this->config() );
+		$this->assertStringNotContainsString( 'alc-quote__file', $off );
+		$this->assertFalse( $this->payload( $off )['settings']['quoteForm']['file']['enabled'] );
 	}
 }

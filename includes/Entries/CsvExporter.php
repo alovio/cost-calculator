@@ -3,11 +3,13 @@ declare( strict_types=1 );
 
 namespace Alovio\Calculator\Entries;
 
+use Alovio\Calculator\Frontend\CurrencyFormatter;
+
 defined( 'ABSPATH' ) || exit;
 
 final class CsvExporter {
 
-	private const COLUMNS = array( 'id', 'calculator_id', 'created_at', 'name', 'email', 'phone', 'message', 'total', 'status', 'snapshot' );
+	private const COLUMNS = array( 'id', 'calculator_id', 'created_at', 'name', 'email', 'phone', 'message', 'total', 'status', 'repeaters', 'file', 'snapshot' );
 
 	public function register(): void {
 		add_action( 'admin_post_alovio_calc_export_entries', array( $this, 'handle' ) );
@@ -43,8 +45,45 @@ final class CsvExporter {
 		header( 'Content-Disposition: attachment; filename=alovio-calculator-entries.csv' );
 		echo implode( ',', self::COLUMNS ) . "\n"; // phpcs:ignore WordPress.Security.EscapeOutput -- CSV stream, constant header.
 		foreach ( $rows as $row ) {
+			$decoded          = json_decode( (string) ( $row['snapshot'] ?? '' ), true );
+			$snap             = is_array( $decoded ) ? $decoded : array();
+			$row['repeaters'] = self::repeater_cell( $snap );
+			$row['file']      = (string) ( $snap['file']['name'] ?? '' );
 			echo self::csv_row( $row ) . "\n"; // phpcs:ignore WordPress.Security.EscapeOutput -- CSV-escaped above.
 		}
 		exit;
+	}
+
+	/**
+	 * Spec §3.1: ONE cell per entry — rows joined with " | ", each as
+	 * "Room 1: r_area=20, r_rate=Standard ($120.00)" (keys = child IDS, values =
+	 * display labels). Empty displays skipped; the csv_row() injection guard and
+	 * RFC-4180 quoting then apply to the whole cell unchanged.
+	 */
+	public static function repeater_cell( array $snapshot ): string {
+		$parts = array();
+		foreach ( (array) ( $snapshot['repeaters'] ?? array() ) as $rep ) {
+			foreach ( (array) ( $rep['rows'] ?? array() ) as $row ) {
+				$vals = array();
+				foreach ( (array) ( $row['values'] ?? array() ) as $cid => $display ) {
+					if ( '' === (string) $display ) {
+						continue;
+					}
+					$vals[] = $cid . '=' . $display;
+				}
+				$money   = CurrencyFormatter::format(
+					(int) ( $row['total'] ?? 0 ),
+					(array) ( $snapshot['currency'] ?? array() ) + array(
+						'symbol'      => '$',
+						'position'    => 'before',
+						'decimals'    => 2,
+						'thousandSep' => ',',
+						'decimalSep'  => '.',
+					)
+				);
+				$parts[] = $row['label'] . ( $vals ? ': ' . implode( ', ', $vals ) : ':' ) . ' (' . $money . ')';
+			}
+		}
+		return implode( ' | ', $parts );
 	}
 }

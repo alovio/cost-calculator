@@ -127,4 +127,132 @@ class FieldSchemaTest extends TestCase {
 		$this->assertSame( 'single', $bad['settings']['theme']['layout'] ); // invalid ⇒ single
 		$this->assertSame( 'single', FieldSchema::normalize( [] )['settings']['theme']['layout'] ); // default
 	}
+
+	public function test_option_default_flag_is_stored(): void {
+		$out = FieldSchema::normalize( [ 'fields' => [ [ 'id' => 'g', 'type' => 'checkbox_group', 'label' => 'G', 'options' => [
+			[ 'value' => 'opt_a', 'label' => 'A', 'default' => true ],
+			[ 'value' => 'opt_b', 'label' => 'B', 'default' => true ],
+			[ 'value' => 'opt_c', 'label' => 'C' ],
+		] ] ] ] );
+		$this->assertSame( [ true, true, false ], array_column( $out['fields'][0]['options'], 'default' ) );
+	}
+
+	public function test_single_choice_types_keep_at_most_one_default(): void {
+		foreach ( [ 'select', 'radio' ] as $type ) {
+			$out = FieldSchema::normalize( [ 'fields' => [ [ 'id' => 'f', 'type' => $type, 'label' => 'F', 'options' => [
+				[ 'value' => 'opt_a', 'label' => 'A', 'default' => true ],
+				[ 'value' => 'opt_b', 'label' => 'B', 'default' => true ],
+			] ] ] ] );
+			$this->assertSame( [ true, false ], array_column( $out['fields'][0]['options'], 'default' ), $type );
+		}
+	}
+
+	public function test_repeater_children_restricted_and_caps_enforced(): void {
+		$out = FieldSchema::normalize( $this->config( [
+			[ 'id' => 'rooms', 'type' => 'repeater', 'label' => 'Rooms', 'minRows' => 0, 'maxRows' => 900,
+				'rowLabel' => 'Room {n}', 'addLabel' => 'Add a room', 'fields' => [
+				[ 'id' => 'area', 'type' => 'number', 'label' => 'Area', 'default' => 5 ],
+				[ 'id' => 'notes', 'type' => 'text', 'label' => 'Not allowed inside' ],
+				[ 'id' => 'nested', 'type' => 'repeater', 'label' => 'No nesting' ],
+			] ],
+		] ) );
+		$rep = $out['fields'][0];
+		$this->assertSame( 'repeater', $rep['type'] );
+		$this->assertSame( [ 'area' ], array_column( $rep['fields'], 'id' ) );
+		$this->assertSame( 1, $rep['minRows'] );      // clamped up to 1
+		$this->assertSame( 50, $rep['maxRows'] );     // hard server cap
+		$this->assertSame( 'Room {n}', $rep['rowLabel'] );
+		$this->assertSame( 'Add a room', $rep['addLabel'] );
+		$this->assertSame( '', $rep['rowExpression'] );
+	}
+
+	public function test_repeater_slug_uniqueness_across_levels_and_no_child_logic(): void {
+		$out = FieldSchema::normalize( $this->config( [
+			[ 'id' => 'area', 'type' => 'number', 'label' => 'Top-level area' ],
+			[ 'id' => 'rooms', 'type' => 'repeater', 'label' => 'Rooms', 'fields' => [
+				[ 'id' => 'area', 'type' => 'number', 'label' => 'Duplicate of top level' ],
+				[ 'id' => 'qty', 'type' => 'quantity', 'label' => 'Qty', 'conditions' => [
+					[ 'field' => 'area', 'operator' => 'is', 'value' => '1' ],
+				], 'conditionAction' => 'require' ],
+			] ],
+			[ 'id' => 'qty', 'type' => 'number', 'label' => 'Shadowed by child, dropped' ],
+		] ) );
+		$rep = $out['fields'][1];
+		$this->assertSame( [ 'qty' ], array_column( $rep['fields'], 'id' ) ); // child 'area' dropped (dup)
+		$this->assertSame( [], $rep['fields'][0]['conditions'] );             // v2.0: no child logic
+		$this->assertSame( 'show', $rep['fields'][0]['conditionAction'] );
+		$this->assertSame( [ 'area', 'rooms' ], array_column( $out['fields'], 'id' ) ); // later top-level dup dropped
+	}
+
+	public function test_row_expression_child_refs_only(): void {
+		$fields = [
+			[ 'id' => 'outside', 'type' => 'number', 'label' => 'Outside' ],
+			[ 'id' => 'rooms', 'type' => 'repeater', 'label' => 'R', 'rowExpression' => '{area} * {outside}', 'fields' => [
+				[ 'id' => 'area', 'type' => 'number', 'label' => 'Area' ],
+			] ],
+		];
+		$out = FieldSchema::normalize( $this->config( $fields ) );
+		$this->assertSame( '', $out['fields'][1]['rowExpression'] ); // cross-scope ref ⇒ blanked (price mode)
+
+		$fields[1]['rowExpression'] = '{area} * 2';
+		$ok = FieldSchema::normalize( $this->config( $fields ) );
+		$this->assertSame( '{area} * 2', $ok['fields'][1]['rowExpression'] ); // child refs pass
+
+		$fields[1]['rowExpression'] = '{area} * * 2';
+		$bad = FieldSchema::normalize( $this->config( $fields ) );
+		$this->assertSame( '{area} * * 2', $bad['fields'][1]['rowExpression'] ); // compile error kept (runtime badge, formula parity)
+	}
+
+	public function test_repeater_is_valid_controller_but_children_are_not(): void {
+		$out = FieldSchema::normalize( $this->config( [
+			[ 'id' => 'rooms', 'type' => 'repeater', 'label' => 'R', 'fields' => [
+				[ 'id' => 'a', 'type' => 'number', 'label' => 'A' ],
+			] ],
+			[ 'id' => 'note', 'type' => 'heading', 'label' => 'N', 'conditions' => [
+				[ 'field' => 'rooms', 'operator' => 'gte', 'value' => '100' ],
+			] ],
+			[ 'id' => 'note2', 'type' => 'heading', 'label' => 'N2', 'conditions' => [
+				[ 'field' => 'a', 'operator' => 'gte', 'value' => '1' ],
+			] ],
+		] ) );
+		$this->assertCount( 1, $out['fields'][1]['conditions'] ); // repeater sum drives conditions (spec §3.1)
+		$this->assertSame( [], $out['fields'][2]['conditions'] ); // child ids are row-scoped, never controllers
+	}
+
+	public function test_new_text_like_types_normalize_with_placeholder(): void {
+		$out = FieldSchema::normalize( $this->config( [
+			[ 'id' => 'visit', 'type' => 'date', 'label' => 'Visit date', 'placeholder' => ' pick one ' ],
+			[ 'id' => 'notes', 'type' => 'textarea', 'label' => 'Notes', 'placeholder' => '<b>x</b>' ],
+			[ 'id' => 'site', 'type' => 'url', 'label' => 'Site' ],
+		] ) );
+		$this->assertSame( 'pick one', $out['fields'][0]['placeholder'] );
+		$this->assertSame( 'x', $out['fields'][1]['placeholder'] );
+		$this->assertSame( '', $out['fields'][2]['placeholder'] );
+	}
+
+	public function test_slider_unit_setting(): void {
+		$out = FieldSchema::normalize( $this->config( [
+			[ 'id' => 'area', 'type' => 'slider', 'label' => 'Area', 'unit' => ' m² <b>x</b> ' ],
+			[ 'id' => 'qty', 'type' => 'number', 'label' => 'Qty', 'unit' => 'kg' ],
+		] ) );
+		$this->assertSame( 'm² x', $out['fields'][0]['unit'] ); // sanitized
+		$this->assertArrayNotHasKey( 'unit', $out['fields'][1] ); // slider-only setting
+	}
+
+	public function test_quote_form_file_settings(): void {
+		$out = FieldSchema::normalize( [ 'fields' => [], 'settings' => [ 'quoteForm' => [
+			'enabled' => 1,
+			'file'    => [ 'enabled' => 1, 'label' => ' <b>Plan</b> ', 'types' => [ 'jpg', 'exe', 'pdf' ], 'maxMb' => 99 ],
+		] ] ] );
+		$file = $out['settings']['quoteForm']['file'];
+		$this->assertTrue( $file['enabled'] );
+		$this->assertSame( 'Plan', $file['label'] );
+		$this->assertSame( [ 'jpg', 'pdf' ], $file['types'] );  // allowlist intersect
+		$this->assertSame( 20, $file['maxMb'] );                 // clamped 1..20
+
+		$d = FieldSchema::normalize( [] )['settings']['quoteForm']['file'];
+		$this->assertFalse( $d['enabled'] );                     // off by default (spec §3.3)
+		$this->assertSame( [ 'jpg', 'png', 'webp', 'pdf' ], $d['types'] );
+		$this->assertSame( 5, $d['maxMb'] );
+	}
 }

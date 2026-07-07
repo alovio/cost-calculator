@@ -1,12 +1,16 @@
 <?php
 namespace Alovio\Calculator\Fields;
 
+use Alovio\Calculator\Formula\Formula;
+use Alovio\Calculator\Formula\FormulaError;
+
 final class FieldSchema {
 
-	public const SCHEMA_VERSION   = 1;
-	public const EXPRESSION_LIMIT = 1000;
-	private const OPERATORS       = [ 'is', 'is_not', 'contains', 'gt', 'gte', 'lt', 'lte', 'is_empty', 'is_not_empty' ];
-	private const THEMES          = [ 'classic', 'minimal', 'midnight', 'soft', 'bold', 'slate' ];
+	public const SCHEMA_VERSION    = 1;
+	public const EXPRESSION_LIMIT  = 1000;
+	public const REPEATER_MAX_ROWS = 50;
+	private const OPERATORS        = [ 'is', 'is_not', 'contains', 'gt', 'gte', 'lt', 'lte', 'is_empty', 'is_not_empty' ];
+	private const THEMES           = [ 'classic', 'minimal', 'midnight', 'soft', 'bold', 'slate' ];
 
 	public static function defaults(): array {
 		return [
@@ -30,6 +34,12 @@ final class FieldSchema {
 					'fields'         => [ 'name', 'email' ],
 					'notifyEmail'    => '',
 					'successMessage' => '',
+					'file'           => [
+						'enabled' => false,
+						'label'   => '',
+						'types'   => [ 'jpg', 'png', 'webp', 'pdf' ],
+						'maxMb'   => 5,
+					],
 				],
 			],
 		];
@@ -51,7 +61,7 @@ final class FieldSchema {
 				continue;
 			}
 			$seen[ $id ] = true;
-			$fields[]    = self::normalize_field( $field, $id, $type );
+			$fields[]    = self::normalize_field( $field, $id, $type, $seen );
 		}
 
 		// Conditions can only be validated once all ids are known.
@@ -71,7 +81,7 @@ final class FieldSchema {
 		return $out;
 	}
 
-	private static function normalize_field( array $raw, string $id, string $type ): array {
+	private static function normalize_field( array $raw, string $id, string $type, array &$seen ): array {
 		$field = [
 			'id'              => $id,
 			'type'            => $type,
@@ -91,6 +101,9 @@ final class FieldSchema {
 				foreach ( [ 'min', 'max', 'step', 'default' ] as $k ) {
 					$field[ $k ] = isset( $raw[ $k ] ) && is_numeric( $raw[ $k ] ) ? (float) $raw[ $k ] : null;
 				}
+				if ( 'slider' === $type ) {
+					$field['unit'] = sanitize_text_field( (string) ( $raw['unit'] ?? '' ) );
+				}
 				// Deliberately NO price on numeric fields — formulas do the multiplying (§6 value maps stay unambiguous).
 				break;
 
@@ -102,7 +115,7 @@ final class FieldSchema {
 			case 'select':
 			case 'radio':
 			case 'checkbox_group':
-				$field['options'] = self::normalize_options( (array) ( $raw['options'] ?? [] ) );
+				$field['options'] = self::normalize_options( (array) ( $raw['options'] ?? [] ), $type );
 				break;
 
 			case 'formula':
@@ -115,18 +128,37 @@ final class FieldSchema {
 
 			case 'text':
 			case 'heading':
+			case 'date':
+			case 'email':
+			case 'phone':
+			case 'url':
+			case 'textarea':
 				$field['placeholder'] = sanitize_text_field( (string) ( $raw['placeholder'] ?? '' ) );
 				break;
 
 			case 'step':
 				$field['description'] = sanitize_text_field( (string) ( $raw['description'] ?? '' ) );
 				break;
+
+			case 'repeater':
+				$field['fields']        = self::normalize_repeater_children( (array) ( $raw['fields'] ?? [] ), $seen );
+				$min                    = isset( $raw['minRows'] ) && is_numeric( $raw['minRows'] ) ? (int) $raw['minRows'] : 1;
+				$max                    = isset( $raw['maxRows'] ) && is_numeric( $raw['maxRows'] ) ? (int) $raw['maxRows'] : 10;
+				$field['minRows']       = max( 1, min( $min, self::REPEATER_MAX_ROWS ) );
+				$field['maxRows']       = max( $field['minRows'], min( $max, self::REPEATER_MAX_ROWS ) );
+				$field['addLabel']      = sanitize_text_field( (string) ( $raw['addLabel'] ?? '' ) );
+				$field['rowLabel']      = sanitize_text_field( (string) ( $raw['rowLabel'] ?? '' ) );
+				$field['rowExpression'] = self::normalize_row_expression(
+					substr( trim( (string) ( $raw['rowExpression'] ?? '' ) ), 0, self::EXPRESSION_LIMIT ),
+					array_column( $field['fields'], 'id' )
+				);
+				break;
 		}
 
 		return $field;
 	}
 
-	private static function normalize_options( array $rawOptions ): array {
+	private static function normalize_options( array $rawOptions, string $type ): array {
 		$options = [];
 		$used    = [];
 		foreach ( $rawOptions as $opt ) {
@@ -139,13 +171,68 @@ final class FieldSchema {
 			}
 			$used[ $value ] = true;
 			$options[]      = [
-				'value' => $value,
-				'label' => sanitize_text_field( (string) ( $opt['label'] ?? '' ) ),
-				'price' => isset( $opt['price'] ) && is_numeric( $opt['price'] ) ? (float) $opt['price'] : 0.0,
-				'image' => isset( $opt['image'] ) ? max( 0, (int) $opt['image'] ) : 0,
+				'value'   => $value,
+				'label'   => sanitize_text_field( (string) ( $opt['label'] ?? '' ) ),
+				'price'   => isset( $opt['price'] ) && is_numeric( $opt['price'] ) ? (float) $opt['price'] : 0.0,
+				'image'   => isset( $opt['image'] ) ? max( 0, (int) $opt['image'] ) : 0,
+				'default' => ! empty( $opt['default'] ),
 			];
 		}
+		// Single-choice fields keep at most ONE default (first wins) — spec §2.4.
+		if ( in_array( $type, [ 'select', 'radio' ], true ) ) {
+			$found = false;
+			foreach ( $options as &$o ) {
+				if ( $o['default'] && $found ) {
+					$o['default'] = false;
+				}
+				$found = $found || $o['default'];
+			}
+			unset( $o );
+		}
 		return $options;
+	}
+
+	/**
+	 * Children are restricted to REPEATER_CHILD_TYPES (no nesting) and carry NO
+	 * conditional logic in v2.0 (spec §3.1). $seen is the GLOBAL slug registry —
+	 * uniqueness holds across all levels.
+	 */
+	private static function normalize_repeater_children( array $rawChildren, array &$seen ): array {
+		$children = [];
+		foreach ( $rawChildren as $child ) {
+			if ( ! is_array( $child ) ) {
+				continue;
+			}
+			$type = (string) ( $child['type'] ?? '' );
+			$id   = sanitize_key( (string) ( $child['id'] ?? '' ) );
+			if ( '' === $id || isset( $seen[ $id ] ) || ! FieldTypes::is_repeater_child( $type ) ) {
+				continue;
+			}
+			$seen[ $id ]                   = true;
+			$normalized                    = self::normalize_field( $child, $id, $type, $seen );
+			$normalized['conditions']      = [];
+			$normalized['conditionMatch']  = 'all';
+			$normalized['conditionAction'] = 'show';
+			$children[]                    = $normalized;
+		}
+		return $children;
+	}
+
+	/**
+	 * A rowExpression may reference CHILD ids only (spec §3.1 graph rule). Refs are
+	 * extracted with the real Lexer/Parser. Compile failures are KEPT — they surface
+	 * at runtime exactly like broken formula fields (error badge, sum 0).
+	 */
+	private static function normalize_row_expression( string $expr, array $childIds ): string {
+		if ( '' === $expr ) {
+			return '';
+		}
+		try {
+			$refs = Formula::references( Formula::compile( $expr ) );
+		} catch ( FormulaError $e ) {
+			return $expr;
+		}
+		return array_diff( $refs, $childIds ) ? '' : $expr;
 	}
 
 	private static function generate_slug( array $used ): string {
@@ -201,6 +288,10 @@ final class FieldSchema {
 		$layout = (string) ( $raw['theme']['layout'] ?? '' );
 		$layout = in_array( $layout, [ 'single', 'wizard' ], true ) ? $layout : $d['theme']['layout'];
 
+		$file  = (array) ( $quote['file'] ?? [] );
+		$types = array_values( array_intersect( [ 'jpg', 'png', 'webp', 'pdf' ], array_map( 'strval', (array) ( $file['types'] ?? [] ) ) ) );
+		$maxMb = isset( $file['maxMb'] ) && is_numeric( $file['maxMb'] ) ? (int) $file['maxMb'] : 5;
+
 		return [
 			'currency'  => [
 				'symbol'      => '' !== $symbol ? $symbol : $d['currency']['symbol'],
@@ -219,6 +310,12 @@ final class FieldSchema {
 				'fields'         => $fields,
 				'notifyEmail'    => sanitize_email( (string) ( $quote['notifyEmail'] ?? '' ) ),
 				'successMessage' => sanitize_text_field( (string) ( $quote['successMessage'] ?? '' ) ),
+				'file'           => [
+					'enabled' => ! empty( $file['enabled'] ),
+					'label'   => sanitize_text_field( (string) ( $file['label'] ?? '' ) ),
+					'types'   => $types ? $types : $d['quoteForm']['file']['types'],
+					'maxMb'   => max( 1, min( 20, $maxMb ) ),
+				],
 			],
 		];
 	}

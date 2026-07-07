@@ -117,4 +117,94 @@ class EvaluationTest extends TestCase {
 		$this->assertSame( '1200', $above['conditionValues']['total'] );
 		$this->assertTrue( $above['active']['bulk_note'] );
 	}
+
+	private function repeater_config( string $rowExpression = '{r_area} * {r_rate}' ): array {
+		return FieldSchema::normalize( [ 'fields' => [
+			[ 'id' => 'rooms', 'type' => 'repeater', 'label' => 'Rooms', 'rowLabel' => 'Room {n}',
+				'minRows' => 1, 'maxRows' => 5, 'showInSummary' => true, 'rowExpression' => $rowExpression, 'fields' => [
+				[ 'id' => 'r_area', 'type' => 'number', 'label' => 'Area', 'default' => 0 ],
+				[ 'id' => 'r_rate', 'type' => 'select', 'label' => 'Rate', 'options' => [
+					[ 'value' => 'opt_std', 'label' => 'Standard', 'price' => 6 ],
+					[ 'value' => 'opt_dlx', 'label' => 'Deluxe', 'price' => 9 ],
+				] ],
+			] ],
+			[ 'id' => 'total', 'type' => 'formula', 'label' => 'Total', 'showInSummary' => true, 'expression' => '{rooms}' ],
+		] ] );
+	}
+
+	public function test_repeater_rows_sum_and_per_row_summary(): void {
+		$r = Evaluation::run( $this->repeater_config(), [ 'rooms' => [
+			[ 'r_area' => '20', 'r_rate' => 'opt_std' ],
+			[ 'r_area' => '10', 'r_rate' => 'opt_dlx' ],
+		] ] );
+		$this->assertSame( 2100000, $r['values']['rooms'] );   // 120 + 90
+		$this->assertSame( 2100000, $r['totalScaled'] );
+		$this->assertSame( [ 'rooms__1', 'rooms__2', 'total' ], array_column( $r['lineItems'], 'id' ) );
+		$this->assertSame( 'Room 1', $r['lineItems'][0]['label'] );
+		$this->assertSame( 'rooms', $r['lineItems'][0]['repeaterId'] );
+		$rows = $r['repeaters']['rooms']['rows'];
+		$this->assertSame( 'Standard', $rows[0]['values']['r_rate'] ); // display label, not slug
+		$this->assertSame( '20', $rows[0]['values']['r_area'] );
+	}
+
+	public function test_repeater_absent_value_yields_min_rows_defaults_and_empty_array_zero(): void {
+		$config = $this->repeater_config( '{r_area} * 2 + 3' );
+		$absent = Evaluation::run( $config, [] );                       // 1 default row: 0*2+3
+		$this->assertSame( 30000, $absent['values']['rooms'] );
+		$empty = Evaluation::run( $config, [ 'rooms' => [] ] );          // zero rows
+		$this->assertSame( 0, $empty['values']['rooms'] );
+		$this->assertSame( [ 'total' ], array_column( $empty['lineItems'], 'id' ) );
+	}
+
+	public function test_repeater_runtime_and_compile_errors_zero_the_sum(): void {
+		$runtime = Evaluation::run( $this->repeater_config( '{r_area} / 0' ), [ 'rooms' => [ [ 'r_area' => '5' ] ] ] );
+		$this->assertSame( 0, $runtime['values']['rooms'] );
+		$this->assertSame( 'div_zero', $runtime['errors']['rooms'] );
+
+		$compile = Evaluation::run( $this->repeater_config( '{r_area} * * 2' ), [ 'rooms' => [ [ 'r_area' => '5' ] ] ] );
+		$this->assertSame( 0, $compile['values']['rooms'] );
+		$this->assertSame( 'syntax', $compile['errors']['rooms'] );
+	}
+
+	public function test_hidden_repeater_contributes_zero_and_can_drive_conditions(): void {
+		$config = FieldSchema::normalize( [ 'fields' => [
+			[ 'id' => 'gate', 'type' => 'toggle', 'label' => 'Gate', 'price' => 0 ],
+			[ 'id' => 'rooms', 'type' => 'repeater', 'label' => 'Rooms', 'rowExpression' => '{r_qty} * 60',
+				'conditions' => [ [ 'field' => 'gate', 'operator' => 'is', 'value' => '1' ] ], 'fields' => [
+				[ 'id' => 'r_qty', 'type' => 'quantity', 'label' => 'Qty', 'default' => 1 ],
+			] ],
+			[ 'id' => 'bulk', 'type' => 'heading', 'label' => 'Bulk!', 'conditions' => [
+				[ 'field' => 'rooms', 'operator' => 'gte', 'value' => '100' ],
+			] ],
+			[ 'id' => 'total', 'type' => 'formula', 'label' => 'T', 'expression' => '{rooms} + 1' ],
+		] ] );
+		$off = Evaluation::run( $config, [ 'gate' => '', 'rooms' => [ [ 'r_qty' => '2' ] ] ] );
+		$this->assertFalse( $off['active']['rooms'] );
+		$this->assertSame( 0, $off['values']['rooms'] );
+		$this->assertSame( 10000, $off['totalScaled'] );
+		$this->assertFalse( $off['active']['bulk'] );
+
+		$on = Evaluation::run( $config, [ 'gate' => '1', 'rooms' => [ [ 'r_qty' => '2' ] ] ] );
+		$this->assertSame( 1200000, $on['values']['rooms'] );
+		$this->assertTrue( $on['active']['bulk'] ); // 120 ≥ 100, via the fixed-point
+	}
+
+	public function test_text_like_fields_feed_conditions_and_summary_display(): void {
+		$config = FieldSchema::normalize( [ 'fields' => [
+			[ 'id' => 'visit', 'type' => 'date', 'label' => 'Visit date', 'showInSummary' => true ],
+			[ 'id' => 'mail', 'type' => 'email', 'label' => 'Email' ],
+			[ 'id' => 'note', 'type' => 'heading', 'label' => 'Thanks!', 'conditions' => [
+				[ 'field' => 'mail', 'operator' => 'is_not_empty', 'value' => '' ],
+			] ],
+		] ] );
+		$r = Evaluation::run( $config, [ 'visit' => ' 2026-08-01 ', 'mail' => 'a@b.co' ] );
+		$this->assertSame( '2026-08-01', $r['conditionValues']['visit'] ); // trimmed, text semantics
+		$this->assertTrue( $r['active']['note'] );
+		$this->assertSame(
+			[ [ 'id' => 'visit', 'label' => 'Visit date', 'amount' => 0, 'isCurrency' => false, 'display' => '2026-08-01' ] ],
+			$r['lineItems']
+		);
+		$empty = Evaluation::run( $config, [] );
+		$this->assertSame( [], $empty['lineItems'] ); // empty text-like values emit no line
+	}
 }

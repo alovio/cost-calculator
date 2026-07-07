@@ -5,6 +5,7 @@ namespace Alovio\Calculator\Admin;
 
 use Alovio\Calculator\Fields\FieldRepository;
 use Alovio\Calculator\Fields\FieldSchema;
+use Alovio\Calculator\Frontend\CalculatorRenderer;
 use Alovio\Calculator\Templates\Presets;
 
 defined( 'ABSPATH' ) || exit;
@@ -84,6 +85,15 @@ final class RestController {
 					'callback'            => array( $this, 'delete_calculator' ),
 					'permission_callback' => array( $this, 'can_manage' ),
 				),
+			)
+		);
+		register_rest_route(
+			'alovio-calc/v1',
+			'/render',
+			array(
+				'methods'             => 'POST',
+				'callback'            => array( $this, 'render_fragment' ),
+				'permission_callback' => array( $this, 'can_manage' ),
 			)
 		);
 		register_rest_route(
@@ -180,9 +190,10 @@ final class RestController {
 		}
 		return rest_ensure_response(
 			array(
-				'id'     => $post->ID,
-				'title'  => $post->post_title,
-				'config' => $this->repo->get( $post->ID ),
+				'id'       => $post->ID,
+				'title'    => $post->post_title,
+				'modified' => (string) $post->post_modified_gmt,
+				'config'   => $this->repo->get( $post->ID ),
 			)
 		);
 	}
@@ -194,24 +205,49 @@ final class RestController {
 			return $this->not_found();
 		}
 
-		$title = $request->get_param( 'title' );
+		$title  = $request->get_param( 'title' );
+		$update = array( 'ID' => $post->ID );
 		if ( is_string( $title ) && '' !== $title ) {
-			wp_update_post(
-				array(
-					'ID'         => $post->ID,
-					'post_title' => $title,
-				)
-			);
+			$update['post_title'] = $title;
 		}
+		// Always runs — even config-only saves must bump post_modified, or the
+		// studio's draft-recovery comparison (spec §2.6) sees a stale timestamp
+		// (FieldRepository::save touches meta only).
+		wp_update_post( $update );
 
 		$config = $request->get_param( 'config' );
 		$saved  = is_array( $config ) ? $this->repo->save( $post->ID, $config ) : $this->repo->get( $post->ID );
 
 		return rest_ensure_response(
 			array(
-				'id'     => $post->ID,
-				'title'  => is_string( $title ) && '' !== $title ? $title : $post->post_title,
-				'config' => $saved, // Normalized — the builder re-hydrates from this (server may rewrite option slugs).
+				'id'       => $post->ID,
+				'title'    => is_string( $title ) && '' !== $title ? $title : $post->post_title,
+				'config'   => $saved, // Normalized — the builder re-hydrates from this (server may rewrite option slugs).
+				'modified' => (string) get_post_field( 'post_modified_gmt', $post->ID ),
+			)
+		);
+	}
+
+	/**
+	 * Studio live canvas (spec §2.2): renders the UNSAVED config through the one
+	 * canonical renderer. Same FieldSchema::normalize path as /preview; the
+	 * response html is injected inline by the builder and re-initialised by the
+	 * real frontend bundle. manage_options-gated like every builder route.
+	 *
+	 * @param \WP_REST_Request $request Request.
+	 * @return \WP_REST_Response|array
+	 */
+	public function render_fragment( $request ) {
+		$config = FieldSchema::normalize(
+			array(
+				'fields'   => (array) $request->get_param( 'fields' ),
+				'settings' => (array) $request->get_param( 'settings' ),
+			)
+		);
+
+		return rest_ensure_response(
+			array(
+				'html' => CalculatorRenderer::render( absint( $request->get_param( 'calculatorId' ) ), $config ),
 			)
 		);
 	}

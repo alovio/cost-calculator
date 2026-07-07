@@ -67,13 +67,32 @@ final class QuoteController {
 
 		$rawValues = $request->get_param( 'values' );
 		$rawValues = is_array( $rawValues ) ? array_slice( $rawValues, 0, self::VALUES_MAX, true ) : array();
+
+		$repeater_ids = array();
+		foreach ( $config['fields'] as $field ) {
+			if ( 'repeater' !== $field['type'] || ! array_key_exists( $field['id'], $rawValues ) ) {
+				continue;
+			}
+			$rows = self::sanitize_repeater_rows( $field, $rawValues[ $field['id'] ] );
+			if ( null === $rows ) {
+				return $this->bad_request( 'too_many_rows', __( 'Too many rows submitted.', 'alovio-calculator' ) );
+			}
+			$rawValues[ $field['id'] ]    = $rows;
+			$repeater_ids[ $field['id'] ] = true;
+		}
 		foreach ( $rawValues as $k => $v ) {
+			if ( isset( $repeater_ids[ $k ] ) ) {
+				continue; // Already row-sanitized above.
+			}
 			if ( is_string( $v ) && strlen( $v ) > self::VALUE_LIMIT ) {
 				$rawValues[ $k ] = substr( $v, 0, self::VALUE_LIMIT );
 			}
 			if ( is_array( $v ) ) {
 				$rawValues[ $k ] = array_map( 'strval', array_slice( $v, 0, 50 ) );
 			}
+		}
+		if ( strlen( (string) wp_json_encode( $rawValues ) ) > 65535 ) {
+			return $this->bad_request( 'too_large', __( 'The submitted data is too large.', 'alovio-calculator' ) );
 		}
 
 		$validated = self::validate_contact( (array) $request->get_param( 'contact' ), $config['settings']['quoteForm'] );
@@ -106,12 +125,24 @@ final class QuoteController {
 			);
 		}
 
+		$fileMeta = self::resolve_file( $config, (string) $request->get_param( 'fileToken' ) );
+		if ( false === $fileMeta ) {
+			return $this->bad_request( 'file_invalid', __( 'The uploaded file could not be verified — please upload it again.', 'alovio-calculator' ) );
+		}
+
 		$snapshot = array(
 			'values'      => array_map( 'sanitize_text_field', $result['conditionValues'] ), // §12: text fields carry raw visitor input — sanitize at the storage boundary.
 			'lineItems'   => $result['lineItems'],
+			'repeaters'   => self::repeater_snapshot( $config['fields'], $result ),
 			'totalScaled' => $result['totalScaled'] ?? 0,
 			'currency'    => $config['settings']['currency'],
 		);
+		if ( null !== $fileMeta ) {
+			$snapshot['file'] = array(
+				'name'   => sanitize_file_name( $fileMeta['name'] ),
+				'stored' => $fileMeta['stored'],
+			);
+		}
 
 		$repo    = new EntriesRepository();
 		$entryId = $repo->insert( EntriesRepository::row_from_submission( $calculator_id, $validated['contact'], $snapshot ) );
@@ -207,6 +238,95 @@ final class QuoteController {
 			'contact'     => $out,
 			'fieldErrors' => $errors,
 		);
+	}
+
+	/**
+	 * Sanitize one repeater's submitted rows. Pure, unit-tested.
+	 *
+	 * @param array $field Normalized repeater field.
+	 * @param mixed $raw   Client-submitted rows.
+	 * @return array|null Cleaned rows, or NULL when the row count exceeds maxRows (⇒ 400).
+	 */
+	public static function sanitize_repeater_rows( array $field, $raw ): ?array {
+		if ( ! is_array( $raw ) ) {
+			return array();
+		}
+		$rows = array_values( $raw );
+		$cap  = min( (int) ( $field['maxRows'] ?? 50 ), 50 );
+		if ( count( $rows ) > $cap ) {
+			return null;
+		}
+		$child_ids = array_column( (array) ( $field['fields'] ?? array() ), 'id' );
+		$out       = array();
+		foreach ( $rows as $row ) {
+			$clean = array();
+			if ( is_array( $row ) ) {
+				foreach ( $child_ids as $cid ) {
+					if ( ! array_key_exists( $cid, $row ) ) {
+						continue;
+					}
+					$v = $row[ $cid ];
+					if ( is_array( $v ) ) {
+						$clean[ $cid ] = array_map( 'strval', array_slice( $v, 0, 50 ) );
+					} elseif ( is_scalar( $v ) ) {
+						$clean[ $cid ] = substr( (string) $v, 0, self::VALUE_LIMIT );
+					}
+				}
+			}
+			$out[] = $clean;
+		}
+		return $out;
+	}
+
+	/**
+	 * Repeater block for the entry snapshot (spec §3.1 entries surfaces): one entry
+	 * per ACTIVE repeater in field order, child id => label/type legends included so
+	 * surfaces never re-read the calculator config.
+	 *
+	 * @return array[]
+	 */
+	public static function repeater_snapshot( array $fields, array $result ): array {
+		$out = array();
+		foreach ( $fields as $field ) {
+			if ( 'repeater' !== $field['type'] || false === ( $result['active'][ $field['id'] ] ?? true ) ) {
+				continue;
+			}
+			$children = array();
+			$types    = array();
+			foreach ( (array) ( $field['fields'] ?? array() ) as $child ) {
+				$children[ $child['id'] ] = $child['label'];
+				$types[ $child['id'] ]    = $child['type'];
+			}
+			$rows = array();
+			foreach ( (array) ( $result['repeaters'][ $field['id'] ]['rows'] ?? array() ) as $row ) {
+				$rows[] = array(
+					'label'  => sanitize_text_field( (string) $row['label'] ),
+					'total'  => (int) $row['total'],
+					'values' => array_map( 'sanitize_text_field', $row['values'] ),
+				);
+			}
+			$out[] = array(
+				'id'       => $field['id'],
+				'label'    => $field['label'],
+				'children' => $children,
+				'types'    => $types,
+				'rows'     => $rows,
+			);
+		}
+		return $out;
+	}
+
+	/**
+	 * File-token gate (spec §3.3). null ⇒ no file expected/sent; array ⇒ consumed
+	 * meta; false ⇒ token invalid (handle() answers 400 file_invalid).
+	 *
+	 * @return array|false|null
+	 */
+	public static function resolve_file( array $config, string $fileToken ) {
+		if ( empty( $config['settings']['quoteForm']['file']['enabled'] ) || '' === $fileToken ) {
+			return null;
+		}
+		return FileUploads::consume( $fileToken ) ?? false;
 	}
 
 	private function within_rate_limit(): bool {

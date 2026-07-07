@@ -38,6 +38,7 @@ final class Plugin {
 		( new Admin\RestController() )->register();
 		( new Admin\Preview() )->register();
 		( new Entries\QuoteController() )->register();
+		( new Entries\FileUploads() )->register();
 		( new Entries\EntriesRestController() )->register();
 		( new Entries\CsvExporter() )->register();
 		( new Entries\Privacy() )->register();
@@ -48,11 +49,17 @@ final class Plugin {
 		( new Admin\ReviewNudge() )->register();
 		( new Admin\UpdateCheck() )->register();
 		( new Admin\ProLink() )->register();
+		( new Import\ImportController() )->register();
+		( new Admin\Onboarding() )->register();
+		( new Analytics\Counter() )->register();
 		Pro\ProModule::register();
 	}
 
 	public function activate( bool $network_wide = false ): void {
 		Entries\EntriesTable::install_for_network( $network_wide );
+		if ( '' === (string) get_option( 'alovio_calc_version', '' ) ) {
+			update_option( Admin\Onboarding::OPTION_WELCOME, 1 ); // fresh install → one-time welcome notice (no redirect)
+		}
 		update_option( 'alovio_calc_version', ALOVIO_CALC_VERSION );
 	}
 

@@ -1,0 +1,383 @@
+{
+    "ccbVersion": "4.0.14",
+    "id": 238,
+    "title": "CCB Extras",
+    "postType": "cost-calc",
+    "meta": {
+        "stm-fields": [
+            {
+                "alias": "page_break_field_id_0",
+                "description": "",
+                "groupElements": [
+                    {
+                        "fields": [
+                            {
+                                "_id": "0",
+                                "label": "Add-ons",
+                                "default": [],
+                                "type": "toggle",
+                                "description": "",
+                                "required": false,
+                                "_event": "change",
+                                "allowRound": false,
+                                "additionalCss": "",
+                                "additionalStyles": "",
+                                "addToSummary": true,
+                                "allowCurrency": false,
+                                "calculateHidden": false,
+                                "fieldCurrency": false,
+                                "checkedLength": "0",
+                                "hasNextTick": true,
+                                "nextTickCount": 0,
+                                "disableOptions": [],
+                                "_tag": "cost-toggle",
+                                "icon": "ccb-icon-ic_toggle",
+                                "alias": "toggle_field_id_0",
+                                "desc_option": "after",
+                                "summary_view": "show_value",
+                                "styles": {
+                                    "elementColumns": "4",
+                                    "box_style": "vertical",
+                                    "style": "default"
+                                },
+                                "options": [
+                                    {
+                                        "optionText": "Express service",
+                                        "optionValue": "35",
+                                        "optionHint": ""
+                                    },
+                                    {
+                                        "optionText": "Insurance",
+                                        "optionValue": "12",
+                                        "optionHint": ""
+                                    }
+                                ],
+                                "apply_style_for_all": false,
+                                "width": 50,
+                                "fieldCurrencySettings": {
+                                    "currency": "$",
+                                    "currencyPosition": "left_with_space",
+                                    "thousands_separator": ",",
+                                    "num_after_integer": 2,
+                                    "decimal_separator": "."
+                                },
+                                "id": 0,
+                                "fieldName": "Switch toggle",
+                                "hidden": false,
+                                "pageId": "",
+                                "sectionId": "",
+                                "index": 0
+                            },
+                            {
+                                "unit": 1,
+                                "min": "1",
+                                "max": "12",
+                                "label": "Hours",
+                                "_id": "1",
+                                "default": "2",
+                                "description": "",
+                                "placeholder": "",
+                                "required": false,
+                                "_event": "keyup",
+                                "type": "quantity",
+                                "allowRound": false,
+                                "additionalCss": "",
+                                "additionalStyles": "",
+                                "addToSummary": true,
+                                "calculateHidden": false,
+                                "allowCurrency": false,
+                                "fieldCurrency": false,
+                                "multiply": false,
+                                "hideMinMax": false,
+                                "unitPosition": "right",
+                                "unitSymbol": "",
+                                "enabled_currency_settings": false,
+                                "_tag": "cost-quantity",
+                                "icon": "ccb-icon-ic_num",
+                                "alias": "quantity_field_id_1",
+                                "desc_option": "after",
+                                "step": "1",
+                                "separation": false,
+                                "buttonsPosition": "right",
+                                "styles": {
+                                    "style": "default"
+                                },
+                                "width": 50,
+                                "pricingStructure": "no_discounts",
+                                "pricingRanges": [
+                                    {
+                                        "minQty": 1,
+                                        "maxQty": 10,
+                                        "unitPrice": 20
+                                    }
+                                ],
+                                "badgeText": "You save",
+                                "badgeVariant": "outlined",
+                                "badgeFormat": "percent",
+                                "fieldCurrencySettings": {
+                                    "currency": "$",
+                                    "currencyPosition": "left_with_space",
+                                    "thousands_separator": ",",
+                                    "num_after_integer": 2,
+                                    "decimal_separator": "."
+                                },
+                                "id": 1,
+                                "fieldName": "Quantity field",
+                                "hidden": false,
+                                "pageId": "",
+                                "sectionId": "",
+                                "index": 0,
+                                "round": false,
+                                "useCurrencySign": false,
+                                "currencySign": false,
+                                "sign": ""
+                            },
+                            {
+                                "label": "Zone",
+                                "_id": "2",
+                                "default": "",
+                                "onValue": null,
+                                "description": "",
+                                "required": false,
+                                "_event": "change",
+                                "allowRound": false,
+                                "additionalCss": "",
+                                "_tag": "cost-radio",
+                                "additionalStyles": "",
+                                "addToSummary": true,
+                                "allowCurrency": false,
+                                "calculateHidden": false,
+                                "fieldCurrency": false,
+                                "seperateCurrency": false,
+                                "hasNextTick": true,
+                                "nextTickCount": 0,
+                                "disableOptions": [],
+                                "type": "radio-button",
+                                "icon": "ccb-icon-ic_radio",
+                                "alias": "radio_field_id_2",
+                                "desc_option": "after",
+                                "summary_view": "show_value",
+                                "styles": {
+                                    "elementColumns": "4",
+                                    "box_style": "vertical",
+                                    "style": "default"
+                                },
+                                "options": [
+                                    {
+                                        "optionText": "Zone A",
+                                        "optionValue": "30",
+                                        "optionHint": ""
+                                    },
+                                    {
+                                        "optionText": "Zone B",
+                                        "optionValue": "50",
+                                        "optionHint": ""
+                                    }
+                                ],
+                                "apply_style_for_all": false,
+                                "width": 50,
+                                "fieldCurrencySettings": {
+                                    "currency": "$",
+                                    "currencyPosition": "left_with_space",
+                                    "thousands_separator": ",",
+                                    "num_after_integer": 2,
+                                    "decimal_separator": "."
+                                },
+                                "id": 2,
+                                "fieldName": "Radio select",
+                                "hidden": false,
+                                "pageId": "",
+                                "sectionId": "",
+                                "index": 0,
+                                "rowBreak": true,
+                                "boxStyle": "vertical"
+                            },
+                            {
+                                "_id": "4",
+                                "currency": "$",
+                                "type": "total",
+                                "additionalCss": "",
+                                "_tag": "cost-total",
+                                "costCalcFormula": " toggle_field_id_0 + quantity_field_id_1 ",
+                                "additionalStyles": "",
+                                "alias": "total_field_id_4",
+                                "icon": "ccb-icon-ic_formula",
+                                "label": "Total",
+                                "formulaFieldView": false,
+                                "letter": "",
+                                "formulaView": false,
+                                "legacyFormula": "",
+                                "fieldCurrency": false,
+                                "calculateHidden": false,
+                                "advancedJsCalculation": false,
+                                "description": "",
+                                "fieldCurrencySettings": {
+                                    "currency": "$",
+                                    "currencyPosition": "left_with_space",
+                                    "thousands_separator": ",",
+                                    "num_after_integer": 2,
+                                    "decimal_separator": "."
+                                },
+                                "id": 4,
+                                "fieldName": "Formula",
+                                "hidden": false,
+                                "pageId": "",
+                                "sectionId": "",
+                                "index": 0,
+                                "width": 50,
+                                "useCurrencySign": false
+                            },
+                            {
+                                "label": "Notes",
+                                "_event": "",
+                                "_id": "3",
+                                "description": "",
+                                "placeholder": "",
+                                "_tag": "cost-text",
+                                "type": "text-area",
+                                "additionalCss": "",
+                                "additionalStyles": "",
+                                "icon": "ccb-icon-ic_text",
+                                "desc_option": "after",
+                                "alias": "text_field_id_3",
+                                "width": 100,
+                                "id": 3,
+                                "fieldName": "Text field",
+                                "hidden": false,
+                                "pageId": "",
+                                "sectionId": "",
+                                "index": 0,
+                                "rowBreak": true,
+                                "required": false,
+                                "numberOfCharacters": "150"
+                            }
+                        ],
+                        "alias": "section_field_id_0",
+                        "description": "",
+                        "label": "Section #1",
+                        "letter": "",
+                        "type": "section",
+                        "_id": 0
+                    }
+                ],
+                "label": "Page 1",
+                "letter": "",
+                "type": "page-break",
+                "_id": 0,
+                "previousBtnLabel": "Back",
+                "nextBtnLabel": "Next"
+            }
+        ],
+        "stm-formula": [],
+        "stm-conditions": {
+            "nodes_v4": [],
+            "links_v4": [],
+            "spaces": []
+        },
+        "stm-name": "CCB Extras",
+        "stm-total-summary": {
+            "sticky": false,
+            "zero_values_for_orders_pdf_emails": true,
+            "mobile_mode": false,
+            "mini_widget_formulas": [],
+            "arrangement_sections": [
+                {
+                    "id": "summary_section_1",
+                    "title": "Section #1",
+                    "sort_id": 1,
+                    "items": [
+                        {
+                            "id": "summary_item_total_summary",
+                            "title": "Header",
+                            "alias": "total_summary",
+                            "sort_id": 1,
+                            "locked": true,
+                            "static": true,
+                            "options": {
+                                "title": "Total Summary"
+                            }
+                        },
+                        {
+                            "id": "summary_item_details",
+                            "title": "Details",
+                            "alias": "details",
+                            "sort_id": 2,
+                            "locked": true,
+                            "static": true,
+                            "options": {
+                                "default_state": "expanded",
+                                "show_zero_values": true,
+                                "cost_breakdown": true
+                            }
+                        },
+                        {
+                            "id": "summary_item_coupons",
+                            "title": "Coupons",
+                            "alias": "coupons",
+                            "sort_id": 3,
+                            "locked": false,
+                            "static": false,
+                            "options": []
+                        },
+                        {
+                            "id": "summary_item_total",
+                            "title": "Total",
+                            "alias": "total",
+                            "sort_id": 4,
+                            "locked": true,
+                            "static": true,
+                            "options": []
+                        },
+                        {
+                            "id": "summary_item_purchase_button",
+                            "title": "Purchase Button",
+                            "alias": "purchase_button",
+                            "sort_id": 5,
+                            "locked": true,
+                            "static": true,
+                            "options": {
+                                "width": 100
+                            }
+                        },
+                        {
+                            "id": "summary_item_pdf_button",
+                            "title": "PDF Button",
+                            "alias": "pdf_button",
+                            "sort_id": 6,
+                            "locked": true,
+                            "static": true,
+                            "options": {
+                                "width": 100
+                            }
+                        },
+                        {
+                            "id": "summary_item_share_button",
+                            "title": "Share Button",
+                            "alias": "share_button",
+                            "sort_id": 7,
+                            "locked": true,
+                            "static": true,
+                            "options": {
+                                "width": 100
+                            }
+                        },
+                        {
+                            "id": "summary_item_payments",
+                            "title": "Payments",
+                            "alias": "payments",
+                            "sort_id": 8,
+                            "locked": true,
+                            "static": true,
+                            "draggable": true,
+                            "options": {
+                                "layout": "horizontal"
+                            }
+                        }
+                    ]
+                }
+            ]
+        },
+        "form_id": "1",
+        "calc_saved": "1"
+    }
+}

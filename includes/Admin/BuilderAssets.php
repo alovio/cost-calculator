@@ -4,6 +4,7 @@ declare( strict_types=1 );
 namespace Alovio\Calculator\Admin;
 
 use Alovio\Calculator\Fields\FieldTypes;
+use Alovio\Calculator\Frontend\FrontendAssets;
 use Alovio\Calculator\Templates\Presets;
 
 defined( 'ABSPATH' ) || exit;
@@ -16,6 +17,7 @@ final class BuilderAssets {
 
 	public function register(): void {
 		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue' ) );
+		add_filter( 'admin_body_class', array( $this, 'body_class' ) );
 	}
 
 	public function enqueue( string $hook ): void {
@@ -38,6 +40,12 @@ final class BuilderAssets {
 			wp_style_add_data( 'alovio-calc-builder', 'rtl', 'replace' );
 		}
 
+		// The studio canvas runs the REAL frontend engine against server-rendered
+		// fragments (spec §2.2) — same handles the Preview page uses.
+		( new FrontendAssets() )->register_assets();
+		wp_enqueue_script( 'alovio-calc-frontend' );
+		wp_enqueue_style( 'alovio-calc-frontend' );
+
 		$presets   = Presets::all();
 		$templates = array();
 		foreach ( $presets as $key => $preset ) {
@@ -45,6 +53,7 @@ final class BuilderAssets {
 				'key'         => $key,
 				'title'       => $preset['title'],
 				'description' => $preset['description'],
+				'fields'      => $preset['config']['fields'],
 			);
 		}
 
@@ -59,7 +68,19 @@ final class BuilderAssets {
 				'templates'   => $templates,
 				'exportNonce' => wp_create_nonce( 'alovio_calc_export_entries' ),
 				'adminPost'   => esc_url_raw( admin_url( 'admin-post.php' ) ),
+				'ccbDetected' => ( new \Alovio\Calculator\Import\CcbDetector() )->is_present(),
 			)
 		);
+	}
+
+	/**
+	 * Marks the builder screen so builder.scss can go full-bleed (spec §2.1).
+	 */
+	public function body_class( string $classes ): string {
+		$screen = function_exists( 'get_current_screen' ) ? get_current_screen() : null;
+		if ( $screen && 'toplevel_page_' . AdminPage::SLUG === $screen->id ) {
+			$classes .= ' alcb-builder-page';
+		}
+		return $classes;
 	}
 }
