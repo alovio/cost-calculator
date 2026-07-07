@@ -16,6 +16,7 @@ export default function CalculatorList( { onEdit, onEntries } ) {
 	const [ notice, setNotice ] = useState( null );
 	const [ ccbOpen, setCcbOpen ] = useState( false );
 	const fileInputRef = useRef( null );
+	const templates = ( window.ALOVIO_CALC_BUILDER && window.ALOVIO_CALC_BUILDER.templates ) || [];
 
 	const refresh = () =>
 		listCalculators()
@@ -52,7 +53,7 @@ export default function CalculatorList( { onEdit, onEntries } ) {
 	const exportCalculator = async ( item ) => {
 		try {
 			const calc = await getCalculator( item.id );
-			const payload = { plugin: 'alovio-calculator', schemaVersion: 1, name: calc.title || '', config: calc.config || {} };
+			const payload = { plugin: 'alovio-calculator', schemaVersion: 2, name: calc.title || '', config: calc.config || {} };
 			const blob = new window.Blob( [ JSON.stringify( payload, null, 2 ) ], { type: 'application/json' } );
 			const url = window.URL.createObjectURL( blob );
 			const a = window.document.createElement( 'a' );
@@ -138,7 +139,32 @@ export default function CalculatorList( { onEdit, onEntries } ) {
 			) }
 
 			{ ! items.length && (
-				<p className="alc-empty">{ __( 'No calculators yet — create your first one from a template.', 'alovio-calculator' ) }</p>
+				<div className="alc-start">
+					<h2 className="alc-start__title">{ __( 'Build your first calculator', 'alovio-calculator' ) }</h2>
+					<p className="alc-start__lead">
+						{ __( 'Start from a ready template — prices, formulas and conditional logic included — or from a blank canvas.', 'alovio-calculator' ) }
+					</p>
+					<div className="alc-start__grid">
+						<button type="button" className="alc-start__card alc-start__card--blank" onClick={ () => setPicking( true ) }>
+							<span className="alc-start__card-title">{ __( 'Start blank', 'alovio-calculator' ) }</span>
+							<span className="alc-start__card-desc">{ __( 'An empty canvas — add fields from the palette.', 'alovio-calculator' ) }</span>
+						</button>
+						{ templates.map( ( t ) => (
+							<button
+								type="button"
+								key={ t.key }
+								className="alc-start__card"
+								onClick={ async () => {
+									const created = await createCalculator( { title: t.title, template: t.key } );
+									onEdit( created.id );
+								} }
+							>
+								<span className="alc-start__card-title">{ t.title }</span>
+								<span className="alc-start__card-desc">{ t.description }</span>
+							</button>
+						) ) }
+					</div>
+				</div>
 			) }
 
 			{ !! items.length && (

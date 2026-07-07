@@ -356,3 +356,18 @@ body.alcb-builder-page #wpbody-content > .error { display: none; }
 .alc-ccb-report__skipped li,
 .alc-ccb-report__warnings li { margin: 2px 0 2px 16px; list-style: disc; font-size: 12px; }
 .alc-ccb-report__warnings li { color: #92400e; }
+
+/* Rich start screen (empty list state) */
+.alc-start { margin: 32px auto; max-width: 860px; text-align: center; }
+.alc-start__title { font-size: 22px; margin: 0 0 4px; }
+.alc-start__lead { margin: 0 0 20px; opacity: 0.75; }
+.alc-start__grid { display: grid; grid-template-columns: repeat( auto-fill, minmax( 240px, 1fr ) ); gap: 12px; text-align: left; }
+.alc-start__card {
+	display: flex; flex-direction: column; gap: 4px; padding: 16px;
+	border: 1px solid rgba( 128, 128, 128, 0.25 ); border-radius: var( --alcb-radius, 8px );
+	background: transparent; cursor: pointer; transition: border-color 0.15s ease, transform 0.15s ease;
+}
+.alc-start__card:hover { border-color: var( --alcb-flame, #f97316 ); transform: translateY( -1px ); }
+.alc-start__card--blank { border-style: dashed; }
+.alc-start__card-title { font-weight: 600; }
+.alc-start__card-desc { font-size: 12px; opacity: 0.7; }
