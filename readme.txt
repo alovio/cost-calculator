@@ -4,41 +4,49 @@ Tags: cost calculator, price calculator, quote calculator, calculator builder, e
 Requires at least: 6.2
 Tested up to: 7.0
 Requires PHP: 7.4
-Stable tag: 1.4.1
+Stable tag: 2.0.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-Cost, price and quote calculators with live totals. Conditional logic free, decimal-safe math, lead capture — works on PHP 7.4+.
+Cost, price and quote calculators with live totals. Studio builder, repeater and conditional logic free, decimal-safe math, lead capture.
 
 == Description ==
 
-**Alovio Calculator** is a calculator-first form builder: give visitors an instant, accurate price while you collect the lead. Build a cost calculator, a price estimate or an instant quote for almost any service — cleaning, moving, construction and renovation, solar panels, landscaping, catering, flooring and tiling, print, agencies, salons or equipment rental — in minutes. Start from a ready template, tweak the prices, and paste a shortcode.
+**Alovio Calculator** is a calculator-first form builder: give visitors an instant, accurate price while you collect the lead. Build a cost calculator, a price estimate or an instant quote for almost any service — cleaning, moving, construction and renovation, solar panels, landscaping, catering, flooring and tiling, print, agencies, salons or equipment rental — in minutes.
+
+**Build in the new Studio.** No preview tab, no guesswork: the 2.0 builder canvas IS your live calculator. Type values while you build and watch totals update, drag fields exactly where you want them, undo and redo freely, and recover unsaved work after a crash. What you see is literally what your visitors get — the canvas runs the same rendering engine as your site.
 
 **Conditional logic is free.** Show, hide or require any field based on another field — or even on the running total — with AND/OR rules and operators for equality, ranges (≥, ≤) and presence (is empty / is not empty). No upgrade wall in front of the feature a quote calculator actually needs.
+
+**The repeater is free too.** Charge per room, per window, per guest: the repeater duplicates a group of fields for each row your visitor adds, computes a per-row total (its own little formula if you want one), and feeds the sum straight into your main formula — a field competitors reserve for paid tiers.
 
 **The math is exact.** Every calculation runs on a fixed-point decimal engine, mirrored in PHP and JavaScript and locked together by a shared test suite — so 0.1 + 0.2 is 0.3, totals never drift by a cent, and the price your visitor sees is the price your email says. Works on any host running PHP 7.4 or newer.
 
 = Features (all free) =
 
-* Drag-and-drop builder with 12 field types: number, slider, dropdown, multiple choice (with images), checkboxes, toggle, quantity, text, heading, HTML, formula, section/step divider
+* Builder Studio: a live canvas that IS the calculator — real engine, real themes, real math while you edit — with undo/redo, drag-and-drop placement, keyboard shortcuts and local draft recovery
+* 18 field types: number, slider, quantity, text, textarea, date, email, phone, URL, dropdown, multiple choice (with image cards), checkboxes, toggle, heading, HTML, formula, repeater, section/step divider
+* Repeater — free: repeat a group of fields per row (per room, per window, per seat) with per-row math and a summed total your formulas can reference
 * Per-option prices on choice fields; live sticky summary with line items and total
 * Formula fields with `+ − × ÷`, `if()`, `min`, `max`, `round`, `ceil`, `floor`, `abs` — validated live as you type
 * Conditional logic — free: show / hide / require, AND/OR, equality + range (≥, ≤) + empty/not-empty operators, conditions even on the running total
-* Quote requests: name/email/phone/message form, entries stored in your dashboard, email notification, CSV export
+* Quote requests: name/email/phone/message form with optional file upload, entries stored in your dashboard, email notification, CSV export
+* Import from Cost Calculator Builder: one click brings your existing calculators over, with a transparent per-calculator report of anything that could not be mapped
+* Export and import calculators as JSON
 * 11 ready templates: cleaning price, moving cost, construction cost, solar panel quote, landscaping quote, catering quote, flooring cost, print quote, agency estimate, salon pricing, rental cost
 * Gutenberg block and `[alovio_calculator id="…"]` shortcode
-* 6 ready themes, each a distinct design — Classic (studio card), Minimal (editorial), Midnight (dark glass), Soft (rounded pastel), Bold (neo-brutalist), Slate (compact dashboard) — pick one, no CSS needed, plus a custom accent color
+* 6 ready themes, each a distinct design — Classic (studio card), Minimal (editorial), Midnight (dark glass), Soft (rounded pastel), Bold (neo-brutalist), Slate (compact dashboard) — plus a custom accent color
 * Currency formatting you control (symbol, position, separators, decimals)
-* GDPR-friendly: no external requests, no IP storage, personal-data export/erase integration
+* GDPR-friendly: no external requests, no cookies, no IP storage; anonymous on-site view counters; personal-data export/erase integration
 * Accessible front end: keyboard-friendly controls, screen-reader announced totals
 
 = What it deliberately does NOT do =
 
-No payment processing — this is a quoting tool, not a checkout. Estimates stay estimates, you stay in control of the sale, and your site avoids a whole class of payment headaches.
+No payment processing — this is a quoting tool, not a checkout. Estimates stay estimates, you stay in control of the sale, and your site avoids a whole class of payment headaches. Likewise, the date field is informational only: Alovio Calculator quotes jobs, it does not book appointments.
 
 = Free vs Pro =
 
-Everything above is free forever — including conditional logic. **Alovio Calculator Pro** adds a multi-step wizard layout, branded PDF quotes (logo, tax/VAT), webhooks/Zapier and a quote analytics dashboard. [Get Alovio Calculator Pro](https://alovio.org/store/calculator-pro).
+Everything above is free forever — including conditional logic and the repeater. **Alovio Calculator Pro** adds a multi-step wizard layout, branded PDF quotes with three layout presets, webhooks/Zapier, conditional email routing, and a quote analytics dashboard with a per-calculator views → interactions → quotes funnel. [Get Alovio Calculator Pro](https://alovio.org/store/calculator-pro).
 
 = Also by Alovio =
 
@@ -49,7 +57,15 @@ Everything above is free forever — including conditional logic. **Alovio Calcu
 
 = Is conditional logic really free? =
 
-Yes. Multi-rule show/hide logic with AND/OR matching is in the free plugin, on every field type.
+Yes. Multi-rule show/hide/require logic with AND/OR matching is in the free plugin, on every field type — conditions can even watch the running total.
+
+= Is the repeater really free? =
+
+Yes. Add a repeater, drop number/choice fields inside it, optionally give it a per-row formula like `{area} * {rate}`, and visitors add as many rows as your limit allows. The summed total is available to your formulas like any other field.
+
+= Can I migrate from Cost Calculator Builder? =
+
+Yes — there is a built-in importer. If Cost Calculator Builder data is found on your site (the plugin does not even need to stay active), the Import menu lists your existing calculators; pick the ones you want and they are converted to Alovio calculators. You get a per-calculator report of everything imported, plus anything that had to be skipped and why. A formula the importer cannot translate arrives empty with a note, ready to rebuild in the Studio in minutes.
 
 = Does it process payments? =
 
@@ -57,19 +73,11 @@ No, by design. Alovio Calculator generates quotes and collects leads. Connect th
 
 = Will my totals be accurate? =
 
-Yes. Calculations use exact fixed-point decimal arithmetic (no floating-point drift), and the same engine runs in the browser preview and on the server — verified against a shared parity test suite on every release. The server independently recomputes every submitted quote.
-
-= Is this a free alternative to Cost Calculator Builder? =
-
-Yes — and the feature most calculators paywall, conditional logic, is free here. If you are comparing against Cost Calculator Builder, Calculated Fields Form or a similar plugin, Alovio Calculator gives you show/hide rules with AND/OR matching, a decimal-safe formula engine and lead capture in the free version. Start from one of the 11 templates and you will usually have a working calculator in about ten minutes.
-
-= Can I migrate from another calculator plugin? =
-
-There is no automated importer yet, but the template gallery plus drag-and-drop builder makes rebuilding a typical calculator a 10-minute job. An importer is on the roadmap.
+Yes. Calculations use exact fixed-point decimal arithmetic (no floating-point drift), and the same engine runs in the browser and on the server — verified against a shared parity test suite on every release. The server independently recomputes every submitted quote, including repeater rows.
 
 = What about GDPR? =
 
-Quote entries live in your own database — no external services, no IP addresses stored. The plugin registers with WordPress's personal-data export and erase tools, and you can delete all plugin data on uninstall.
+Quote entries live in your own database — no external services, no IP addresses stored. The plugin counts calculator views and interactions anonymously in your own database too: no cookies, no personal data, and the counts are simply approximate if you use full-page caching. It registers with WordPress's personal-data export and erase tools, and you can delete all plugin data on uninstall.
 
 = Does it work with my theme / page builder? =
 
@@ -81,14 +89,25 @@ PHP 7.4 and newer, including PHP 8.4.
 
 == Screenshots ==
 
-1. Drag-and-drop builder with live formula validation
-2. Cleaning price calculator on the front end with sticky quote summary
-3. Conditional logic editor — show/hide any field with AND/OR rules
-4. Template gallery: eleven ready-made calculators
+1. The Builder Studio — the canvas is your live calculator, with undo/redo and drag-and-drop
+2. A repeater on the front end: per-row totals feeding the sticky quote summary
+3. Conditional logic editor — show, hide or require any field with sentence-style rules
+4. The start screen: ready templates or a blank canvas
 5. Quote entries dashboard with CSV export
-6. Per-calculator settings: currency, accent color, quote form
+6. Cost Calculator Builder importer with its per-calculator mapping report
 
 == Changelog ==
+
+= 2.0.0 =
+* Builder Studio: the tabs are gone — you build inside a live canvas that IS the calculator (real engine, real themes, real totals), with undo/redo, drag-and-drop insertion, keyboard shortcuts and local draft recovery.
+* Repeater field — free: repeat a group of fields per row (per room, per window, per guest); per-row formulas, capped rows, and a summed total usable in your formulas and conditions.
+* 5 new informational field types: textarea, date, email, phone and URL — 18 field types in total.
+* Quote form file upload (images/PDF) with strict validation, private storage and automatic cleanup.
+* Import from Cost Calculator Builder: converts your existing calculators with a transparent per-calculator mapping report; formulas that cannot be translated import empty with a note.
+* Slider polish: value bubble, min/max labels and an optional unit suffix.
+* Lighter onboarding: a start screen with template cards, a 3-step Studio tour, and one-time welcome/what's-new notices (no redirects).
+* Anonymous view/interaction counters (no cookies, no personal data) that power the Pro funnel analytics.
+* Calculator JSON exports are now schemaVersion 2; version 1 files still import.
 
 = 1.4.1 =
 * Alovio Calculator Pro is now available (multi-step wizard, branded PDF quotes, webhooks/Zapier, quote analytics) — links and the Pro tab updated; image choice cards were already free since 1.4.0.
@@ -128,3 +147,8 @@ PHP 7.4 and newer, including PHP 8.4.
 
 = 1.0.0 =
 * Initial release: drag-and-drop calculator builder, decimal-safe formula engine (PHP+JS parity), free conditional logic, quote entries with CSV export and privacy tools, 6 templates, block + shortcode.
+
+== Upgrade Notice ==
+
+= 2.0.0 =
+Major update: new Builder Studio, free repeater, 18 field types, Cost Calculator Builder importer. Existing calculators keep working unchanged.
