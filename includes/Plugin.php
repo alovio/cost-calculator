@@ -51,6 +51,7 @@ final class Plugin {
 		( new Admin\ProLink() )->register();
 		( new Import\ImportController() )->register();
 		( new Admin\Onboarding() )->register();
+		( new Analytics\Counter() )->register();
 		Pro\ProModule::register();
 	}
 

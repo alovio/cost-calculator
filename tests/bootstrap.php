@@ -13,3 +13,24 @@ if ( ! class_exists( 'WP_Post' ) ) {
 		public $post_modified_gmt = '';
 	}
 }
+
+if ( ! class_exists( 'WP_REST_Response' ) ) {
+	// Minimal stub — enough for callback-level endpoint tests (data + status only).
+	class WP_REST_Response {
+		public $data;
+		public $status;
+		public function __construct( $data = null, $status = 200 ) {
+			$this->data   = $data;
+			$this->status = $status;
+		}
+		public function get_status() {
+			return $this->status;
+		}
+		public function get_data() {
+			return $this->data;
+		}
+	}
+}
+if ( ! defined( 'MINUTE_IN_SECONDS' ) ) {
+	define( 'MINUTE_IN_SECONDS', 60 );
+}
