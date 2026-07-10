@@ -161,7 +161,18 @@ body.alcb-builder-page #wpbody-content > .error { display: none; }
 }
 // Neutralise wp-admin form chrome inside the real fragment so it matches the site.
 .alcb-fragment select { max-width: none; min-height: 0; }
-.alcb-fragment input[type="checkbox"], .alcb-fragment input[type="radio"] { margin: 0; }
+.alcb-fragment input[type="checkbox"], .alcb-fragment input[type="radio"] {
+	margin: 0;
+	// wp-admin forms.css repaints these (appearance:none + blue :checked::before); restore the
+	// native controls the visitor sees, coloured by the calculator's own accent.
+	appearance: auto;
+	-webkit-appearance: auto;
+	border: 0; background: transparent; box-shadow: none;
+	inline-size: auto; block-size: auto;
+	accent-color: var(--alc-accent, #f97316);
+}
+.alcb-fragment input[type="checkbox"]:checked::before,
+.alcb-fragment input[type="radio"]:checked::before { content: none; }
 
 // ── 06 · Overlay: outline, ops toolbar, IF pill, error badge, insert line
 .alcb-overlay { position: absolute; inset: 26px 30px; pointer-events: none; } // matches .alcb-sheet padding
