@@ -4,7 +4,7 @@ Tags: cost calculator, price calculator, quote calculator, calculator builder, e
 Requires at least: 6.2
 Tested up to: 7.0
 Requires PHP: 7.4
-Stable tag: 2.0.0
+Stable tag: 2.0.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -97,6 +97,11 @@ PHP 7.4 and newer, including PHP 8.4.
 6. Cost Calculator Builder importer with its per-calculator mapping report
 
 == Changelog ==
+
+= 2.0.1 =
+* The admin app is now fully responsive: on phones and small tablets the Studio shows the live canvas full-width, with the field palette as a slide-in drawer and field settings as a bottom sheet (opens automatically when you tap a field).
+* Calculator and entry lists turn into readable cards on small screens; on desktop the tables sit in a proper panel with consistent action buttons.
+* Fixed the slider's min/max scale being squeezed next to the rail on every theme (the value bubble also stays inside the rail at the extremes).
 
 = 2.0.0 =
 * Builder Studio: the tabs are gone — you build inside a live canvas that IS the calculator (real engine, real themes, real totals), with undo/redo, drag-and-drop insertion, keyboard shortcuts and local draft recovery.
