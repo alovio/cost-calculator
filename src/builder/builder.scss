@@ -615,3 +615,14 @@ body.alcb-builder-page #wpbody-content { min-height: calc(100vh - 32px); }
 	.alc-app .alc-topbar { flex-direction: column; align-items: stretch; }
 	.alc-topbar__actions { justify-content: flex-start; }
 }
+
+// Brand accent for every @wordpress/components control on our page (modals included — they portal inside body).
+body.alcb-builder-page {
+	--wp-components-color-accent: #f97316;
+	--wp-components-color-accent-darker-10: #ea580c;
+	--wp-components-color-accent-darker-20: #c2410c;
+}
+.alc-template-card.is-selected {
+	border-color: var(--alcb-flame);
+	box-shadow: 0 0 0 1px var(--alcb-flame);
+}
