@@ -102,6 +102,7 @@ PHP 7.4 and newer, including PHP 8.4.
 * The admin app is now fully responsive: on phones and small tablets the Studio shows the live canvas full-width, with the field palette as a slide-in drawer and field settings as a bottom sheet (opens automatically when you tap a field).
 * The calculator and entries screens have a refreshed design: centered layout, branded header, and consistent action buttons — and the tables turn into readable cards on small screens.
 * Fixed the slider's min/max scale being squeezed next to the rail on every theme (the value bubble also stays inside the rail at the extremes).
+* The Studio's Desktop / Tablet / Mobile preview toggle now really triggers the calculator's responsive layout on the canvas (previously the narrow canvas kept the desktop layout, overlapping the summary).
 
 = 2.0.0 =
 * Builder Studio: the tabs are gone — you build inside a live canvas that IS the calculator (real engine, real themes, real totals), with undo/redo, drag-and-drop insertion, keyboard shortcuts and local draft recovery.

@@ -5,6 +5,29 @@
    (the default); .alc-theme--{minimal,midnight,soft,bold,slate} override the tokens.
    --alc-accent is set inline by the renderer (the per-calculator accent colour). */
 
+// The Builder Studio canvas renders this stylesheet inline (no iframe), so its
+// Desktop/Tablet/Mobile toggle only narrows a container — viewport media queries
+// can't see it. Every responsive block is therefore emitted twice: as a viewport
+// media query (visitors) and as a container query against the Studio canvas frame
+// (`container: alc-canvas` on .alcb-sheet). On the front end no alc-canvas
+// container exists, so the @container copies are inert.
+@mixin alc-narrow($bp: 720px) {
+	@media (max-width: $bp) {
+		@content;
+	}
+	@container alc-canvas (max-width: #{$bp}) {
+		@content;
+	}
+}
+@mixin alc-wide($bp) {
+	@media (min-width: $bp) {
+		@content;
+	}
+	@container alc-canvas (min-width: #{$bp}) {
+		@content;
+	}
+}
+
 .alc-calculator {
 	/* themeable tokens (classic defaults) */
 	--alc-radius: 8px;
@@ -426,7 +449,7 @@
 	outline-offset: 2px;
 }
 
-@media (max-width: 720px) {
+@include alc-narrow {
 	.alc-calculator {
 		grid-template-columns: 1fr;
 	}
@@ -888,7 +911,7 @@
 /* ============================================================
    MOBILE — single clean column
    ============================================================ */
-@media (max-width: 720px) {
+@include alc-narrow {
 	.alc-calculator.alc-theme--classic {
 		grid-template-columns: 1fr;
 		grid-template-areas:
@@ -1418,7 +1441,7 @@
 }
 
 /* ── Mobile: collapse to one clean column, ledger stays full & legible ── */
-@media (max-width: 720px) {
+@include alc-narrow {
 	.alc-calculator.alc-theme--minimal {
 		grid-template-columns: 1fr;
 		grid-template-areas:
@@ -1639,7 +1662,7 @@
 }
 
 /* radios side by side on wide screens */
-@media (min-width: 560px) {
+@include alc-wide(560px) {
   .alc-calculator.alc-theme--midnight .alc-field--radio fieldset {
     flex-direction: row;
     flex-wrap: wrap;
@@ -1647,6 +1670,18 @@
   .alc-calculator.alc-theme--midnight .alc-choice {
     flex: 1 1 0;
     justify-content: flex-start;
+  }
+}
+/* …but in the Studio the viewport media query above still fires at any canvas
+   width, so a narrow canvas must re-stack them (wins by source order). */
+@container alc-canvas (max-width: 559px) {
+  .alc-calculator.alc-theme--midnight .alc-field--radio fieldset {
+    flex-direction: column;
+    flex-wrap: nowrap;
+  }
+  .alc-calculator.alc-theme--midnight .alc-choice {
+    flex: 0 1 auto;
+    justify-content: normal;
   }
 }
 
@@ -1921,7 +1956,7 @@
 }
 
 /* ---------- MOBILE: single clean column ---------- */
-@media (max-width: 720px) {
+@include alc-narrow {
   .alc-calculator.alc-theme--midnight {
     grid-template-columns: 1fr;
     grid-template-areas:
@@ -2423,7 +2458,7 @@
 }
 
 /* ── Mobile: clean single column, nothing clipped ──────────────────────── */
-@media (max-width: 720px) {
+@include alc-narrow {
 	.alc-calculator.alc-theme--soft {
 		grid-template-columns: 1fr;
 		grid-template-areas:
@@ -2889,7 +2924,7 @@
 }
 
 /* ── Mobile: single clean column ─────────────────────────── */
-@media (max-width: 720px) {
+@include alc-narrow {
 	.alc-calculator.alc-theme--bold {
 		grid-template-columns: 1fr;
 		grid-template-areas:
@@ -3321,7 +3356,7 @@
 /* ============================================================
    MOBILE — single clean column (already stacked; tighten only)
    ============================================================ */
-@media (max-width: 720px) {
+@include alc-narrow {
   .alc-calculator.alc-theme--slate {
     max-inline-size: 100%;
     grid-template-columns: minmax(0, 1fr);

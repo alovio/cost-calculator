@@ -157,6 +157,7 @@ body.alcb-builder-page #wpbody-content > .error { display: none; }
 	margin: 0 auto; background: var(--alcb-panel);
 	border: 1px solid var(--alcb-line); border-radius: 16px; box-shadow: var(--alcb-shadow);
 	padding: 26px 30px; transition: max-width 0.2s ease;
+	container: alc-canvas / inline-size; // the frontend stylesheet mirrors its responsive blocks as @container queries against this
 }
 // Neutralise wp-admin form chrome inside the real fragment so it matches the site.
 .alcb-fragment select { max-width: none; min-height: 0; }
