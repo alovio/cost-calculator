@@ -72,6 +72,7 @@ export default function EntriesList( { onBack } ) {
 			{ data && ! data.rows.length && <p className="alc-empty">{ __( 'No entries yet.', 'alovio-calculator' ) }</p> }
 
 			{ data && !! data.rows.length && (
+				<div className="alc-panel alc-table-wrap">
 				<table className="widefat striped alc-table">
 					<thead>
 						<tr>
@@ -86,22 +87,23 @@ export default function EntriesList( { onBack } ) {
 					<tbody>
 						{ data.rows.map( ( row ) => (
 							<tr key={ row.id } className={ row.status === 'new' ? 'alc-row--new' : '' }>
-								<td>{ row.created_at }</td>
-								<td>{ row.name }</td>
-								<td>{ row.email }</td>
-								<td>{ row.total }</td>
-								<td><span className={ `alc-badge alc-badge--${ row.status }` }>{ row.status }</span></td>
+								<td className="alc-cell-updated" data-th={ __( 'Date', 'alovio-calculator' ) }>{ row.created_at }</td>
+								<td className="alc-cell-name" data-th={ __( 'Name', 'alovio-calculator' ) }>{ row.name }</td>
+								<td data-th={ __( 'Email', 'alovio-calculator' ) }>{ row.email }</td>
+								<td data-th={ __( 'Total', 'alovio-calculator' ) }>{ row.total }</td>
+								<td data-th={ __( 'Status', 'alovio-calculator' ) }><span className={ `alc-badge alc-badge--${ row.status }` }>{ row.status }</span></td>
 								<td className="alc-table__ops">
 									<Button size="small" variant="secondary" onClick={ () => setOpen( row ) }>{ __( 'View', 'alovio-calculator' ) }</Button>
 									{ row.status === 'new' && (
-										<Button size="small" onClick={ () => markRead( row ) }>{ __( 'Mark read', 'alovio-calculator' ) }</Button>
+										<Button size="small" variant="secondary" onClick={ () => markRead( row ) }>{ __( 'Mark read', 'alovio-calculator' ) }</Button>
 									) }
-									<Button size="small" isDestructive onClick={ () => remove( row ) }>{ __( 'Delete', 'alovio-calculator' ) }</Button>
+									<Button size="small" variant="secondary" isDestructive onClick={ () => remove( row ) }>{ __( 'Delete', 'alovio-calculator' ) }</Button>
 								</td>
 							</tr>
 						) ) }
 					</tbody>
 				</table>
+				</div>
 			) }
 
 			{ data && pages > 1 && (
