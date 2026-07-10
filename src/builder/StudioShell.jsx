@@ -19,11 +19,12 @@ function isTextTarget( t ) {
 }
 
 export default function StudioShell( { calculatorId, onBack } ) {
-	const { fields, settings, name, canUndo, canRedo } = useSelect(
+	const { fields, settings, name, selectedId, canUndo, canRedo } = useSelect(
 		( select ) => ( {
 			fields: select( STORE ).getFields(),
 			settings: select( STORE ).getSettings(),
 			name: select( STORE ).getName(),
+			selectedId: select( STORE ).getSelectedId(),
 			canUndo: select( STORE ).canUndo(),
 			canRedo: select( STORE ).canRedo(),
 		} ),
@@ -36,6 +37,8 @@ export default function StudioShell( { calculatorId, onBack } ) {
 	const [ flash, setFlash ] = useState( null ); // 'saved' | 'error' | null
 	const [ proOpen, setProOpen ] = useState( false );
 	const [ draft, setDraft ] = useState( null );
+	// Small screens (≤960px): the side columns become overlay drawers ('palette' | 'settings' | null).
+	const [ mobilePanel, setMobilePanel ] = useState( null );
 	const savedRef = useRef( null );
 	const modifiedRef = useRef( '' ); // server post_modified_gmt (fed from chunk 2; draft.js consumes it in chunk 4)
 	const isPro = !! ( window.ALOVIO_CALC_BUILDER && window.ALOVIO_CALC_BUILDER.isPro );
@@ -86,6 +89,13 @@ export default function StudioShell( { calculatorId, onBack } ) {
 		}
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [ loading ] );
+
+	// Tapping a canvas field on a small screen opens its settings as a bottom sheet.
+	useEffect( () => {
+		if ( selectedId && window.matchMedia( '(max-width: 960px)' ).matches ) {
+			setMobilePanel( 'settings' );
+		}
+	}, [ selectedId ] );
 
 	const save = useCallback( async () => {
 		setSaving( true );
@@ -182,9 +192,9 @@ export default function StudioShell( { calculatorId, onBack } ) {
 					onChange={ ( e ) => setName( e.target.value ) }
 				/>
 				<div className="alcb-grow"></div>
-				<span className={ statusCls }><span className="alcb-dot"></span>{ statusTxt }</span>
-				<button className="alcb-btn-ghost" disabled={ ! canUndo } onClick={ undo }>⟲ { __( 'Undo', 'alovio-calculator' ) }</button>
-				<button className="alcb-btn-ghost" disabled={ ! canRedo } onClick={ redo }>⟳ { __( 'Redo', 'alovio-calculator' ) }</button>
+				<span className={ statusCls }><span className="alcb-dot"></span><span className="alcb-status-txt">{ statusTxt }</span></span>
+				<button className="alcb-btn-ghost" disabled={ ! canUndo } onClick={ undo } aria-label={ __( 'Undo', 'alovio-calculator' ) }>⟲ <span className="alcb-btn-txt">{ __( 'Undo', 'alovio-calculator' ) }</span></button>
+				<button className="alcb-btn-ghost" disabled={ ! canRedo } onClick={ redo } aria-label={ __( 'Redo', 'alovio-calculator' ) }>⟳ <span className="alcb-btn-txt">{ __( 'Redo', 'alovio-calculator' ) }</span></button>
 				<button className="alcb-btn-primary" data-tour="save" disabled={ saving } onClick={ save }>
 					{ saving ? __( 'Saving…', 'alovio-calculator' ) : __( 'Save', 'alovio-calculator' ) }
 				</button>
@@ -205,10 +215,34 @@ export default function StudioShell( { calculatorId, onBack } ) {
 					</button>
 				</div>
 			) }
-			<div className="alcb-work">
-				<div className="alcb-col alcb-col--left"><PaletteV2 /></div>
+			{ /* Small screens only (CSS-hidden on desktop): toggles for the drawer columns. */ }
+			<div className="alcb-mobilebar">
+				<button
+					className={ 'palette' === mobilePanel ? 'is-on' : '' }
+					aria-expanded={ 'palette' === mobilePanel }
+					onClick={ () => setMobilePanel( 'palette' === mobilePanel ? null : 'palette' ) }
+				>
+					＋ { __( 'Fields', 'alovio-calculator' ) }
+				</button>
+				<button
+					className={ 'settings' === mobilePanel ? 'is-on' : '' }
+					aria-expanded={ 'settings' === mobilePanel }
+					onClick={ () => setMobilePanel( 'settings' === mobilePanel ? null : 'settings' ) }
+				>
+					⚙ { __( 'Settings', 'alovio-calculator' ) }
+				</button>
+			</div>
+			<div className={ 'alcb-work' + ( 'palette' === mobilePanel ? ' is-palette-open' : '' ) + ( 'settings' === mobilePanel ? ' is-settings-open' : '' ) }>
+				{ mobilePanel && <div className="alcb-drawer-backdrop" onClick={ () => setMobilePanel( null ) }></div> }
+				<div className="alcb-col alcb-col--left">
+					<button className="alcb-drawer-close" aria-label={ __( 'Close', 'alovio-calculator' ) } onClick={ () => setMobilePanel( null ) }>✕</button>
+					<PaletteV2 />
+				</div>
 				<div className="alcb-col alcb-col--center alcb-col--canvas"><LiveCanvas calculatorId={ calculatorId } /></div>
-				<div className="alcb-col alcb-col--right alcb-col--panel"><SettingsPanel proOpen={ proOpen } /></div>
+				<div className="alcb-col alcb-col--right alcb-col--panel">
+					<button className="alcb-drawer-close" aria-label={ __( 'Close', 'alovio-calculator' ) } onClick={ () => setMobilePanel( null ) }>✕</button>
+					<SettingsPanel proOpen={ proOpen } />
+				</div>
 			</div>
 		</div>
 	);

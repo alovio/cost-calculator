@@ -168,6 +168,7 @@ export default function CalculatorList( { onEdit, onEntries } ) {
 			) }
 
 			{ !! items.length && (
+				<div className="alc-panel alc-table-wrap">
 				<table className="widefat striped alc-table">
 					<thead>
 						<tr>
@@ -180,26 +181,27 @@ export default function CalculatorList( { onEdit, onEntries } ) {
 					<tbody>
 						{ items.map( ( item ) => (
 							<tr key={ item.id }>
-								<td>
+								<td className="alc-cell-name">
 									<Button variant="link" onClick={ () => onEdit( item.id ) }>{ item.title || __( '(untitled)', 'alovio-calculator' ) }</Button>
 								</td>
-								<td>
-									<code>{ item.shortcode }</code>{ ' ' }
-									<Button size="small" onClick={ () => copyShortcode( item ) }>
+								<td className="alc-cell-shortcode">
+									<code>{ item.shortcode }</code>
+									<Button size="small" variant="tertiary" onClick={ () => copyShortcode( item ) }>
 										{ copiedId === item.id ? __( 'Copied!', 'alovio-calculator' ) : __( 'Copy', 'alovio-calculator' ) }
 									</Button>
 								</td>
-								<td>{ item.updated }</td>
+								<td className="alc-cell-updated">{ item.updated }</td>
 								<td className="alc-table__ops">
 									<Button size="small" variant="secondary" onClick={ () => onEdit( item.id ) }>{ __( 'Edit', 'alovio-calculator' ) }</Button>
-									<Button size="small" onClick={ () => duplicate( item ) }>{ __( 'Duplicate', 'alovio-calculator' ) }</Button>
-									<Button size="small" onClick={ () => exportCalculator( item ) }>{ __( 'Export', 'alovio-calculator' ) }</Button>
-									<Button size="small" isDestructive onClick={ () => remove( item ) }>{ __( 'Delete', 'alovio-calculator' ) }</Button>
+									<Button size="small" variant="secondary" onClick={ () => duplicate( item ) }>{ __( 'Duplicate', 'alovio-calculator' ) }</Button>
+									<Button size="small" variant="secondary" onClick={ () => exportCalculator( item ) }>{ __( 'Export', 'alovio-calculator' ) }</Button>
+									<Button size="small" variant="secondary" isDestructive onClick={ () => remove( item ) }>{ __( 'Delete', 'alovio-calculator' ) }</Button>
 								</td>
 							</tr>
 						) ) }
 					</tbody>
 				</table>
+				</div>
 			) }
 
 			{ deleteOnUninstall !== null && (

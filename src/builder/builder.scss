@@ -385,3 +385,138 @@ body.alcb-builder-page #wpbody-content > .error { display: none; }
 .alcb-tour__btn { background: transparent; border: 0; color: #fff; opacity: 0.7; cursor: pointer; }
 .alcb-tour__btn--primary { opacity: 1; color: var( --alcb-flame, #f97316 ); font-weight: 600; }
 .alcb-tour-target { outline: 2px solid var( --alcb-flame, #f97316 ); outline-offset: 2px; border-radius: 4px; }
+
+// ── 12 · Responsive admin + list/entries table polish
+// Desktop polish: the list tables live inside a proper panel card.
+.alc-app .alc-panel {
+	background: var(--alcb-panel);
+	border: 1px solid var(--alcb-line);
+	border-radius: var(--alcb-r);
+	box-shadow: var(--alcb-shadow);
+	overflow: hidden;
+}
+.alc-table-wrap { margin-top: 16px; }
+.alc-app table.alc-table { border: 0; box-shadow: none; margin: 0; border-radius: 0; }
+.alc-app .alc-table thead th {
+	font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.06em;
+	color: var(--alcb-ink-3); background: #fafaf9; padding: 12px 16px;
+	border-bottom: 1px solid var(--alcb-line);
+}
+.alc-app .alc-table tbody td { padding: 12px 16px; vertical-align: middle; }
+.alc-app table.striped > tbody > :nth-child(odd) { background: transparent; } // our own separators instead of stripes
+.alc-app .alc-table tbody tr { border-bottom: 1px solid var(--alcb-line); }
+.alc-app .alc-table tbody tr:last-child { border-bottom: 0; }
+.alc-app .alc-table tbody tr:hover { background: #fafaf9; }
+.alc-app .alc-table .alc-cell-name .components-button.is-link { font-weight: 700; text-decoration: none; }
+.alc-app .alc-table .alc-cell-name .components-button.is-link:hover { color: var(--alcb-flame-deep); }
+.alc-cell-shortcode { white-space: nowrap; }
+.alc-cell-shortcode code {
+	background: var(--alcb-bg); border: 1px solid var(--alcb-line); border-radius: 6px;
+	padding: 3px 8px; font-size: 12px; margin-right: 4px;
+}
+.alc-cell-updated { color: var(--alcb-ink-3); font-variant-numeric: tabular-nums; }
+.alc-table__ops { display: flex; gap: 6px; flex-wrap: wrap; }
+.alc-app .alc-badge {
+	display: inline-block; padding: 2px 9px; border-radius: 999px;
+	background: var(--alcb-bg); border: 1px solid var(--alcb-line-2);
+	font-size: 10.5px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; color: var(--alcb-ink-2);
+}
+.alc-app .alc-badge--new { background: #fef3c7; border-color: #fde68a; color: #92400e; }
+.alc-app .alc-danger-zone {
+	margin-top: 16px; padding: 12px 16px;
+	background: var(--alcb-panel); border: 1px solid var(--alcb-line); border-radius: var(--alcb-r);
+	color: var(--alcb-ink-2);
+}
+.alc-app .alc-danger-zone summary { font-weight: 700; }
+.alc-app .alc-pagination { justify-content: center; }
+
+// List/entries on phones: rows become cards (WP's own 782px breakpoint).
+@media (max-width: 782px) {
+	.alc-app .alc-topbar { flex-wrap: wrap; row-gap: 8px; padding: 12px 14px; }
+	.alc-app .alc-table thead { display: none; }
+	.alc-app table.alc-table,
+	.alc-app .alc-table tbody,
+	.alc-app .alc-table tbody tr,
+	.alc-app .alc-table tbody td { display: block; width: auto; }
+	.alc-app .alc-table tbody tr { padding: 12px 14px; }
+	.alc-app .alc-table tbody td { padding: 2px 0; border: 0; }
+	.alc-app .alc-table td[data-th]::before {
+		content: attr(data-th); display: inline-block; min-width: 64px; margin-right: 8px;
+		font-size: 10.5px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; color: var(--alcb-ink-3);
+	}
+	.alc-app .alc-table .alc-cell-name .components-button.is-link { font-size: 14px; padding: 0; height: auto; }
+	.alc-cell-shortcode { white-space: normal; }
+	.alc-cell-shortcode code { display: inline-block; margin: 2px 4px 2px 0; word-break: break-all; white-space: normal; }
+	.alc-table__ops { padding-top: 10px; }
+	.alc-start__grid { grid-template-columns: 1fr; }
+}
+
+// ── 13 · Studio on small screens: single-column canvas + drawer columns
+.alcb-mobilebar { display: none; }
+.alcb-drawer-backdrop { display: none; }
+.alcb-drawer-close { display: none; }
+
+@media (max-width: 960px) {
+	.alcb-app { height: auto; min-height: calc(100vh - 46px); overflow: visible; }
+
+	// Header wraps to two tidy rows (name on top, actions below); icon-only undo/redo; dot-only status.
+	.alcb-hdr { height: auto; flex-wrap: wrap; padding: 10px 12px; row-gap: 8px; }
+	.alcb-logo .alcb-sub { display: none; }
+	.alcb-name { min-width: 110px; max-width: none; }
+	.alcb-hdr .alcb-grow { flex: 0 0 100%; height: 0; } // forces the row break after the name
+	.alcb-hdr .alcb-status { margin-right: auto; }
+	.alcb-btn-txt { display: none; }
+	.alcb-status-txt { display: none; }
+	.alcb-btn-ghost { padding: 0 11px; }
+
+	.alcb-mobilebar {
+		display: flex; gap: 8px; padding: 8px 12px; flex: none;
+		background: var(--alcb-panel); border-bottom: 1px solid var(--alcb-line);
+	}
+	.alcb-mobilebar button {
+		flex: 1; height: 38px; border-radius: var(--alcb-r-sm); cursor: pointer;
+		border: 1px solid var(--alcb-line-2); background: #fff;
+		font-size: 13px; font-weight: 700; color: var(--alcb-ink-2);
+	}
+	.alcb-mobilebar button.is-on {
+		border-color: var(--alcb-flame); color: var(--alcb-flame-deep); background: var(--alcb-flame-soft);
+	}
+
+	// The canvas becomes the page; side columns turn into overlays.
+	.alcb-work { display: block; }
+	.alcb-drawer-backdrop { display: block; position: fixed; inset: 0; z-index: 100005; background: rgba(28, 25, 23, 0.45); }
+	.alcb-col--left,
+	.alcb-col--right { position: fixed; z-index: 100010; transition: transform 0.22s ease; box-shadow: 0 12px 40px rgba(0, 0, 0, 0.28); }
+	.alcb-col--left {
+		top: 0; bottom: 0; left: 0; width: min(320px, 86vw);
+		padding-top: 44px; transform: translateX(-105%); overflow-y: auto;
+	}
+	.is-palette-open .alcb-col--left { transform: translateX(0); }
+	.alcb-col--right {
+		left: 0; right: 0; bottom: 0; top: auto; max-height: 78vh;
+		border-radius: 16px 16px 0 0; border-top: 1px solid var(--alcb-line);
+		transform: translateY(105%); overflow-y: auto;
+	}
+	.is-settings-open .alcb-col--right { transform: translateY(0); }
+	.alcb-drawer-close {
+		display: flex; position: absolute; top: 8px; right: 10px; z-index: 3;
+		width: 30px; height: 30px; align-items: center; justify-content: center; cursor: pointer;
+		border: 1px solid var(--alcb-line-2); border-radius: 8px; background: #fff; color: var(--alcb-ink-2);
+	}
+	.alcb-col--right .alcb-drawer-close { top: 10px; }
+	.alcb-col--right .alcb-sp-title { padding-right: 34px; }
+
+	// Canvas spacing tightened; the overlay inset MUST mirror the sheet padding.
+	.alcb-canvas-col { height: auto; }
+	.alcb-toolbar { margin: 10px 12px 0; padding: 8px 10px; }
+	.alcb-devices { display: none; } // the canvas is already phone-width here
+	.alcb-render-error,
+	.alcb-canvas-hint { margin: 8px 12px 0; }
+	.alcb-canvas { overflow: visible; padding: 12px 12px 20px; }
+	.alcb-sheet { padding: 16px 14px; border-radius: 12px; }
+	.alcb-overlay { inset: 16px 14px; }
+}
+
+@media (max-width: 600px) {
+	.alcb-app { min-height: 100vh; } // the WP admin bar scrolls away below 600px
+}

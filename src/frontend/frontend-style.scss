@@ -86,7 +86,7 @@
 	&__bubble {
 		position: absolute;
 		inset-block-start: 0;
-		inset-inline-start: clamp(0%, var(--alc-pos, 50%), 100%);
+		inset-inline-start: clamp(20px, var(--alc-pos, 50%), calc(100% - 20px)); // keep the pill inside the rail at the extremes
 		transform: translateX(-50%); /* physical on purpose: tracks the % offset */
 		padding: 2px 8px;
 		border-radius: 999px;
@@ -3425,3 +3425,21 @@
 .alc-calculator.alc-theme--bold .alc-repeater { border-width: 2px; border-color: var(--alc-border); }
 
 .alc-calculator.alc-theme--slate .alc-repeater { background: var(--alc-surface); border-color: var(--alc-surface-border); }
+
+/* ---- SLIDER structure guard: themes recolor the slider but must never re-lay-out the
+   new rail/bubble/scale markup (their display:flex rules predate it). Repeater-row
+   sliders (no __rail) keep the theme layout — hence the :has() scope. ---- */
+.alc-calculator .alc-slider:has(> .alc-slider__rail) {
+	display: block;
+	gap: 0;
+}
+.alc-calculator .alc-slider:has(> .alc-slider__rail) > .alc-slider__rail {
+	display: flex;
+	align-items: center;
+	padding-block-start: 28px;
+}
+.alc-calculator .alc-slider:has(> .alc-slider__rail) > .alc-slider__scale {
+	display: flex;
+	justify-content: space-between;
+	margin-block-start: 2px;
+}
