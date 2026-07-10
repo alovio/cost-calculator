@@ -48,22 +48,27 @@ export default function EntriesList( { onBack } ) {
 	return (
 		<div className="alc-app">
 			<div className="alc-topbar">
-				<Button variant="tertiary" onClick={ onBack }>← { __( 'All calculators', 'alovio-calculator' ) }</Button>
-				<h1 className="alc-heading">{ __( 'Entries', 'alovio-calculator' ) }</h1>
-				<SelectControl
-					label={ __( 'Calculator', 'alovio-calculator' ) }
-					hideLabelFromVision
-					value={ String( calculator ) }
-					options={ [
-						{ label: __( 'All calculators', 'alovio-calculator' ), value: '0' },
-						...calculators.map( ( c ) => ( { label: c.title, value: String( c.id ) } ) ),
-					] }
-					onChange={ ( v ) => {
-						setCalculator( parseInt( v, 10 ) || 0 );
-						setPage( 1 );
-					} }
-				/>
-				<Button variant="secondary" href={ exportUrl }>{ __( 'Export CSV', 'alovio-calculator' ) }</Button>
+				<div className="alc-brand">
+					<Button variant="tertiary" className="alc-back" onClick={ onBack } aria-label={ __( 'All calculators', 'alovio-calculator' ) }>←</Button>
+					<span className="alc-brand__mark">▲</span>
+					<h1 className="alc-heading">{ __( 'Entries', 'alovio-calculator' ) }</h1>
+				</div>
+				<div className="alc-topbar__actions">
+					<SelectControl
+						label={ __( 'Calculator', 'alovio-calculator' ) }
+						hideLabelFromVision
+						value={ String( calculator ) }
+						options={ [
+							{ label: __( 'All calculators', 'alovio-calculator' ), value: '0' },
+							...calculators.map( ( c ) => ( { label: c.title, value: String( c.id ) } ) ),
+						] }
+						onChange={ ( v ) => {
+							setCalculator( parseInt( v, 10 ) || 0 );
+							setPage( 1 );
+						} }
+					/>
+					<Button variant="secondary" href={ exportUrl }>{ __( 'Export CSV', 'alovio-calculator' ) }</Button>
+				</div>
 			</div>
 
 			{ error && <Notice status="error" isDismissible={ false }>{ error }</Notice> }

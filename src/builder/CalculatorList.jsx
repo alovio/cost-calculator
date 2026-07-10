@@ -105,7 +105,11 @@ export default function CalculatorList( { onEdit, onEntries } ) {
 	return (
 		<div className="alc-app">
 			<div className="alc-topbar">
-				<h1 className="alc-heading">{ __( 'Alovio Calculator', 'alovio-calculator' ) }</h1>
+				<div className="alc-brand">
+					<span className="alc-brand__mark">▲</span>
+					<h1 className="alc-heading">Alovio <span className="alc-brand__sub">{ __( 'Calculator', 'alovio-calculator' ) }</span></h1>
+				</div>
+				<div className="alc-topbar__actions">
 				<Button variant="primary" onClick={ () => setPicking( true ) }>{ __( 'Add new', 'alovio-calculator' ) }</Button>
 				<Button variant="secondary" onClick={ onEntries }>{ __( 'Entries', 'alovio-calculator' ) }</Button>
 				<DropdownMenu text={ __( 'Import', 'alovio-calculator' ) } icon={ null } label={ __( 'Import', 'alovio-calculator' ) } toggleProps={ { variant: 'secondary' } }>
@@ -132,6 +136,7 @@ export default function CalculatorList( { onEdit, onEntries } ) {
 						e.target.value = '';
 					} }
 				/>
+				</div>
 			</div>
 
 			{ notice && (

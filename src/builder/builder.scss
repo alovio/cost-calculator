@@ -520,3 +520,98 @@ body.alcb-builder-page #wpbody-content > .error { display: none; }
 @media (max-width: 600px) {
 	.alcb-app { min-height: 100vh; } // the WP admin bar scrolls away below 600px
 }
+
+// ── 14 · List/entries app pages: centered layout + the Studio's coal/flame identity
+// (supersedes the lighter section-10 restyle: same selectors, later rules win)
+body.alcb-builder-page #wpcontent { background: var(--alcb-bg); }
+body.alcb-builder-page #wpbody-content { min-height: calc(100vh - 32px); }
+.alc-app {
+	max-width: 1200px;
+	margin: 0 auto;
+	padding: 28px 28px 56px;
+}
+
+// Coal brand header — mirrors the Studio header bar.
+.alc-app .alc-topbar {
+	margin: 0 0 20px;
+	padding: 12px 16px;
+	background: var(--alcb-coal);
+	border: none;
+	border-radius: var(--alcb-r);
+	box-shadow: var(--alcb-shadow);
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 12px;
+}
+.alc-brand { display: flex; align-items: center; gap: 10px; min-width: 0; }
+.alc-brand__mark {
+	width: 30px; height: 30px; flex: none; border-radius: 8px;
+	background: linear-gradient(135deg, var(--alcb-flame), var(--alcb-flame-deep));
+	color: #fff; display: flex; align-items: center; justify-content: center; font-size: 14px;
+}
+.alc-app .alc-topbar .alc-heading { margin: 0; font-size: 16px; font-weight: 800; color: #fff; white-space: nowrap; }
+.alc-brand__sub { color: #a8a29e; font-weight: 600; }
+.alc-topbar__actions { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
+.alc-topbar__actions .components-base-control { margin: 0; }
+.alc-topbar__actions .components-base-control__field { margin: 0; }
+
+// Buttons ON the coal bar: flame primary + dark-ghost secondaries (like the Studio).
+.alc-app .alc-topbar .components-button { border-radius: var(--alcb-r-sm); font-weight: 700; }
+.alc-app .alc-topbar .components-button.is-primary {
+	background: linear-gradient(135deg, var(--alcb-flame), var(--alcb-flame-deep));
+	box-shadow: 0 4px 14px -4px rgba(234, 88, 12, 0.6);
+}
+.alc-app .alc-topbar .components-button.is-secondary {
+	color: #d6d3d1;
+	background: transparent;
+	box-shadow: inset 0 0 0 1px #44403c;
+}
+.alc-app .alc-topbar .components-button.is-secondary:hover:not(:disabled) { color: #fff; box-shadow: inset 0 0 0 1px #78716c; }
+.alc-app .alc-topbar .components-button.is-tertiary { color: #a8a29e; }
+.alc-app .alc-topbar .components-button.is-tertiary:hover:not(:disabled) { color: #fff; background: transparent; }
+.alc-app .alc-topbar .alc-back {
+	width: 32px; height: 32px; min-width: 32px; padding: 0; flex: none;
+	justify-content: center; color: #d6d3d1; box-shadow: inset 0 0 0 1px #44403c;
+}
+.alc-app .alc-topbar .alc-back:hover { color: #fff; box-shadow: inset 0 0 0 1px #78716c; }
+.alc-app .alc-topbar select {
+	background-color: rgba(255, 255, 255, 0.08);
+	border: 1px solid rgba(255, 255, 255, 0.16);
+	border-radius: var(--alcb-r-sm);
+	color: #e7e5e4; font-weight: 600; max-width: 220px;
+}
+.alc-app .alc-topbar select:focus { border-color: var(--alcb-flame); box-shadow: none; color: #fff; }
+
+// Body-wide button system: neutral ink ghosts that warm to flame on hover.
+.alc-app .components-button { border-radius: var(--alcb-r-sm); }
+.alc-app .alc-panel .components-button.is-secondary,
+.alc-app .alc-pagination .components-button {
+	color: var(--alcb-ink-2);
+	background: #fff;
+	box-shadow: inset 0 0 0 1px var(--alcb-line-2);
+	font-weight: 600;
+}
+.alc-app .alc-panel .components-button.is-secondary:hover:not(:disabled),
+.alc-app .alc-pagination .components-button:hover:not(:disabled) {
+	color: var(--alcb-flame-deep);
+	background: var(--alcb-flame-soft);
+	box-shadow: inset 0 0 0 1px var(--alcb-flame-border);
+}
+.alc-app .alc-panel .components-button.is-secondary.is-destructive { color: #b91c1c; }
+.alc-app .alc-panel .components-button.is-secondary.is-destructive:hover:not(:disabled) {
+	color: #b91c1c; background: #fef2f2; box-shadow: inset 0 0 0 1px #fecaca;
+}
+.alc-app .alc-panel .components-button.is-tertiary { color: var(--alcb-ink-3); font-weight: 600; }
+.alc-app .alc-panel .components-button.is-tertiary:hover:not(:disabled) { color: var(--alcb-flame-deep); background: transparent; }
+.alc-app .alc-table .alc-cell-name .components-button.is-link { color: var(--alcb-ink); font-size: 13.5px; }
+
+// Start-screen cards sit on the warm page background now.
+.alc-start__card { background: var(--alcb-panel); border-color: var(--alcb-line); }
+.alc-start__card:hover { box-shadow: var(--alcb-shadow); }
+
+@media (max-width: 782px) {
+	.alc-app { padding: 16px 14px 40px; }
+	.alc-app .alc-topbar { flex-direction: column; align-items: stretch; }
+	.alc-topbar__actions { justify-content: flex-start; }
+}
