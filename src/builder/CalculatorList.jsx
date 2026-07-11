@@ -3,6 +3,7 @@ import { Button, Spinner, Notice, ToggleControl, DropdownMenu, MenuGroup, MenuIt
 import { __, _n, sprintf } from '@wordpress/i18n';
 import { listCalculators, createCalculator, getCalculator, saveCalculator, deleteCalculator, getSettings, saveSettings, listCcbImport, runCcbImport } from './api';
 import TemplatePicker from './TemplatePicker';
+import { FLAME } from './icons';
 
 const slugify = ( s ) =>
 	( s || 'calculator' ).toLowerCase().replace( /[^a-z0-9]+/g, '-' ).replace( /^-+|-+$/g, '' ).slice( 0, 60 ) || 'calculator';
@@ -106,7 +107,7 @@ export default function CalculatorList( { onEdit, onEntries } ) {
 		<div className="alc-app">
 			<div className="alc-topbar">
 				<div className="alc-brand">
-					<span className="alc-brand__mark">▲</span>
+					<span className="alc-brand__mark">{ FLAME }</span>
 					<h1 className="alc-heading">Alovio <span className="alc-brand__sub">{ __( 'Calculator', 'alovio-calculator' ) }</span></h1>
 				</div>
 				<div className="alc-topbar__actions">

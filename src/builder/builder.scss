@@ -562,6 +562,8 @@ body.alcb-builder-page #wpbody-content { min-height: calc(100vh - 32px); }
 	background: linear-gradient(135deg, var(--alcb-flame), var(--alcb-flame-deep));
 	color: #fff; display: flex; align-items: center; justify-content: center; font-size: 14px;
 }
+.alc-brand__mark svg, .alcb-logo .alcb-mark svg { display: block; }
+.alcb-logo .alcb-mark { color: #fff; }
 .alc-app .alc-topbar .alc-heading { margin: 0; font-size: 16px; font-weight: 800; color: #fff; white-space: nowrap; }
 .alc-brand__sub { color: #a8a29e; font-weight: 600; }
 .alc-topbar__actions { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }

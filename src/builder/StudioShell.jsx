@@ -6,6 +6,7 @@ import { STORE } from './store';
 import { getCalculator, saveCalculator } from './api';
 import PaletteV2 from './PaletteV2';
 import LiveCanvas from './LiveCanvas';
+import { FLAME } from './icons';
 import SettingsPanel from './SettingsPanel';
 import { saveDraft, loadDraft, clearDraft, isDraftNewer, DRAFT_DEBOUNCE_MS } from './draft';
 import { shouldStartTour, startTour } from './tour';
@@ -181,7 +182,7 @@ export default function StudioShell( { calculatorId, onBack } ) {
 			<div className="alcb-hdr">
 				<button className="alcb-back" onClick={ back } aria-label={ __( 'All calculators', 'alovio-calculator' ) }>←</button>
 				<div className="alcb-logo">
-					<span className="alcb-mark">▲</span>
+					<span className="alcb-mark">{ FLAME }</span>
 					Alovio <span className="alcb-sub">{ __( 'Calculator', 'alovio-calculator' ) }</span>
 				</div>
 				<input

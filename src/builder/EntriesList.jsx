@@ -3,6 +3,7 @@ import { Button, Spinner, Notice, SelectControl, Modal } from '@wordpress/compon
 import { __ } from '@wordpress/i18n';
 import { listEntries, updateEntry, deleteEntry, listCalculators } from './api';
 import { formatCurrency } from '../shared/currency';
+import { FLAME } from './icons';
 
 const PER_PAGE = 20;
 
@@ -50,7 +51,7 @@ export default function EntriesList( { onBack } ) {
 			<div className="alc-topbar">
 				<div className="alc-brand">
 					<Button variant="tertiary" className="alc-back" onClick={ onBack } aria-label={ __( 'All calculators', 'alovio-calculator' ) }>←</Button>
-					<span className="alc-brand__mark">▲</span>
+					<span className="alc-brand__mark">{ FLAME }</span>
 					<h1 className="alc-heading">{ __( 'Entries', 'alovio-calculator' ) }</h1>
 				</div>
 				<div className="alc-topbar__actions">
