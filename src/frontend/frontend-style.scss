@@ -190,7 +190,7 @@
 		border: 0;
 		background: none;
 		color: var(--alc-muted);
-		font-size: 18px;
+		font-size: 1.125em;
 		line-height: 1;
 		padding: 2px 6px;
 		cursor: pointer;
@@ -521,7 +521,7 @@
 
 	color: var(--clc-ink);
 	font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-	font-size: 15px;
+	font-size: 0.938em;
 	line-height: 1.5;
 	-webkit-font-smoothing: antialiased;
 }
@@ -552,7 +552,7 @@
 
 .alc-calculator.alc-theme--classic .alc-field > label,
 .alc-calculator.alc-theme--classic .alc-field legend {
-	font-size: 12.5px;
+	font-size: 0.833em;
 	font-weight: 600;
 	letter-spacing: 0.01em;
 	color: var(--clc-muted);
@@ -604,7 +604,7 @@
 	text-align: center;
 	font-variant-numeric: tabular-nums;
 	font-weight: 700;
-	font-size: 14px;
+	font-size: 0.933em;
 	color: var(--clc-ink);
 	padding: 6px 10px;
 	background: var(--clc-panel);
@@ -705,7 +705,7 @@
 }
 .alc-calculator.alc-theme--classic .alc-heading {
 	margin: 0;
-	font-size: 12px;
+	font-size: 0.8em;
 	font-weight: 700;
 	letter-spacing: 0.08em;
 	text-transform: uppercase;
@@ -733,7 +733,7 @@
 .alc-calculator.alc-theme--classic .alc-line__value {
 	flex: none;
 	font-variant-numeric: tabular-nums;
-	font-size: 18px;
+	font-size: 1.2em;
 	font-weight: 800;
 	color: var(--clc-ink);
 }
@@ -756,7 +756,7 @@
 .alc-calculator.alc-theme--classic .alc-summary::before {
 	content: "Summary";
 	display: block;
-	font-size: 11px;
+	font-size: 0.733em;
 	font-weight: 700;
 	letter-spacing: 0.1em;
 	text-transform: uppercase;
@@ -776,7 +776,7 @@
 	display: flex;
 	align-items: baseline;
 	gap: 6px;
-	font-size: 13.5px;
+	font-size: 0.9em;
 }
 .alc-calculator.alc-theme--classic .alc-line-label {
 	flex: 0 1 auto;
@@ -813,7 +813,7 @@
 	border-block-start: 2px solid var(--clc-panel-edge);
 }
 .alc-calculator.alc-theme--classic .alc-total__label {
-	font-size: 13px;
+	font-size: 0.754em;
 	font-weight: 700;
 	letter-spacing: 0.04em;
 	text-transform: uppercase;
@@ -821,7 +821,7 @@
 }
 .alc-calculator.alc-theme--classic .alc-total__value {
 	font-variant-numeric: tabular-nums;
-	font-size: clamp(26px, 4vw, 32px);
+	font-size: clamp(1.507em, 4vw, 1.855em);
 	font-weight: 800;
 	line-height: 1;
 	letter-spacing: -0.02em;
@@ -840,7 +840,7 @@
 }
 .alc-calculator.alc-theme--classic .alc-quote h3 {
 	margin: 0;
-	font-size: 17px;
+	font-size: 1.133em;
 	font-weight: 700;
 	letter-spacing: -0.01em;
 	color: var(--clc-ink);
@@ -849,7 +849,7 @@
 	display: flex;
 	flex-direction: column;
 	gap: 7px;
-	font-size: 12.5px;
+	font-size: 0.833em;
 	font-weight: 600;
 	color: var(--clc-muted);
 }
@@ -875,7 +875,7 @@
 	margin-block-start: 4px;
 	font: inherit;
 	font-weight: 700;
-	font-size: 14px;
+	font-size: 0.933em;
 	color: #fff;
 	padding: 12px 24px;
 	background: var(--alc-accent);
@@ -892,7 +892,7 @@
 	transform: translateY(1px);
 }
 .alc-calculator.alc-theme--classic .alc-quote-feedback {
-	font-size: 13px;
+	font-size: 0.867em;
 	color: var(--clc-muted);
 }
 .alc-calculator.alc-theme--classic .alc-quote-feedback:not(:empty) {
@@ -1014,7 +1014,7 @@
 		padding: 0;
 		font-family: var(--alc-serif);
 		font-weight: 400;
-		font-size: 0.74rem;
+		font-size: 0.74em;
 		letter-spacing: 0.16em;
 		text-transform: uppercase;
 		color: var(--alc-muted);
@@ -1046,7 +1046,7 @@
 		background: transparent;
 		color: var(--alc-ink);
 		font-family: var(--alc-serif);
-		font-size: 1.12rem;
+		font-size: 1.12em;
 		line-height: 1.4;
 		transition: border-color 0.18s ease;
 		appearance: none;
@@ -1086,7 +1086,7 @@
 		min-inline-size: 4ch;
 		text-align: end;
 		font-variant-numeric: tabular-nums;
-		font-size: 1.5rem;
+		font-size: 1.5em;
 		font-weight: 400;
 		line-height: 1;
 		color: var(--alc-ink);
@@ -1113,7 +1113,7 @@
 	}
 
 	.alc-choice__label {
-		font-size: 1.06rem;
+		font-size: 1.06em;
 		letter-spacing: 0.01em;
 	}
 
@@ -1128,7 +1128,7 @@
 		align-items: center;
 		gap: 14px;
 		cursor: pointer;
-		font-size: 1.06rem;
+		font-size: 1.06em;
 		color: var(--alc-ink);
 		grid-column: 1 / -1;
 	}
@@ -1190,7 +1190,7 @@
 		font-family: var(--alc-serif);
 		font-weight: 400;
 		font-style: italic;
-		font-size: clamp(1.35rem, 1rem + 1.4vw, 1.9rem);
+		font-size: clamp(1.35em, 1em + 1.4vw, 1.9em);
 		letter-spacing: 0.01em;
 		line-height: 1.15;
 		color: var(--alc-ink);
@@ -1212,13 +1212,13 @@
 
 	.alc-line > span:first-child {
 		font-style: italic;
-		font-size: 1.05rem;
+		font-size: 1.05em;
 		color: var(--alc-muted);
 	}
 
 	.alc-line__value {
 		font-variant-numeric: tabular-nums;
-		font-size: 1.7rem;
+		font-size: 1.7em;
 		line-height: 1;
 		color: var(--alc-ink);
 	}
@@ -1249,7 +1249,7 @@
 		margin: 0;
 		padding-block: clamp(13px, 1.6vw, 18px);
 		border-block-end: 1px solid var(--alc-rule);
-		font-size: 0.98rem;
+		font-size: 0.98em;
 	}
 
 	.alc-summary__lines li:first-child {
@@ -1282,7 +1282,7 @@
 	.alc-total__label {
 		display: block;
 		margin-block-end: 6px;
-		font-size: 0.72rem;
+		font-size: 0.626em;
 		letter-spacing: 0.24em;
 		text-transform: uppercase;
 		color: var(--alc-muted);
@@ -1292,7 +1292,7 @@
 		display: block;
 		font-family: var(--alc-serif);
 		font-weight: 400;
-		font-size: clamp(2rem, 4.5vw, 2.9rem); /* capped so the serif total can't overflow the narrow summary column */
+		font-size: clamp(1.739em, 4.5vw, 2.522em); /* capped so the serif total can't overflow the narrow summary column */
 		line-height: 0.95;
 		letter-spacing: -0.015em;
 		font-variant-numeric: tabular-nums lining-nums;
@@ -1335,7 +1335,7 @@
 		font-family: var(--alc-serif);
 		font-weight: 400;
 		font-style: italic;
-		font-size: clamp(1.5rem, 1.1rem + 1.8vw, 2.2rem);
+		font-size: clamp(1.5em, 1.1em + 1.8vw, 2.2em);
 		line-height: 1.15;
 		letter-spacing: 0.01em;
 		color: var(--alc-ink);
@@ -1345,7 +1345,7 @@
 		grid-column: 2;
 		display: block;
 		margin: 0;
-		font-size: 0.74rem;
+		font-size: 0.74em;
 		letter-spacing: 0.16em;
 		text-transform: uppercase;
 		color: var(--alc-muted);
@@ -1363,7 +1363,7 @@
 		background: transparent;
 		color: var(--alc-ink);
 		font-family: var(--alc-serif);
-		font-size: 1.12rem;
+		font-size: 1.12em;
 		transition: border-color 0.18s ease;
 		appearance: none;
 		-webkit-appearance: none;
@@ -1389,7 +1389,7 @@
 		color: var(--alc-ink);
 		font-family: var(--alc-serif);
 		font-style: italic;
-		font-size: 1.18rem;
+		font-size: 1.18em;
 		letter-spacing: 0.01em;
 		cursor: pointer;
 		transition: color 0.18s ease, border-color 0.18s ease, padding-inline 0.2s ease;
@@ -1419,7 +1419,7 @@
 	.alc-quote-feedback.is-error {
 		color: #b4332a;
 		font-style: italic;
-		font-size: 0.9rem;
+		font-size: 0.9em;
 		letter-spacing: 0.01em;
 		margin-block-start: 6px;
 		text-transform: none;
@@ -1428,7 +1428,7 @@
 	.alc-quote-feedback.is-success {
 		font-style: italic;
 		font-weight: 400;
-		font-size: 0.95rem;
+		font-size: 0.95em;
 		margin-block-start: 6px;
 		color: var(--alc-ink);
 	}
@@ -1554,7 +1554,7 @@
 
 .alc-calculator.alc-theme--midnight .alc-field > label,
 .alc-calculator.alc-theme--midnight .alc-field legend {
-  font-size: 0.72rem;
+  font-size: 0.72em;
   font-weight: 600;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -1568,7 +1568,7 @@
   inline-size: 100%;
   appearance: none;
   font: inherit;
-  font-size: 0.96rem;
+  font-size: 0.96em;
   color: var(--mid-text);
   background: var(--mid-glass);
   border: 1px solid var(--mid-hair);
@@ -1608,7 +1608,7 @@
   text-align: center;
   font-variant-numeric: tabular-nums;
   font-weight: 700;
-  font-size: 0.95rem;
+  font-size: 0.95em;
   color: var(--mid-text);
   padding: 7px 10px;
   background: var(--mid-glass-2);
@@ -1641,7 +1641,7 @@
   border: 1px solid var(--mid-hair);
   border-radius: 12px;
   cursor: pointer;
-  font-size: 0.92rem;
+  font-size: 0.92em;
   transition: border-color 0.18s ease, background 0.18s ease, box-shadow 0.18s ease;
 }
 .alc-calculator.alc-theme--midnight .alc-choice input[type="radio"] {
@@ -1691,7 +1691,7 @@
   align-items: center;
   gap: 12px;
   cursor: pointer;
-  font-size: 0.95rem;
+  font-size: 0.95em;
   font-weight: 500;
   color: var(--mid-text);
   user-select: none;
@@ -1742,7 +1742,7 @@
 }
 .alc-calculator.alc-theme--midnight .alc-heading {
   margin: 0;
-  font-size: 0.74rem;
+  font-size: 0.74em;
   font-weight: 700;
   letter-spacing: 0.14em;
   text-transform: uppercase;
@@ -1767,7 +1767,7 @@
   border-radius: 14px;
 }
 .alc-calculator.alc-theme--midnight .alc-line > span:first-child {
-  font-size: 0.78rem;
+  font-size: 0.78em;
   font-weight: 600;
   letter-spacing: 0.06em;
   text-transform: uppercase;
@@ -1776,7 +1776,7 @@
 .alc-calculator.alc-theme--midnight .alc-line__value {
   font-variant-numeric: tabular-nums;
   font-weight: 800;
-  font-size: 1.15rem;
+  font-size: 1.15em;
   color: var(--alc-accent);
   text-shadow: 0 0 18px var(--mid-glow);
 }
@@ -1825,13 +1825,13 @@
   padding-block-start: 2px;
 }
 .alc-calculator.alc-theme--midnight .alc-line-label {
-  font-size: 0.86rem;
+  font-size: 0.935em;
   color: var(--mid-muted);
 }
 .alc-calculator.alc-theme--midnight .alc-line-value {
   font-variant-numeric: tabular-nums;
   font-weight: 600;
-  font-size: 0.92rem;
+  font-size: 1em;
   color: var(--mid-text);
   text-align: end;
 }
@@ -1854,7 +1854,7 @@
     0 14px 40px -16px var(--mid-glow);
 }
 .alc-calculator.alc-theme--midnight .alc-total__label {
-  font-size: 0.74rem;
+  font-size: 0.643em;
   font-weight: 700;
   letter-spacing: 0.16em;
   text-transform: uppercase;
@@ -1863,7 +1863,7 @@
 .alc-calculator.alc-theme--midnight .alc-total__value {
   font-variant-numeric: tabular-nums;
   font-weight: 800;
-  font-size: 1.85rem;
+  font-size: 1.609em;
   line-height: 1;
   color: #fff;
   text-shadow:
@@ -1888,7 +1888,7 @@
 .alc-calculator.alc-theme--midnight .alc-quote h3 {
   grid-column: 1 / -1;
   margin: 0 0 2px;
-  font-size: 1.05rem;
+  font-size: 1.05em;
   font-weight: 700;
   letter-spacing: -0.01em;
   color: var(--mid-text);
@@ -1897,7 +1897,7 @@
   display: flex;
   flex-direction: column;
   gap: 8px;
-  font-size: 0.72rem;
+  font-size: 0.72em;
   font-weight: 600;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -1911,7 +1911,7 @@
   cursor: pointer;
   font: inherit;
   font-weight: 700;
-  font-size: 0.96rem;
+  font-size: 0.96em;
   letter-spacing: 0.02em;
   color: #1a1206;
   padding: 14px 20px;
@@ -1943,7 +1943,7 @@
 }
 .alc-calculator.alc-theme--midnight .alc-quote-feedback {
   grid-column: 1 / -1;
-  font-size: 0.86rem;
+  font-size: 0.86em;
   color: var(--mid-muted);
 }
 .alc-calculator.alc-theme--midnight .alc-quote-feedback:empty {
@@ -1974,7 +1974,7 @@
     grid-template-columns: 1fr;
   }
   .alc-calculator.alc-theme--midnight .alc-total__value {
-    font-size: 1.7rem;
+    font-size: 1.478em;
   }
 }
 /* ════════════════════════════════════════════════════════════════════════
@@ -2559,7 +2559,7 @@
 .alc-calculator.alc-theme--bold .alc-field legend {
 	display: block;
 	margin-block-end: 8px;
-	font-size: 0.74rem;
+	font-size: 0.74em;
 	font-weight: 700;
 	letter-spacing: 0.08em;
 	text-transform: uppercase;
@@ -2663,7 +2663,7 @@
 .alc-calculator.alc-theme--bold .alc-choice__label {
 	text-transform: uppercase;
 	letter-spacing: 0.04em;
-	font-size: 0.82rem;
+	font-size: 0.82em;
 }
 
 /* ── Toggle: hard-edged switch in a boxed row ────────────── */
@@ -2672,7 +2672,7 @@
 	align-items: center;
 	gap: 12px;
 	font-family: ui-monospace, Menlo, Consolas, monospace;
-	font-size: 0.78rem;
+	font-size: 0.78em;
 	font-weight: 700;
 	letter-spacing: 0.06em;
 	text-transform: uppercase;
@@ -2704,7 +2704,7 @@
 	margin: 0;
 	padding: 6px 14px;
 	font-family: ui-monospace, Menlo, Consolas, monospace;
-	font-size: 0.82rem;
+	font-size: 0.82em;
 	font-weight: 800;
 	letter-spacing: 0.12em;
 	text-transform: uppercase;
@@ -2755,7 +2755,7 @@
 	display: block;
 	padding: 10px 16px;
 	font-family: ui-monospace, Menlo, Consolas, monospace;
-	font-size: 0.74rem;
+	font-size: 0.74em;
 	font-weight: 800;
 	letter-spacing: 0.16em;
 	color: var(--alc-paper);
@@ -2774,7 +2774,7 @@
 	align-items: baseline;
 	gap: 12px;
 	padding-block: 9px;
-	font-size: 0.82rem;
+	font-size: 0.82em;
 	border-block-end: 2px dashed var(--alc-ink);
 }
 
@@ -2806,7 +2806,7 @@
 }
 
 .alc-calculator.alc-theme--bold .alc-total__label {
-	font-size: 0.84rem;
+	font-size: 0.73em;
 	font-weight: 800;
 	letter-spacing: 0.12em;
 	text-transform: uppercase;
@@ -2815,7 +2815,7 @@
 
 .alc-calculator.alc-theme--bold .alc-total__value {
 	font-family: ui-monospace, Menlo, Consolas, monospace;
-	font-size: 1.5rem;
+	font-size: 1.304em;
 	font-weight: 800;
 	color: var(--alc-ink);            /* accent is the FILL, ink is the text */
 	font-variant-numeric: tabular-nums;
@@ -2834,7 +2834,7 @@
 .alc-calculator.alc-theme--bold .alc-quote h3 {
 	margin: 0 0 14px;
 	font-family: ui-monospace, Menlo, Consolas, monospace;
-	font-size: 0.92rem;
+	font-size: 0.92em;
 	font-weight: 800;
 	letter-spacing: 0.08em;
 	text-transform: uppercase;
@@ -2843,7 +2843,7 @@
 .alc-calculator.alc-theme--bold .alc-quote__field {
 	display: block;
 	margin-block-end: 14px;
-	font-size: 0.72rem;
+	font-size: 0.72em;
 	font-weight: 700;
 	letter-spacing: 0.08em;
 	text-transform: uppercase;
@@ -2872,7 +2872,7 @@
 	margin-block-start: 4px;
 	padding: 14px 26px;
 	font-family: ui-monospace, Menlo, Consolas, monospace;
-	font-size: 0.86rem;
+	font-size: 0.86em;
 	font-weight: 800;
 	letter-spacing: 0.1em;
 	text-transform: uppercase;
@@ -2908,7 +2908,7 @@
 	margin-block-start: 10px;
 	padding: 8px 12px;
 	font-family: ui-monospace, Menlo, Consolas, monospace;
-	font-size: 0.74rem;
+	font-size: 0.74em;
 	font-weight: 700;
 	text-transform: uppercase;
 	letter-spacing: 0.04em;
@@ -2976,7 +2976,7 @@
   border: 1px solid var(--slate-line-2);
   border-radius: var(--slate-radius);
   font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-  font-size: 13px;
+  font-size: 0.812em;
   line-height: 1.35;
   color: var(--slate-ink);
   -webkit-font-smoothing: antialiased;
@@ -3026,7 +3026,7 @@
 .alc-calculator.alc-theme--slate .alc-field legend {
   display: block;
   margin-block-end: 6px;
-  font-size: 10.5px;
+  font-size: 0.808em;
   font-weight: 600;
   letter-spacing: 0.06em;
   text-transform: uppercase;
@@ -3038,7 +3038,7 @@
 .alc-calculator.alc-theme--slate input[type="number"] {
   inline-size: 100%;
   padding: 6px 9px;
-  font-size: 13px;
+  font-size: 1em;
   color: var(--slate-ink);
   background: var(--slate-bg);
   border: 1px solid var(--slate-line-2);
@@ -3079,7 +3079,7 @@
   flex: 0 0 auto;
   min-inline-size: 48px;
   padding: 3px 8px;
-  font-size: 12px;
+  font-size: 0.923em;
   font-weight: 600;
   text-align: end;
   color: var(--slate-ink);
@@ -3101,7 +3101,7 @@
   gap: 6px;
   margin-inline-end: 6px;
   padding: 5px 10px;
-  font-size: 12px;
+  font-size: 0.923em;
   color: var(--slate-ink-soft);
   background: var(--slate-bg);
   border: 1px solid var(--slate-line-2);
@@ -3125,7 +3125,7 @@
   display: flex;
   align-items: center;
   gap: 9px;
-  font-size: 12.5px;
+  font-size: 0.962em;
   font-weight: 500;
   color: var(--slate-ink);
   cursor: pointer;
@@ -3177,7 +3177,7 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  font-size: 10.5px;
+  font-size: 0.808em;
   font-weight: 700;
   letter-spacing: 0.09em;
   text-transform: uppercase;
@@ -3200,14 +3200,14 @@
   align-items: baseline;
   justify-content: space-between;
   gap: 10px;
-  font-size: 12px;
+  font-size: 0.923em;
 }
 .alc-calculator.alc-theme--slate .alc-line > span:first-child {
   font-weight: 600;
   color: var(--slate-ink-soft);
 }
 .alc-calculator.alc-theme--slate .alc-line__value {
-  font-size: 14px;
+  font-size: 1.167em;
   font-weight: 700;
   color: var(--slate-ink);
 }
@@ -3233,7 +3233,7 @@
   align-items: baseline;
   gap: 8px;
   padding-block: 4px;
-  font-size: 12px;
+  font-size: 0.923em;
 }
 /* dotted leader between label and value — receipt feel */
 .alc-calculator.alc-theme--slate .alc-line-label {
@@ -3251,7 +3251,7 @@
   flex: 0 0 auto;
   font-family: var(--slate-mono);
   font-variant-numeric: tabular-nums;
-  font-size: 12.5px;
+  font-size: 1.042em;
   font-weight: 600;
   color: #f1f5f9;
 }
@@ -3268,7 +3268,7 @@
   border-block-start: 1px solid color-mix(in srgb, var(--alc-accent) 35%, transparent);
 }
 .alc-calculator.alc-theme--slate .alc-total__label {
-  font-size: 10.5px;
+  font-size: 0.703em;
   font-weight: 700;
   letter-spacing: 0.1em;
   text-transform: uppercase;
@@ -3277,7 +3277,7 @@
 .alc-calculator.alc-theme--slate .alc-total__value {
   font-family: var(--slate-mono);
   font-variant-numeric: tabular-nums;
-  font-size: 20px;
+  font-size: 1.337em;
   font-weight: 700;
   line-height: 1;
   color: #fff;
@@ -3296,7 +3296,7 @@
 }
 .alc-calculator.alc-theme--slate .alc-quote h3 {
   margin: 0 0 9px;
-  font-size: 11px;
+  font-size: 0.846em;
   font-weight: 700;
   letter-spacing: 0.06em;
   text-transform: uppercase;
@@ -3307,7 +3307,7 @@
   flex-direction: column;
   gap: 4px;
   margin-block-end: 8px;
-  font-size: 10.5px;
+  font-size: 0.808em;
   font-weight: 600;
   letter-spacing: 0.04em;
   text-transform: uppercase;
@@ -3322,7 +3322,7 @@
   margin-block-start: 4px;
   padding: 9px 14px;
   font-family: inherit;
-  font-size: 12.5px;
+  font-size: 0.962em;
   font-weight: 700;
   letter-spacing: 0.04em;
   text-transform: uppercase;
@@ -3346,7 +3346,7 @@
 .alc-calculator.alc-theme--slate .alc-quote-feedback {
   margin-block-start: 8px;
   font-family: var(--slate-mono);
-  font-size: 11.5px;
+  font-size: 0.885em;
   color: var(--slate-ink-soft);
 }
 .alc-calculator.alc-theme--slate .alc-quote-feedback:empty {
