@@ -16,3 +16,6 @@ tests
 vendor
 .wporg/
 .DS_Store
+.superpowers
+.wp-env.override.json
+bin

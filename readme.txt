@@ -4,7 +4,7 @@ Tags: cost calculator, price calculator, quote calculator, calculator builder, e
 Requires at least: 6.2
 Tested up to: 7.0
 Requires PHP: 7.4
-Stable tag: 2.0.1
+Stable tag: 2.0.2
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -98,6 +98,12 @@ PHP 7.4 and newer, including PHP 8.4.
 
 == Changelog ==
 
+= 2.0.2 =
+* Fix: the calculator now follows your site's text size on every theme. Four of the six built-in themes had their type set in units that ignored the surrounding page, so a calculator embedded in a page with larger text kept rendering its own at 12–15px and looked pasted in. A site already at the usual 16px sees exactly what it saw before.
+* Improve: the Studio's own typography runs on one five-step scale instead of eleven near-identical sizes, so labels, hints and headings read as a hierarchy.
+* Improve: the Studio header hides its least important labels based on its own width rather than the browser window's — with the WordPress admin menu open, the window was never a reliable measure of the room the header actually had.
+* Improve: the back, undo, redo, settings and close glyphs are drawn icons now, matching the field-type set, instead of text characters that changed weight with the surrounding font.
+
 = 2.0.1 =
 * The admin app is now fully responsive: on phones and small tablets the Studio shows the live canvas full-width, with the field palette as a slide-in drawer and field settings as a bottom sheet (opens automatically when you tap a field).
 * The calculator and entries screens have a refreshed design: centered layout, branded header, and consistent action buttons — and the tables turn into readable cards on small screens.
@@ -155,6 +161,9 @@ PHP 7.4 and newer, including PHP 8.4.
 * Initial release: drag-and-drop calculator builder, decimal-safe formula engine (PHP+JS parity), free conditional logic, quote entries with CSV export and privacy tools, 6 templates, block + shortcode.
 
 == Upgrade Notice ==
+
+= 2.0.2 =
+Calculators now follow your site's text size on every theme. If your pages use larger type, the calculator will match it instead of staying small.
 
 = 2.0.0 =
 Major update: new Builder Studio, free repeater, 18 field types, Cost Calculator Builder importer. Existing calculators keep working unchanged.
