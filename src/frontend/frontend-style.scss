@@ -853,7 +853,9 @@
 	font-weight: 600;
 	color: var(--clc-muted);
 }
-.alc-calculator.alc-theme--classic .alc-quote__field input {
+.alc-calculator.alc-theme--classic .alc-quote__field input,
+.alc-calculator.alc-theme--classic .alc-field input[type="date"],
+.alc-calculator.alc-theme--classic .alc-field textarea {
 	inline-size: 100%;
 	font: inherit;
 	font-weight: 400;
@@ -1256,6 +1258,18 @@
 		border-block-start: 1px solid var(--alc-rule);
 	}
 
+	/* A long summary label used to run straight out of the panel: slate set
+	   white-space: nowrap with no overflow guard, so the text could neither wrap
+	   nor ellipsize and it shoved the value past the panel edge. classic already
+	   did this deliberately — every theme gets it now. min-inline-size lets the
+	   flex child actually shrink, which is what allows the ellipsis to engage. */
+	.alc-line-label {
+		min-inline-size: 0;
+		overflow: hidden;
+		text-overflow: ellipsis;
+	}
+	.alc-line-value { min-inline-size: 0; }
+
 	.alc-line-label {
 		font-style: italic;
 		text-align: start;
@@ -1351,7 +1365,9 @@
 		color: var(--alc-muted);
 	}
 
-	.alc-quote__field input {
+	.alc-quote__field input,
+	.alc-field input[type="date"],
+	.alc-field textarea {
 		display: block;
 		inline-size: 100%;
 		max-inline-size: none;
@@ -1564,7 +1580,9 @@
 
 /* shared dark glass input surface */
 .alc-calculator.alc-theme--midnight input[type="number"],
-.alc-calculator.alc-theme--midnight input[type="text"] {
+.alc-calculator.alc-theme--midnight input[type="text"],
+.alc-calculator.alc-theme--midnight .alc-field input[type="date"],
+.alc-calculator.alc-theme--midnight .alc-field textarea {
   inline-size: 100%;
   appearance: none;
   font: inherit;
@@ -2384,7 +2402,9 @@
 	font-size: 0.92em;
 	color: var(--soft-ink);
 }
-.alc-calculator.alc-theme--soft .alc-quote__field input {
+.alc-calculator.alc-theme--soft .alc-quote__field input,
+.alc-calculator.alc-theme--soft .alc-field input[type="date"],
+.alc-calculator.alc-theme--soft .alc-field textarea {
 	display: block;
 	inline-size: 100%;
 	max-inline-size: 440px;
@@ -2849,7 +2869,9 @@
 	text-transform: uppercase;
 }
 
-.alc-calculator.alc-theme--bold .alc-quote__field input {
+.alc-calculator.alc-theme--bold .alc-quote__field input,
+.alc-calculator.alc-theme--bold .alc-field input[type="date"],
+.alc-calculator.alc-theme--bold .alc-field textarea {
 	display: block;
 	inline-size: 100%;
 	max-inline-size: none;
@@ -2994,7 +3016,9 @@
 .alc-calculator.alc-theme--slate .alc-total__value,
 .alc-calculator.alc-theme--slate .alc-slider__bubble,
 .alc-calculator.alc-theme--slate input[type="number"],
-.alc-calculator.alc-theme--slate input[type="text"] {
+.alc-calculator.alc-theme--slate input[type="text"],
+.alc-calculator.alc-theme--slate .alc-field input[type="date"],
+.alc-calculator.alc-theme--slate .alc-field textarea {
   font-family: var(--slate-mono);
   font-variant-numeric: tabular-nums;
   font-feature-settings: "tnum" 1;
@@ -3035,7 +3059,9 @@
 
 /* ---- inputs: tight slate-bordered fields ---- */
 .alc-calculator.alc-theme--slate input[type="text"],
-.alc-calculator.alc-theme--slate input[type="number"] {
+.alc-calculator.alc-theme--slate input[type="number"],
+.alc-calculator.alc-theme--slate .alc-field input[type="date"],
+.alc-calculator.alc-theme--slate .alc-field textarea {
   inline-size: 100%;
   padding: 6px 9px;
   font-size: 1em;
@@ -3239,6 +3265,9 @@
 .alc-calculator.alc-theme--slate .alc-line-label {
   color: #94a3b8;
   white-space: nowrap;
+	min-inline-size: 0;
+	overflow: hidden;
+	text-overflow: ellipsis;
 }
 .alc-calculator.alc-theme--slate .alc-summary__lines li::after {
   content: "";
@@ -3254,6 +3283,7 @@
   font-size: 1.042em;
   font-weight: 600;
   color: #f1f5f9;
+	min-inline-size: 0;
 }
 
 /* ---- total: accent register bar across the strip ---- */
@@ -3313,7 +3343,9 @@
   text-transform: uppercase;
   color: var(--slate-ink-faint);
 }
-.alc-calculator.alc-theme--slate .alc-quote__field input {
+.alc-calculator.alc-theme--slate .alc-quote__field input,
+.alc-calculator.alc-theme--slate .alc-field input[type="date"],
+.alc-calculator.alc-theme--slate .alc-field textarea {
   inline-size: 100%;
 }
 
