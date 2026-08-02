@@ -5,17 +5,17 @@
 
 .alc-unsaved {
 	color: #b32d2e;
-	font-size: 12px;
+	font-size: var(--alcb-fs-sm);
 }
 
 /* === Calculator app additions (list, entries, templates, options, formula) === */
 .alc-topbar { display: flex; align-items: center; gap: 12px; margin: 16px 0; }
-.alc-topbar .alc-heading { margin: 0 auto 0 0; font-size: 1.3em; }
+.alc-topbar .alc-heading { margin: 0 auto 0 0; font-size: var(--alcb-fs-lg); }
 .alc-title-input { flex: 1; max-width: 420px; }
 .alc-table { margin-top: 8px; }
 .alc-table__ops { display: flex; gap: 4px; flex-wrap: wrap; }
 .alc-row--new td { font-weight: 600; }
-.alc-badge { padding: 1px 8px; border-radius: 9px; background: #dcdcde; font-size: 11px; text-transform: uppercase; }
+.alc-badge { padding: 1px 8px; border-radius: 9px; background: #dcdcde; font-size: var(--alcb-fs-xs); text-transform: uppercase; }
 .alc-badge--new { background: #fcf0c0; }
 .alc-empty { margin: 24px 0; color: #757575; }
 .alc-danger-zone { margin-top: 32px; color: #757575; }
@@ -23,7 +23,7 @@
 .alc-template-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 10px; margin: 16px 0; }
 .alc-template-card { display: flex; flex-direction: column; gap: 4px; text-align: start; padding: 12px; border: 1px solid #dcdcde; border-radius: 6px; background: #fff; cursor: pointer; }
 .alc-template-card.is-selected { border-color: var(--wp-admin-theme-color, #2271b1); box-shadow: 0 0 0 1px var(--wp-admin-theme-color, #2271b1); }
-.alc-template-card span { color: #757575; font-size: 12px; }
+.alc-template-card span { color: #757575; font-size: var(--alcb-fs-sm); }
 .alc-modal-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 16px; }
 .alc-formula__ok { color: #007017; margin: 4px 0 12px; }
 .alc-pagination { display: flex; align-items: center; gap: 10px; margin-top: 12px; }
