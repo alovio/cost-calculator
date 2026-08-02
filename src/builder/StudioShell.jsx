@@ -6,7 +6,7 @@ import { STORE } from './store';
 import { getCalculator, saveCalculator } from './api';
 import PaletteV2 from './PaletteV2';
 import LiveCanvas from './LiveCanvas';
-import { FLAME } from './icons';
+import { FLAME, UI } from './icons';
 import SettingsPanel from './SettingsPanel';
 import { saveDraft, loadDraft, clearDraft, isDraftNewer, DRAFT_DEBOUNCE_MS } from './draft';
 import { shouldStartTour, startTour } from './tour';
@@ -180,7 +180,7 @@ export default function StudioShell( { calculatorId, onBack } ) {
 	return (
 		<div className="alcb-app">
 			<div className="alcb-hdr">
-				<button className="alcb-back" onClick={ back } aria-label={ __( 'All calculators', 'alovio-calculator' ) }>←</button>
+				<button className="alcb-back" onClick={ back } aria-label={ __( 'All calculators', 'alovio-calculator' ) }>{ UI.back }</button>
 				<div className="alcb-logo">
 					<span className="alcb-mark">{ FLAME }</span>
 					Alovio <span className="alcb-sub">{ __( 'Calculator', 'alovio-calculator' ) }</span>
@@ -194,8 +194,8 @@ export default function StudioShell( { calculatorId, onBack } ) {
 				/>
 				<div className="alcb-grow"></div>
 				<span className={ statusCls }><span className="alcb-dot"></span><span className="alcb-status-txt">{ statusTxt }</span></span>
-				<button className="alcb-btn-ghost" disabled={ ! canUndo } onClick={ undo } aria-label={ __( 'Undo', 'alovio-calculator' ) }>⟲ <span className="alcb-btn-txt">{ __( 'Undo', 'alovio-calculator' ) }</span></button>
-				<button className="alcb-btn-ghost" disabled={ ! canRedo } onClick={ redo } aria-label={ __( 'Redo', 'alovio-calculator' ) }>⟳ <span className="alcb-btn-txt">{ __( 'Redo', 'alovio-calculator' ) }</span></button>
+				<button className="alcb-btn-ghost" disabled={ ! canUndo } onClick={ undo } aria-label={ __( 'Undo', 'alovio-calculator' ) }>{ UI.undo } <span className="alcb-btn-txt">{ __( 'Undo', 'alovio-calculator' ) }</span></button>
+				<button className="alcb-btn-ghost" disabled={ ! canRedo } onClick={ redo } aria-label={ __( 'Redo', 'alovio-calculator' ) }>{ UI.redo } <span className="alcb-btn-txt">{ __( 'Redo', 'alovio-calculator' ) }</span></button>
 				<button className="alcb-btn-primary" data-tour="save" disabled={ saving } onClick={ save }>
 					{ saving ? __( 'Saving…', 'alovio-calculator' ) : __( 'Save', 'alovio-calculator' ) }
 				</button>
@@ -230,7 +230,7 @@ export default function StudioShell( { calculatorId, onBack } ) {
 					aria-expanded={ 'settings' === mobilePanel }
 					onClick={ () => setMobilePanel( 'settings' === mobilePanel ? null : 'settings' ) }
 				>
-					⚙ { __( 'Settings', 'alovio-calculator' ) }
+					{ UI.gear } { __( 'Settings', 'alovio-calculator' ) }
 				</button>
 			</div>
 			<div className={ 'alcb-work' + ( 'palette' === mobilePanel ? ' is-palette-open' : '' ) + ( 'settings' === mobilePanel ? ' is-settings-open' : '' ) }>

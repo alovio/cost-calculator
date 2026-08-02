@@ -32,6 +32,22 @@ export const ICONS = {
 	repeater: <svg { ...P }><rect x="3" y="4" width="18" height="6" rx="2" /><rect x="3" y="14" width="12" height="6" rx="2" /><path d="M19 15v4M17 17h4" /></svg>,
 };
 
+/**
+ * Chrome icons — the studio's own glyphs, not field types.
+ *
+ * These replace the "←", "⟲", "⟳", "⚙" and "✕" text characters the shell used
+ * to print. A text glyph takes the surrounding font, so its weight and baseline
+ * drift away from the labels beside it, and at the narrow widths where the
+ * label is dropped it was left carrying the button alone.
+ */
+export const UI = {
+	back: <svg { ...P }><path d="M19 12H5" /><path d="m11 6-6 6 6 6" /></svg>,
+	undo: <svg { ...P }><path d="M4 8.5h9.5a5.5 5.5 0 0 1 0 11H8" /><path d="m7.5 4.5-4 4 4 4" /></svg>,
+	redo: <svg { ...P }><path d="M20 8.5h-9.5a5.5 5.5 0 0 0 0 11H16" /><path d="m16.5 4.5 4 4-4 4" /></svg>,
+	gear: <svg { ...P }><circle cx="12" cy="12" r="3.2" /><path d="M12 3.5v2M12 18.5v2M3.5 12h2M18.5 12h2M5.9 5.9l1.5 1.5M16.6 16.6l1.5 1.5M18.1 5.9l-1.5 1.5M7.4 16.6l-1.5 1.5" /></svg>,
+	close: <svg { ...P }><path d="m6 6 12 12M18 6 6 18" /></svg>,
+};
+
 /** Brand flame — the white mark on the flame-gradient square (shared with Pro's console). */
 export const FLAME = (
 	<svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true">

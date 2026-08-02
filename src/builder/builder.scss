@@ -485,18 +485,32 @@ body.alcb-builder-page #wpbody-content > .error { display: none; }
 .alcb-drawer-backdrop { display: none; }
 .alcb-drawer-close { display: none; }
 
+/* The header sheds labels on its own inline size, not the viewport: wp-admin's
+   sidebar is 160px wide (36px folded), so the same window gives this row two
+   different widths. Note a container query measures the CONTENT box, i.e.
+   inside the header's own padding. */
+.alcb-hdr {
+	container-type: inline-size;
+	container-name: alcb-hdr;
+}
+@container alcb-hdr (max-width: 900px) {
+	.alcb-logo .alcb-sub { display: none; }
+	.alcb-status-txt { display: none; }
+	.alcb-hdr .alcb-status { gap: 0; }
+}
+@container alcb-hdr (max-width: 760px) {
+	.alcb-btn-txt { display: none; }
+	.alcb-btn-ghost { padding: 0 11px; }
+}
+
 @media (max-width: 960px) {
 	.alcb-app { height: auto; min-height: calc(100vh - 46px); overflow: visible; }
 
-	// Header wraps to two tidy rows (name on top, actions below); icon-only undo/redo; dot-only status.
+	// Header wraps to two tidy rows (name on top, actions below).
 	.alcb-hdr { height: auto; flex-wrap: wrap; padding: 10px 12px; row-gap: 8px; }
-	.alcb-logo .alcb-sub { display: none; }
 	.alcb-name { min-width: 110px; max-width: none; }
 	.alcb-hdr .alcb-grow { flex: 0 0 100%; height: 0; } // forces the row break after the name
 	.alcb-hdr .alcb-status { margin-right: auto; }
-	.alcb-btn-txt { display: none; }
-	.alcb-status-txt { display: none; }
-	.alcb-btn-ghost { padding: 0 11px; }
 
 	.alcb-mobilebar {
 		display: flex; gap: 8px; padding: 8px 12px; flex: none;
