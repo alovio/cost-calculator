@@ -125,8 +125,8 @@ final class QuoteController {
 			);
 		}
 
-		$fileMeta = self::resolve_file( $config, (string) $request->get_param( 'fileToken' ) );
-		if ( false === $fileMeta ) {
+		$fileMetas = self::resolve_files( $config, (string) $request->get_param( 'fileToken' ) );
+		if ( false === $fileMetas ) {
 			return $this->bad_request( 'file_invalid', __( 'The uploaded file could not be verified — please upload it again.', 'alovio-calculator' ) );
 		}
 
@@ -137,11 +137,19 @@ final class QuoteController {
 			'totalScaled' => $result['totalScaled'] ?? 0,
 			'currency'    => $config['settings']['currency'],
 		);
-		if ( null !== $fileMeta ) {
-			$snapshot['file'] = array(
-				'name'   => sanitize_file_name( $fileMeta['name'] ),
-				'stored' => $fileMeta['stored'],
+		if ( null !== $fileMetas ) {
+			$snapshot['files'] = array_map(
+				static function ( $m ) {
+					return array(
+						'name'   => sanitize_file_name( $m['name'] ),
+						'stored' => $m['stored'],
+					);
+				},
+				$fileMetas
 			);
+			// Kept so entries written before multi-file, and anything reading the
+			// old shape, still resolve to the first attachment.
+			$snapshot['file'] = $snapshot['files'][0];
 		}
 
 		$repo    = new EntriesRepository();
@@ -323,10 +331,38 @@ final class QuoteController {
 	 * @return array|false|null
 	 */
 	public static function resolve_file( array $config, string $fileToken ) {
-		if ( empty( $config['settings']['quoteForm']['file']['enabled'] ) || '' === $fileToken ) {
+		$files = self::resolve_files( $config, $fileToken );
+		if ( false === $files || null === $files ) {
+			return $files;
+		}
+		return $files[0];
+	}
+
+	/**
+	 * The field may carry several files, so the token param is a comma-joined
+	 * list. Every token must consume cleanly — a half-attached quote would lose
+	 * files silently, which is worse than rejecting the submission.
+	 *
+	 * @return array[]|false|null
+	 */
+	public static function resolve_files( array $config, string $fileTokens ) {
+		if ( empty( $config['settings']['quoteForm']['file']['enabled'] ) || '' === trim( $fileTokens ) ) {
 			return null;
 		}
-		return FileUploads::consume( $fileToken ) ?? false;
+		$max    = (int) ( $config['settings']['quoteForm']['file']['maxFiles'] ?? 1 );
+		$tokens = array_slice( array_filter( array_map( 'trim', explode( ',', $fileTokens ) ) ), 0, max( 1, $max ) );
+		if ( ! $tokens ) {
+			return null;
+		}
+		$out = array();
+		foreach ( $tokens as $token ) {
+			$meta = FileUploads::consume( $token );
+			if ( null === $meta ) {
+				return false;
+			}
+			$out[] = $meta;
+		}
+		return $out;
 	}
 
 	private function within_rate_limit(): bool {

@@ -37,8 +37,9 @@ final class FieldSchema {
 					'file'           => [
 						'enabled' => false,
 						'label'   => '',
-						'types'   => [ 'jpg', 'png', 'webp', 'pdf' ],
-						'maxMb'   => 5,
+						'types'    => [ 'jpg', 'png', 'webp', 'pdf' ],
+						'maxMb'    => 5,
+						'maxFiles' => 1,
 					],
 				],
 			],
@@ -291,6 +292,8 @@ final class FieldSchema {
 		$file  = (array) ( $quote['file'] ?? [] );
 		$types = array_values( array_intersect( [ 'jpg', 'png', 'webp', 'pdf' ], array_map( 'strval', (array) ( $file['types'] ?? [] ) ) ) );
 		$maxMb = isset( $file['maxMb'] ) && is_numeric( $file['maxMb'] ) ? (int) $file['maxMb'] : 5;
+		// One file unless the author opts in; ten is the ceiling, as in the other Alovio plugins.
+		$maxFiles = isset( $file['maxFiles'] ) && is_numeric( $file['maxFiles'] ) ? (int) $file['maxFiles'] : 1;
 
 		return [
 			'currency'  => [
@@ -313,8 +316,9 @@ final class FieldSchema {
 				'file'           => [
 					'enabled' => ! empty( $file['enabled'] ),
 					'label'   => sanitize_text_field( (string) ( $file['label'] ?? '' ) ),
-					'types'   => $types ? $types : $d['quoteForm']['file']['types'],
-					'maxMb'   => max( 1, min( 20, $maxMb ) ),
+					'types'    => $types ? $types : $d['quoteForm']['file']['types'],
+					'maxMb'    => max( 1, min( 20, $maxMb ) ),
+					'maxFiles' => max( 1, min( 10, $maxFiles ) ),
 				],
 			],
 		];

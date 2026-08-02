@@ -174,6 +174,8 @@ export function init( root ) {
 		requiredError: 'Please fill in the required fields.',
 		fileUploading: 'Uploading…',
 		fileTooLarge: 'File is too large (max %d MB).',
+		fileMax: 'Up to %d files.',
+		fileRemove: 'Remove file',
 		wizard: { back: 'Back', next: 'Next', step: 'Step', of: 'of' },
 	};
 

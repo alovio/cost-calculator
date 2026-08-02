@@ -319,6 +319,41 @@
 	margin-block-start: 10px;
 }
 
+/* Attached files: one removable row each. The remove button inherits its size —
+   its parent already sets one, and an em token here would multiply. */
+.alc-quote__file-list {
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+	margin-block-start: 6px;
+}
+.alc-quote__file-item {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 8px;
+	font-size: 0.85em;
+	opacity: 0.85;
+}
+.alc-quote__file-name {
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	min-inline-size: 0;
+}
+.alc-quote__file-remove {
+	flex: none;
+	border: 0;
+	background: none;
+	cursor: pointer;
+	color: inherit;
+	font-size: inherit;
+	line-height: 1;
+	padding: 0 4px;
+	opacity: 0.6;
+}
+.alc-quote__file-remove:hover { opacity: 1; }
+
 .alc-quote__file-status {
 	font-size: 0.85em;
 	color: var(--alc-muted);

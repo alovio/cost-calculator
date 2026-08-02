@@ -105,7 +105,12 @@ export function wireQuoteForm( root, config, getRawValues, validateRequired ) {
 	} );
 }
 
-/** Async file upload (spec §3.3): upload on selection, keep only the returned token. */
+/**
+ * Async file upload (spec §3.3): upload on selection, keep only the returned
+ * tokens. Several files are allowed when the author raised Max files — the
+ * hidden input carries a comma-joined token list, and each file gets a row it
+ * can be removed from without starting the field over.
+ */
 function wireFileUpload( form, config, state ) {
 	const fileCfg = config.settings.quoteForm.file;
 	const picker = form.querySelector( '.alc-quote__file' );
@@ -113,41 +118,86 @@ function wireFileUpload( form, config, state ) {
 		return;
 	}
 	const hidden = form.querySelector( '[name="alc_file_token"]' );
+	const list = form.querySelector( '.alc-quote__file-list' );
 	const status = form.querySelector( '.alc-quote__file-status' );
+	const maxFiles = Math.max( 1, parseInt( fileCfg.maxFiles, 10 ) || 1 );
 	const say = ( text ) => {
 		if ( status ) {
 			status.textContent = text;
 		}
 	};
+
+	// [{ token, name }] — the single source of truth; the hidden input mirrors it.
+	let attached = [];
+
+	const sync = () => {
+		hidden.value = attached.map( ( f ) => f.token ).join( ',' );
+		if ( ! list ) {
+			return;
+		}
+		list.textContent = '';
+		attached.forEach( ( f, i ) => {
+			const row = document.createElement( 'span' );
+			row.className = 'alc-quote__file-item';
+			const name = document.createElement( 'span' );
+			name.className = 'alc-quote__file-name';
+			name.textContent = f.name;
+			const remove = document.createElement( 'button' );
+			remove.type = 'button';
+			remove.className = 'alc-quote__file-remove';
+			remove.setAttribute( 'aria-label', config.i18n.fileRemove || 'Remove' );
+			remove.textContent = '×';
+			remove.addEventListener( 'click', () => {
+				attached.splice( i, 1 );
+				sync();
+				say( '' );
+			} );
+			row.append( name, remove );
+			list.append( row );
+		} );
+	};
+
 	picker.addEventListener( 'change', async () => {
-		const file = picker.files && picker.files[ 0 ];
-		hidden.value = '';
-		if ( ! file ) {
-			say( '' );
+		const chosen = Array.from( picker.files || [] );
+		picker.value = '';               // let the same file be picked again after a removal
+		if ( ! chosen.length ) {
 			return;
 		}
-		if ( file.size > fileCfg.maxMb * 1048576 ) {
-			picker.value = '';
-			say( config.i18n.fileTooLarge.replace( '%d', String( fileCfg.maxMb ) ) );
+
+		const room = maxFiles - attached.length;
+		if ( room <= 0 ) {
+			say( ( config.i18n.fileMax || 'Up to %d files.' ).replace( '%d', String( maxFiles ) ) );
 			return;
 		}
-		say( config.i18n.fileUploading );
+		const queue = chosen.slice( 0, room );
+		const skipped = chosen.length - queue.length;
+
 		state.uploading = true;
-		try {
-			const body = new FormData();
-			body.append( 'file', file );
-			body.append( 'calculatorId', String( config.calculatorId ) );
-			body.append( 'alc_website', '' );
-			const resp = await window.fetch( fileCfg.endpoint, { method: 'POST', body } );
-			const data = await resp.json();
-			if ( ! resp.ok || ! data.token ) {
-				throw new Error( ( data && data.message ) || config.i18n.networkError );
+		say( config.i18n.fileUploading );
+		for ( const file of queue ) {
+			if ( file.size > fileCfg.maxMb * 1048576 ) {
+				say( config.i18n.fileTooLarge.replace( '%d', String( fileCfg.maxMb ) ) );
+				continue;
 			}
-			hidden.value = data.token;
-			say( '✓ ' + data.name );
-		} catch ( err ) {
-			picker.value = '';
-			say( err.message || config.i18n.networkError );
+			try {
+				const body = new FormData();
+				body.append( 'file', file );
+				body.append( 'calculatorId', String( config.calculatorId ) );
+				body.append( 'alc_website', '' );
+				const resp = await window.fetch( fileCfg.endpoint, { method: 'POST', body } );
+				const data = await resp.json();
+				if ( ! resp.ok || ! data.token ) {
+					throw new Error( ( data && data.message ) || config.i18n.networkError );
+				}
+				attached.push( { token: data.token, name: data.name } );
+				sync();
+				say( '' );
+			} catch ( err ) {
+				say( err.message || config.i18n.networkError );
+			}
+		}
+		if ( skipped > 0 ) {
+			say( ( config.i18n.fileMax || 'Up to %d files.' ).replace( '%d', String( maxFiles ) ) );
 		}
 		state.uploading = false;
 	} );

@@ -39,10 +39,16 @@ final class EntryMailer {
 		}
 		$lines[] = __( 'Total', 'alovio-calculator' ) . ': ' . DecimalMath::fromScaled( $snapshot['totalScaled'] );
 
-		if ( ! empty( $snapshot['file']['name'] ) ) {
+		$attached = ! empty( $snapshot['files'] ) && is_array( $snapshot['files'] )
+			? wp_list_pluck( $snapshot['files'], 'name' )
+			: ( ! empty( $snapshot['file']['name'] ) ? array( $snapshot['file']['name'] ) : array() );
+		if ( $attached ) {
 			$lines[] = '';
-			/* translators: %s: uploaded file name. */
-			$lines[] = sprintf( __( 'Attached file: %s', 'alovio-calculator' ), $snapshot['file']['name'] );
+			/* translators: %s: comma-separated list of uploaded file names. */
+			$lines[] = sprintf(
+				_n( 'Attached file: %s', 'Attached files: %s', count( $attached ), 'alovio-calculator' ),
+				implode( ', ', $attached )
+			);
 			/* translators: %s: admin dashboard URL. */
 			$lines[] = sprintf( __( 'Download it from the entry in your dashboard: %s', 'alovio-calculator' ), admin_url( 'admin.php?page=alovio-calculator' ) );
 		}

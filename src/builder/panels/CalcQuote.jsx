@@ -80,6 +80,15 @@ export default function CalcQuote() {
 								value={ file.maxMb ?? 5 }
 								onChange={ ( v ) => setFile( { maxMb: parseInt( v, 10 ) || 5 } ) }
 							/>
+							<TextControl
+								type="number"
+								min={ 1 }
+								max={ 10 }
+								label={ __( 'Max files', 'alovio-calculator' ) }
+								help={ __( 'Above 1, visitors can attach a set — each file gets its own removable row.', 'alovio-calculator' ) }
+								value={ file.maxFiles ?? 1 }
+								onChange={ ( v ) => setFile( { maxFiles: Math.max( 1, Math.min( 10, parseInt( v, 10 ) || 1 ) ) } ) }
+							/>
 						</>
 					) }
 				</>

@@ -48,7 +48,9 @@ final class CsvExporter {
 			$decoded          = json_decode( (string) ( $row['snapshot'] ?? '' ), true );
 			$snap             = is_array( $decoded ) ? $decoded : array();
 			$row['repeaters'] = self::repeater_cell( $snap );
-			$row['file']      = (string) ( $snap['file']['name'] ?? '' );
+			$row['file']      = ! empty( $snap['files'] ) && is_array( $snap['files'] )
+				? implode( ' | ', wp_list_pluck( $snap['files'], 'name' ) )
+				: (string) ( $snap['file']['name'] ?? '' );
 			echo self::csv_row( $row ) . "\n"; // phpcs:ignore WordPress.Security.EscapeOutput -- CSV-escaped above.
 		}
 		exit;

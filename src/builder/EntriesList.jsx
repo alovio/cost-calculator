@@ -1,6 +1,6 @@
 import { useState, useEffect } from '@wordpress/element';
 import { Button, Spinner, Notice, SelectControl, Modal } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
+import { __, _n } from '@wordpress/i18n';
 import { listEntries, updateEntry, deleteEntry, listCalculators } from './api';
 import { formatCurrency } from '../shared/currency';
 import { FLAME } from './icons';
@@ -127,14 +127,28 @@ export default function EntriesList( { onBack } ) {
 						{ open.phone && <> · <strong>{ __( 'Phone:', 'alovio-calculator' ) }</strong> { open.phone }</> }
 					</p>
 					{ open.message && <p><strong>{ __( 'Message:', 'alovio-calculator' ) }</strong> { open.message }</p> }
-					{ open.snapshot && open.snapshot.file && open.snapshot.file.name && (
-						<p>
-							<strong>{ __( 'File:', 'alovio-calculator' ) }</strong>{ ' ' }
-							<a href={ `${ window.ALOVIO_CALC_BUILDER.root }alovio-calc/v1/entries/${ open.id }/file?_wpnonce=${ window.ALOVIO_CALC_BUILDER.nonce }` }>
-								{ open.snapshot.file.name }
-							</a>
-						</p>
-					) }
+					{ ( () => {
+						// Entries can carry several files; older ones only have `file`.
+						const files = open.snapshot && Array.isArray( open.snapshot.files ) && open.snapshot.files.length
+							? open.snapshot.files
+							: ( open.snapshot && open.snapshot.file && open.snapshot.file.name ? [ open.snapshot.file ] : [] );
+						if ( ! files.length ) {
+							return null;
+						}
+						return (
+							<p>
+								<strong>{ _n( 'File:', 'Files:', files.length, 'alovio-calculator' ) }</strong>{ ' ' }
+								{ files.map( ( f, i ) => (
+									<span key={ f.stored || i }>
+										{ i > 0 && ', ' }
+										<a href={ `${ window.ALOVIO_CALC_BUILDER.root }alovio-calc/v1/entries/${ open.id }/file?i=${ i }&_wpnonce=${ window.ALOVIO_CALC_BUILDER.nonce }` }>
+											{ f.name }
+										</a>
+									</span>
+								) ) }
+							</p>
+						);
+					} )() }
 					{ open.snapshot && Array.isArray( open.snapshot.repeaters ) && open.snapshot.repeaters.map( ( rep ) => (
 						<div key={ rep.id } className="alc-entry-repeater">
 							<strong>{ rep.label }</strong>

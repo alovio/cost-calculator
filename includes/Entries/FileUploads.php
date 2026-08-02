@@ -196,7 +196,13 @@ final class FileUploads {
 	public function download( $request ) {
 		$row      = ( new EntriesRepository() )->find( (int) $request['id'] );
 		$snapshot = null !== $row ? json_decode( (string) $row['snapshot'], true ) : null;
-		$file     = is_array( $snapshot ) && ! empty( $snapshot['file']['stored'] ) ? (array) $snapshot['file'] : null;
+		// Entries may carry several files; ?i= picks one. Entries written before
+		// multi-file only have the single 'file' key, so fall back to it.
+		$list = is_array( $snapshot ) && ! empty( $snapshot['files'] ) && is_array( $snapshot['files'] )
+			? array_values( $snapshot['files'] )
+			: ( is_array( $snapshot ) && ! empty( $snapshot['file'] ) ? array( (array) $snapshot['file'] ) : array() );
+		$index = max( 0, (int) $request->get_param( 'i' ) );
+		$file  = isset( $list[ $index ] ) && ! empty( $list[ $index ]['stored'] ) ? (array) $list[ $index ] : null;
 		if ( null === $file ) {
 			return new \WP_Error( 'alc_not_found', __( 'No file for this entry.', 'alovio-calculator' ), array( 'status' => 404 ) );
 		}
@@ -216,6 +222,15 @@ final class FileUploads {
 	/** Entry delete + privacy erase call this before removing the row (spec §3.3). */
 	public static function delete_entry_file( array $row ): void {
 		$snapshot = json_decode( (string) ( $row['snapshot'] ?? '' ), true );
+		// Every attachment, not only the first — otherwise deleting an entry
+		// leaves its extra files orphaned on disk until the GC sweeps them.
+		$all = is_array( $snapshot ) && ! empty( $snapshot['files'] ) ? (array) $snapshot['files'] : array();
+		foreach ( $all as $one ) {
+			if ( ! empty( $one['stored'] ) ) {
+				$p = self::dir_path() . '/' . basename( (string) $one['stored'] );
+				if ( file_exists( $p ) ) { wp_delete_file( $p ); }
+			}
+		}
 		if ( ! is_array( $snapshot ) || empty( $snapshot['file']['stored'] ) ) {
 			return;
 		}

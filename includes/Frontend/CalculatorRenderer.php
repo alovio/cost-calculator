@@ -44,6 +44,7 @@ final class CalculatorRenderer {
 						'label'    => '' !== $quote['file']['label'] ? $quote['file']['label'] : __( 'Attach a file', 'alovio-calculator' ),
 						'types'    => $quote['file']['types'],
 						'maxMb'    => $quote['file']['maxMb'],
+						'maxFiles' => $quote['file']['maxFiles'],
 						'endpoint' => esc_url( rest_url( 'alovio-calc/v1/quote-file' ) ),
 					),
 				),
@@ -374,12 +375,16 @@ final class CalculatorRenderer {
 
 		if ( ! empty( $quote['file']['enabled'] ) ) {
 			$file_label = '' !== $quote['file']['label'] ? $quote['file']['label'] : __( 'Attach a file', 'alovio-calculator' );
+			$max_files  = (int) $quote['file']['maxFiles'];
 			$inputs    .= sprintf(
-				'<label class="alc-quote__field alc-quote__file-field">%1$s<input type="file" class="alc-quote__file" accept="%2$s"></label>'
+				'<label class="alc-quote__field alc-quote__file-field">%1$s<input type="file" class="alc-quote__file" accept="%2$s"%3$s data-alc-max-files="%4$d"></label>'
 				. '<input type="hidden" name="alc_file_token" value="">'
+				. '<span class="alc-quote__file-list"></span>'
 				. '<span class="alc-quote__file-status" role="status"></span>',
 				esc_html( $file_label ),
-				esc_attr( '.' . implode( ',.', $quote['file']['types'] ) )
+				esc_attr( '.' . implode( ',.', $quote['file']['types'] ) ),
+				$max_files > 1 ? ' multiple' : '',
+				$max_files
 			);
 		}
 
