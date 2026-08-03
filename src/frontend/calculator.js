@@ -175,6 +175,8 @@ export function init( root ) {
 		fileUploading: 'Uploading…',
 		fileTooLarge: 'File is too large (max %d MB).',
 		fileMax: 'Up to %d files.',
+		fileCount: '%1$d of %2$d attached',
+		fileOne: '1 attached',
 		fileRemove: 'Remove file',
 		wizard: { back: 'Back', next: 'Next', step: 'Step', of: 'of' },
 	};

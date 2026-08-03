@@ -4,7 +4,7 @@ Tags: cost calculator, price calculator, quote calculator, calculator builder, e
 Requires at least: 6.2
 Tested up to: 7.0
 Requires PHP: 7.4
-Stable tag: 2.0.2
+Stable tag: 2.1.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -95,8 +95,14 @@ PHP 7.4 and newer, including PHP 8.4.
 4. The start screen: ready templates or a blank canvas
 5. Quote entries dashboard with CSV export
 6. Cost Calculator Builder importer with its per-calculator mapping report
+7. Quote requests can carry attachments — a floor plan and photos, each removable before sending
 
 == Changelog ==
+
+= 2.1.0 =
+* NEW: the quote form accepts several files. Set **Max files** (1–10) next to the size limit and visitors can attach a set — a floor plan and two photos, say — instead of one file replacing the last. Each upload gets its own removable row, the entry lists a download link per file, the notification email names them all, and the CSV export lists them in its cell.
+* Fix: date fields and text areas were never styled. Every theme dresses its text controls, but none of the six ever reached the date picker or the text area, so those two rendered as raw browser widgets — square corners, monospace text, hairline borders — between controls that were carefully themed. They now take each theme's own look.
+* Fix: a long label in the summary could run out of the panel and push the price outside it, on themes that set the label to a single line without a way to shorten it.
 
 = 2.0.2 =
 * Fix: the calculator now follows your site's text size on every theme. Four of the six built-in themes had their type set in units that ignored the surrounding page, so a calculator embedded in a page with larger text kept rendering its own at 12–15px and looked pasted in. A site already at the usual 16px sees exactly what it saw before.
@@ -161,6 +167,9 @@ PHP 7.4 and newer, including PHP 8.4.
 * Initial release: drag-and-drop calculator builder, decimal-safe formula engine (PHP+JS parity), free conditional logic, quote entries with CSV export and privacy tools, 6 templates, block + shortcode.
 
 == Upgrade Notice ==
+
+= 2.1.0 =
+Quote forms can now take several attachments — set Max files in the quote-form settings. Date fields and text areas also pick up your chosen theme's styling instead of the browser's default.
 
 = 2.0.2 =
 Calculators now follow your site's text size on every theme. If your pages use larger type, the calculator will match it instead of staying small.

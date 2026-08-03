@@ -130,6 +130,14 @@ function wireFileUpload( form, config, state ) {
 	// [{ token, name }] — the single source of truth; the hidden input mirrors it.
 	let attached = [];
 
+	const countText = () => {
+		if ( ! attached.length ) {
+			return '';
+		}
+		const tpl = maxFiles > 1 ? ( config.i18n.fileCount || '%1$d of %2$d attached' ) : ( config.i18n.fileOne || '1 attached' );
+		return tpl.replace( '%1$d', String( attached.length ) ).replace( '%2$d', String( maxFiles ) );
+	};
+
 	const sync = () => {
 		hidden.value = attached.map( ( f ) => f.token ).join( ',' );
 		if ( ! list ) {
@@ -150,7 +158,7 @@ function wireFileUpload( form, config, state ) {
 			remove.addEventListener( 'click', () => {
 				attached.splice( i, 1 );
 				sync();
-				say( '' );
+				say( countText() );
 			} );
 			row.append( name, remove );
 			list.append( row );
@@ -191,7 +199,7 @@ function wireFileUpload( form, config, state ) {
 				}
 				attached.push( { token: data.token, name: data.name } );
 				sync();
-				say( '' );
+				say( countText() );
 			} catch ( err ) {
 				say( err.message || config.i18n.networkError );
 			}
