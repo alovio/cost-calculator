@@ -1,0 +1,2010 @@
+# Copyright (C) 2026 Alovio
+# This file is distributed under the GPL-2.0-or-later.
+msgid ""
+msgstr ""
+"Project-Id-Version: Alovio Calculator – Cost, Price & Quote Calculator Builder 2.2.0\n"
+"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/alovio-calculator\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"POT-Creation-Date: 2026-09-03T16:58:40+00:00\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"X-Generator: WP-CLI 2.12.0\n"
+"X-Domain: alovio-calculator\n"
+
+#. Plugin Name of the plugin
+#: alovio-calculator.php
+msgid "Alovio Calculator – Cost, Price & Quote Calculator Builder"
+msgstr ""
+
+#. Plugin URI of the plugin
+#: alovio-calculator.php
+msgid "https://alovio.org/calculator"
+msgstr ""
+
+#. Description of the plugin
+#: alovio-calculator.php
+msgid "Build cost, price and quote calculators with live totals, free conditional logic, and lead capture."
+msgstr ""
+
+#. Author of the plugin
+#: alovio-calculator.php
+msgid "Alovio"
+msgstr ""
+
+#. Author URI of the plugin
+#: alovio-calculator.php
+msgid "https://alovio.org"
+msgstr ""
+
+#: includes/Admin/AdminPage.php:18
+#: src/block/edit.js:40
+msgid "Alovio Calculator"
+msgstr ""
+
+#: includes/Admin/AdminPage.php:19
+#: src/block/edit.js:27
+#: src/block/edit.js:37
+#: src/builder/CalculatorList.jsx:111
+#: src/builder/EntriesList.jsx:59
+#: src/builder/StudioShell.jsx:186
+msgid "Calculator"
+msgstr ""
+
+#: includes/Admin/Onboarding.php:71
+msgid "Alovio Calculator is ready. Start from a template — you can have a working price calculator with a quote form in about ten minutes."
+msgstr ""
+
+#: includes/Admin/Onboarding.php:72
+msgid "Alovio Calculator 2.0 is here: the new Builder Studio, the free repeater field and 18 field types. Your existing calculators work unchanged."
+msgstr ""
+
+#: includes/Admin/Onboarding.php:74
+msgid "Create your first calculator"
+msgstr ""
+
+#: includes/Admin/Onboarding.php:75
+msgid "Open the new Studio"
+msgstr ""
+
+#: includes/Admin/Onboarding.php:82
+msgid "Dismiss"
+msgstr ""
+
+#: includes/Admin/Onboarding.php:88
+#: includes/Admin/ReviewNudge.php:43
+#: includes/Admin/UpdateCheck.php:41
+#: includes/Entries/CsvExporter.php:37
+msgid "Insufficient permissions."
+msgstr ""
+
+#: includes/Admin/Preview.php:75
+msgid "Preview is not available."
+msgstr ""
+
+#: includes/Admin/Preview.php:80
+msgid "Nothing to preview yet — edit the calculator first."
+msgstr ""
+
+#: includes/Admin/ProLink.php:44
+msgid "Upgrade to Pro"
+msgstr ""
+
+#: includes/Admin/RestController.php:155
+msgid "Unknown template."
+msgstr ""
+
+#: includes/Admin/RestController.php:284
+#: includes/Entries/QuoteController.php:60
+msgid "Calculator not found."
+msgstr ""
+
+#: includes/Admin/ReviewNudge.php:33
+msgid "Your calculators have collected 3 quote requests 🎉 If Alovio Calculator is working for you, a review on WordPress.org helps a lot."
+msgstr ""
+
+#: includes/Admin/ReviewNudge.php:35
+msgid "Leave a review"
+msgstr ""
+
+#: includes/Admin/ReviewNudge.php:37
+msgid "Dismiss forever"
+msgstr ""
+
+#: includes/Admin/UpdateCheck.php:34
+msgid "Check for updates"
+msgstr ""
+
+#: includes/Admin/UpdateCheck.php:69
+msgid "Alovio Calculator: a new version is available — use “Update now” in the plugin row below."
+msgstr ""
+
+#. translators: %s: current plugin version
+#: includes/Admin/UpdateCheck.php:78
+#, php-format
+msgid "Alovio Calculator is up to date (version %s)."
+msgstr ""
+
+#: includes/Entries/EntriesRestController.php:118
+msgid "Entry not found."
+msgstr ""
+
+#. translators: %s: calculator title.
+#: includes/Entries/EntryMailer.php:20
+#, php-format
+msgid "New quote request — %s"
+msgstr ""
+
+#: includes/Entries/EntryMailer.php:40
+#: includes/Frontend/CalculatorRenderer.php:352
+#: src/builder/EntriesList.jsx:88
+#: src/builder/EntriesList.jsx:99
+#: src/builder/EntriesList.jsx:183
+msgid "Total"
+msgstr ""
+
+#: includes/Entries/EntryMailer.php:49
+#, php-format
+msgid "Attached file: %s"
+msgid_plural "Attached files: %s"
+msgstr[0] ""
+msgstr[1] ""
+
+#. translators: %s: admin dashboard URL.
+#: includes/Entries/EntryMailer.php:53
+#, php-format
+msgid "Download it from the entry in your dashboard: %s"
+msgstr ""
+
+#. translators: %s: site name.
+#: includes/Entries/EntryMailer.php:57
+#, php-format
+msgid "[%s] New quote request"
+msgstr ""
+
+#: includes/Entries/FileUploads.php:107
+msgid "Too many uploads. Please try again later."
+msgstr ""
+
+#: includes/Entries/FileUploads.php:114
+msgid "File uploads are not enabled."
+msgstr ""
+
+#: includes/Entries/FileUploads.php:120
+msgid "No file received."
+msgstr ""
+
+#: includes/Entries/FileUploads.php:132
+msgid "The file is too large."
+msgstr ""
+
+#: includes/Entries/FileUploads.php:133
+msgid "This file type is not allowed."
+msgstr ""
+
+#: includes/Entries/FileUploads.php:152
+msgid "Upload failed. Please try again."
+msgstr ""
+
+#: includes/Entries/FileUploads.php:207
+msgid "No file for this entry."
+msgstr ""
+
+#: includes/Entries/FileUploads.php:211
+msgid "The file is missing on disk."
+msgstr ""
+
+#: includes/Entries/Privacy.php:18
+#: includes/Entries/Privacy.php:26
+msgid "Alovio Calculator quote requests"
+msgstr ""
+
+#: includes/Entries/Privacy.php:37
+#: includes/Frontend/CalculatorRenderer.php:360
+#: src/builder/CalculatorList.jsx:181
+#: src/builder/EntriesList.jsx:86
+#: src/builder/EntriesList.jsx:97
+#: src/builder/TemplatePicker.jsx:34
+msgid "Name"
+msgstr ""
+
+#: includes/Entries/Privacy.php:41
+#: includes/Frontend/CalculatorRenderer.php:361
+#: src/builder/EntriesList.jsx:87
+#: src/builder/EntriesList.jsx:98
+#: src/builder/PaletteV2.jsx:14
+msgid "Email"
+msgstr ""
+
+#: includes/Entries/Privacy.php:45
+#: includes/Frontend/CalculatorRenderer.php:362
+#: src/builder/PaletteV2.jsx:15
+#: src/builder/panels/CalcQuote.jsx:40
+msgid "Phone"
+msgstr ""
+
+#: includes/Entries/Privacy.php:49
+#: includes/Frontend/CalculatorRenderer.php:363
+#: src/builder/panels/CalcQuote.jsx:41
+msgid "Message"
+msgstr ""
+
+#: includes/Entries/Privacy.php:53
+#: includes/Templates/Presets.php:246
+msgid "Quote total"
+msgstr ""
+
+#: includes/Entries/Privacy.php:57
+msgid "Submitted at"
+msgstr ""
+
+#: includes/Entries/Privacy.php:63
+#: src/builder/panels/CalcQuote.jsx:29
+msgid "Quote requests"
+msgstr ""
+
+#: includes/Entries/QuoteController.php:50
+msgid "Too many requests. Please try again in a minute."
+msgstr ""
+
+#: includes/Entries/QuoteController.php:65
+msgid "Quote requests are not enabled."
+msgstr ""
+
+#: includes/Entries/QuoteController.php:78
+msgid "Too many rows submitted."
+msgstr ""
+
+#: includes/Entries/QuoteController.php:95
+msgid "The submitted data is too large."
+msgstr ""
+
+#: includes/Entries/QuoteController.php:104
+#: includes/Entries/QuoteController.php:121
+msgid "Please correct the highlighted fields."
+msgstr ""
+
+#: includes/Entries/QuoteController.php:130
+msgid "The uploaded file could not be verified — please upload it again."
+msgstr ""
+
+#. translators: %s: field label
+#: includes/Entries/QuoteController.php:207
+#, php-format
+msgid "%s is required."
+msgstr ""
+
+#: includes/Entries/QuoteController.php:221
+msgid "Too long."
+msgstr ""
+
+#: includes/Entries/QuoteController.php:228
+msgid "Name is required."
+msgstr ""
+
+#: includes/Entries/QuoteController.php:234
+msgid "A valid email is required."
+msgstr ""
+
+#: includes/Fields/FieldRepository.php:13
+msgid "Calculators"
+msgstr ""
+
+#: includes/Frontend/CalculatorRenderer.php:27
+#: src/builder/panels/CalcQuote.jsx:51
+msgid "Thanks! We'll be in touch shortly."
+msgstr ""
+
+#: includes/Frontend/CalculatorRenderer.php:41
+msgid "Download PDF"
+msgstr ""
+
+#: includes/Frontend/CalculatorRenderer.php:44
+#: includes/Frontend/CalculatorRenderer.php:385
+#: src/builder/panels/CalcQuote.jsx:67
+msgid "Attach a file"
+msgstr ""
+
+#: includes/Frontend/CalculatorRenderer.php:134
+#: includes/Frontend/CalculatorRenderer.php:304
+#: includes/Frontend/CalculatorRenderer.php:413
+msgid "— select —"
+msgstr ""
+
+#: includes/Frontend/CalculatorRenderer.php:254
+msgid "Add row"
+msgstr ""
+
+#: includes/Frontend/CalculatorRenderer.php:280
+#: src/builder/panels/MatrixTab.jsx:86
+msgid "Remove row"
+msgstr ""
+
+#: includes/Frontend/CalculatorRenderer.php:400
+msgid "Get this quote by email"
+msgstr ""
+
+#: includes/Frontend/CalculatorRenderer.php:403
+msgid "Request quote"
+msgstr ""
+
+#: includes/Frontend/Shortcode.php:21
+msgid "Alovio Calculator: calculator not found (visible to admins only)."
+msgstr ""
+
+#. translators: 1: field label, 2: technical reason
+#: includes/Import/CcbMapper.php:64
+#, php-format
+msgid "“%1$s” skipped — %2$s."
+msgstr ""
+
+#. translators: 1: field label, 2: CCB field type token
+#: includes/Import/CcbMapper.php:70
+#, php-format
+msgid "“%1$s” skipped — the “%2$s” field type has no free equivalent in Alovio Calculator."
+msgstr ""
+
+#. translators: 1: formula field label, 2: the original CCB formula
+#: includes/Import/CcbMapper.php:95
+#, php-format
+msgid "The formula for “%1$s” could not be translated automatically and was imported empty — rebuild it in the builder. Original: %2$s"
+msgstr ""
+
+#: includes/Import/ImportController.php:99
+msgid "Could not read this calculator — its stored data is missing or in an unknown format."
+msgstr ""
+
+#: includes/Import/ImportController.php:102
+#: src/builder/CalculatorList.jsx:82
+msgid "Imported calculator"
+msgstr ""
+
+#: includes/Import/ImportController.php:114
+msgid "Could not create the calculator post."
+msgstr ""
+
+#: includes/Import/ImportController.php:129
+msgid "Import failed for this calculator."
+msgstr ""
+
+#: includes/Templates/Presets.php:15
+msgid "Cleaning Price Calculator"
+msgstr ""
+
+#: includes/Templates/Presets.php:16
+msgid "Per-square-meter cleaning quote with service level and extras."
+msgstr ""
+
+#: includes/Templates/Presets.php:23
+#: includes/Templates/Presets.php:973
+msgid "Area (m²)"
+msgstr ""
+
+#: includes/Templates/Presets.php:33
+#: includes/Templates/Presets.php:779
+msgid "Service level"
+msgstr ""
+
+#: includes/Templates/Presets.php:38
+#: includes/Templates/Presets.php:672
+msgid "Standard"
+msgstr ""
+
+#: includes/Templates/Presets.php:43
+msgid "Deep clean"
+msgstr ""
+
+#: includes/Templates/Presets.php:51
+msgid "Windows"
+msgstr ""
+
+#: includes/Templates/Presets.php:60
+msgid "Express (24h)"
+msgstr ""
+
+#: includes/Templates/Presets.php:67
+msgid "Express slots are limited on weekends."
+msgstr ""
+
+#: includes/Templates/Presets.php:81
+msgid "Estimated price"
+msgstr ""
+
+#: includes/Templates/Presets.php:95
+msgid "Moving Cost Calculator"
+msgstr ""
+
+#: includes/Templates/Presets.php:96
+msgid "Rooms, distance and extras — instant moving estimate."
+msgstr ""
+
+#: includes/Templates/Presets.php:103
+msgid "Rooms"
+msgstr ""
+
+#: includes/Templates/Presets.php:112
+msgid "Distance (km)"
+msgstr ""
+
+#: includes/Templates/Presets.php:121
+msgid "Floor access"
+msgstr ""
+
+#: includes/Templates/Presets.php:125
+msgid "Ground floor"
+msgstr ""
+
+#: includes/Templates/Presets.php:130
+msgid "Upper floor with elevator"
+msgstr ""
+
+#: includes/Templates/Presets.php:135
+msgid "Upper floor, stairs only"
+msgstr ""
+
+#: includes/Templates/Presets.php:143
+msgid "Packing service"
+msgstr ""
+
+#: includes/Templates/Presets.php:150
+msgid "Our team brings packing material for fragile items."
+msgstr ""
+
+#: includes/Templates/Presets.php:164
+#: includes/Templates/Presets.php:635
+#: includes/Templates/Presets.php:1050
+msgid "Estimated cost"
+msgstr ""
+
+#: includes/Templates/Presets.php:178
+msgid "Print Quote Calculator"
+msgstr ""
+
+#: includes/Templates/Presets.php:179
+msgid "Flyers, posters and stickers with quantity pricing and a minimum order."
+msgstr ""
+
+#: includes/Templates/Presets.php:186
+msgid "Product"
+msgstr ""
+
+#: includes/Templates/Presets.php:191
+msgid "Flyer (A5)"
+msgstr ""
+
+#: includes/Templates/Presets.php:196
+msgid "Poster (A2)"
+msgstr ""
+
+#: includes/Templates/Presets.php:201
+msgid "Sticker"
+msgstr ""
+
+#: includes/Templates/Presets.php:209
+#: src/builder/PaletteV2.jsx:10
+#: src/builder/panels/RepeaterFields.jsx:16
+msgid "Quantity"
+msgstr ""
+
+#: includes/Templates/Presets.php:219
+msgid "Double-sided"
+msgstr ""
+
+#: includes/Templates/Presets.php:225
+msgid "Express production"
+msgstr ""
+
+#: includes/Templates/Presets.php:232
+msgid "Orders above 500 pieces qualify for bulk shipping."
+msgstr ""
+
+#: includes/Templates/Presets.php:260
+msgid "Agency Project Estimate"
+msgstr ""
+
+#: includes/Templates/Presets.php:261
+msgid "Website project estimate by type, pages and add-on services."
+msgstr ""
+
+#: includes/Templates/Presets.php:268
+#: includes/Templates/Presets.php:566
+msgid "Project type"
+msgstr ""
+
+#: includes/Templates/Presets.php:273
+msgid "Landing page"
+msgstr ""
+
+#: includes/Templates/Presets.php:278
+msgid "Corporate site"
+msgstr ""
+
+#: includes/Templates/Presets.php:283
+msgid "Online store"
+msgstr ""
+
+#: includes/Templates/Presets.php:291
+msgid "Number of pages"
+msgstr ""
+
+#: includes/Templates/Presets.php:301
+msgid "CMS setup & training"
+msgstr ""
+
+#: includes/Templates/Presets.php:307
+msgid "SEO package"
+msgstr ""
+
+#: includes/Templates/Presets.php:311
+msgid "None"
+msgstr ""
+
+#: includes/Templates/Presets.php:316
+msgid "Basic on-page SEO"
+msgstr ""
+
+#: includes/Templates/Presets.php:321
+msgid "Full SEO setup"
+msgstr ""
+
+#: includes/Templates/Presets.php:329
+msgid "SEO packages include a monthly care-plan offer."
+msgstr ""
+
+#: includes/Templates/Presets.php:343
+msgid "Estimated budget"
+msgstr ""
+
+#: includes/Templates/Presets.php:357
+msgid "Salon Pricing Calculator"
+msgstr ""
+
+#: includes/Templates/Presets.php:358
+msgid "Treatments, hair length and add-ons with weekend pricing."
+msgstr ""
+
+#: includes/Templates/Presets.php:365
+msgid "Treatment"
+msgstr ""
+
+#: includes/Templates/Presets.php:370
+msgid "Cut & style"
+msgstr ""
+
+#: includes/Templates/Presets.php:375
+msgid "Full color"
+msgstr ""
+
+#: includes/Templates/Presets.php:380
+msgid "Keratin treatment"
+msgstr ""
+
+#: includes/Templates/Presets.php:388
+msgid "Hair length"
+msgstr ""
+
+#: includes/Templates/Presets.php:392
+msgid "Short"
+msgstr ""
+
+#: includes/Templates/Presets.php:397
+msgid "Medium"
+msgstr ""
+
+#: includes/Templates/Presets.php:402
+msgid "Long"
+msgstr ""
+
+#: includes/Templates/Presets.php:410
+msgid "Add-ons"
+msgstr ""
+
+#: includes/Templates/Presets.php:415
+msgid "Scalp massage"
+msgstr ""
+
+#: includes/Templates/Presets.php:420
+msgid "Repair mask"
+msgstr ""
+
+#: includes/Templates/Presets.php:425
+msgid "Event styling"
+msgstr ""
+
+#: includes/Templates/Presets.php:433
+msgid "Weekend appointment"
+msgstr ""
+
+#: includes/Templates/Presets.php:439
+msgid "Long hair may need an extended session — we will confirm by phone."
+msgstr ""
+
+#: includes/Templates/Presets.php:453
+#: src/builder/panels/OptionsTab.jsx:58
+msgid "Price"
+msgstr ""
+
+#: includes/Templates/Presets.php:467
+msgid "Rental Cost Calculator"
+msgstr ""
+
+#: includes/Templates/Presets.php:468
+msgid "Per-day rental pricing with insurance and delivery."
+msgstr ""
+
+#: includes/Templates/Presets.php:475
+msgid "Vehicle"
+msgstr ""
+
+#: includes/Templates/Presets.php:480
+msgid "Compact"
+msgstr ""
+
+#: includes/Templates/Presets.php:485
+msgid "SUV"
+msgstr ""
+
+#: includes/Templates/Presets.php:490
+msgid "Van"
+msgstr ""
+
+#: includes/Templates/Presets.php:498
+msgid "Days"
+msgstr ""
+
+#: includes/Templates/Presets.php:507
+msgid "Full insurance (per day)"
+msgstr ""
+
+#: includes/Templates/Presets.php:513
+msgid "Delivery to address"
+msgstr ""
+
+#: includes/Templates/Presets.php:520
+msgid "Rentals over 7 days get a free extra driver."
+msgstr ""
+
+#: includes/Templates/Presets.php:534
+msgid "Rental total"
+msgstr ""
+
+#: includes/Templates/Presets.php:548
+msgid "Construction Cost Calculator"
+msgstr ""
+
+#: includes/Templates/Presets.php:549
+msgid "Per-square-meter build estimate by project type, floors and permits."
+msgstr ""
+
+#: includes/Templates/Presets.php:556
+msgid "Floor area (m²)"
+msgstr ""
+
+#: includes/Templates/Presets.php:571
+msgid "New build"
+msgstr ""
+
+#: includes/Templates/Presets.php:576
+msgid "Renovation"
+msgstr ""
+
+#: includes/Templates/Presets.php:581
+msgid "Extension"
+msgstr ""
+
+#: includes/Templates/Presets.php:589
+msgid "Floors"
+msgstr ""
+
+#: includes/Templates/Presets.php:598
+msgid "Permit handling"
+msgstr ""
+
+#: includes/Templates/Presets.php:605
+msgid "Asbestos survey (pre-1990 renovation)"
+msgstr ""
+
+#: includes/Templates/Presets.php:621
+msgid "Permit handling includes drawings and council submission."
+msgstr ""
+
+#: includes/Templates/Presets.php:649
+msgid "Solar Panel Quote Calculator"
+msgstr ""
+
+#: includes/Templates/Presets.php:650
+msgid "System size, panel tier, battery and roof type — instant install quote."
+msgstr ""
+
+#: includes/Templates/Presets.php:657
+msgid "System size (kW)"
+msgstr ""
+
+#: includes/Templates/Presets.php:667
+msgid "Panel tier"
+msgstr ""
+
+#: includes/Templates/Presets.php:677
+#: includes/Templates/Presets.php:897
+msgid "Premium"
+msgstr ""
+
+#: includes/Templates/Presets.php:685
+msgid "Roof type"
+msgstr ""
+
+#: includes/Templates/Presets.php:690
+#: includes/Templates/Presets.php:998
+msgid "Tile"
+msgstr ""
+
+#: includes/Templates/Presets.php:695
+msgid "Metal"
+msgstr ""
+
+#: includes/Templates/Presets.php:700
+msgid "Flat"
+msgstr ""
+
+#: includes/Templates/Presets.php:708
+msgid "Battery storage"
+msgstr ""
+
+#: includes/Templates/Presets.php:715
+msgid "Backup circuits"
+msgstr ""
+
+#: includes/Templates/Presets.php:733
+msgid "Battery storage may qualify for additional local rebates."
+msgstr ""
+
+#: includes/Templates/Presets.php:747
+msgid "Estimated install"
+msgstr ""
+
+#: includes/Templates/Presets.php:761
+msgid "Landscaping Quote Calculator"
+msgstr ""
+
+#: includes/Templates/Presets.php:762
+msgid "Garden area, service level, trees and irrigation — instant lawn-care quote."
+msgstr ""
+
+#: includes/Templates/Presets.php:769
+msgid "Garden area (m²)"
+msgstr ""
+
+#: includes/Templates/Presets.php:784
+msgid "Mowing only"
+msgstr ""
+
+#: includes/Templates/Presets.php:789
+msgid "Full maintenance"
+msgstr ""
+
+#: includes/Templates/Presets.php:794
+msgid "Design & planting"
+msgstr ""
+
+#: includes/Templates/Presets.php:802
+msgid "Trees to prune"
+msgstr ""
+
+#: includes/Templates/Presets.php:811
+msgid "Install irrigation"
+msgstr ""
+
+#: includes/Templates/Presets.php:818
+msgid "Flower beds to plant"
+msgstr ""
+
+#: includes/Templates/Presets.php:836
+msgid "Irrigation install includes a timer and a 12-month warranty."
+msgstr ""
+
+#: includes/Templates/Presets.php:850
+#: includes/Templates/Presets.php:951
+msgid "Estimated quote"
+msgstr ""
+
+#: includes/Templates/Presets.php:864
+msgid "Catering Quote Calculator"
+msgstr ""
+
+#: includes/Templates/Presets.php:865
+msgid "Guests, menu tier, drinks and staff — instant catering quote per head."
+msgstr ""
+
+#: includes/Templates/Presets.php:872
+msgid "Guests"
+msgstr ""
+
+#: includes/Templates/Presets.php:882
+msgid "Menu"
+msgstr ""
+
+#: includes/Templates/Presets.php:887
+msgid "Buffet"
+msgstr ""
+
+#: includes/Templates/Presets.php:892
+msgid "Plated"
+msgstr ""
+
+#: includes/Templates/Presets.php:905
+msgid "Open bar package"
+msgstr ""
+
+#: includes/Templates/Presets.php:912
+msgid "Serving staff"
+msgstr ""
+
+#: includes/Templates/Presets.php:921
+msgid "Sommelier service"
+msgstr ""
+
+#: includes/Templates/Presets.php:937
+msgid "The open bar package covers a 4-hour service window."
+msgstr ""
+
+#: includes/Templates/Presets.php:965
+msgid "Flooring Cost Calculator"
+msgstr ""
+
+#: includes/Templates/Presets.php:966
+msgid "Area, material, underlay and removal — instant flooring or tiling cost."
+msgstr ""
+
+#: includes/Templates/Presets.php:983
+msgid "Material"
+msgstr ""
+
+#: includes/Templates/Presets.php:988
+msgid "Laminate"
+msgstr ""
+
+#: includes/Templates/Presets.php:993
+msgid "Hardwood"
+msgstr ""
+
+#: includes/Templates/Presets.php:1006
+msgid "Premium underlay"
+msgstr ""
+
+#: includes/Templates/Presets.php:1013
+msgid "Remove old floor"
+msgstr ""
+
+#: includes/Templates/Presets.php:1020
+msgid "Wet-area waterproofing"
+msgstr ""
+
+#: includes/Templates/Presets.php:1036
+msgid "Removal includes haul-away of the old floor and surface prep."
+msgstr ""
+
+#: src/block/edit.js:21
+msgid "— choose a calculator —"
+msgstr ""
+
+#: src/builder/CalculatorList.jsx:25
+msgid "Could not load calculators."
+msgstr ""
+
+#: src/builder/CalculatorList.jsx:48
+msgid "Delete this calculator? Its entries stay in the database."
+msgstr ""
+
+#: src/builder/CalculatorList.jsx:68
+msgid "Export failed."
+msgstr ""
+
+#: src/builder/CalculatorList.jsx:91
+msgid "Import failed — not a valid Alovio Calculator export file."
+msgstr ""
+
+#: src/builder/CalculatorList.jsx:114
+msgid "Add new"
+msgstr ""
+
+#: src/builder/CalculatorList.jsx:115
+#: src/builder/EntriesList.jsx:55
+msgid "Entries"
+msgstr ""
+
+#: src/builder/CalculatorList.jsx:116
+msgid "Import"
+msgstr ""
+
+#: src/builder/CalculatorList.jsx:120
+msgid "From JSON file"
+msgstr ""
+
+#: src/builder/CalculatorList.jsx:124
+msgid "From Cost Calculator Builder"
+msgstr ""
+
+#: src/builder/CalculatorList.jsx:149
+msgid "Build your first calculator"
+msgstr ""
+
+#: src/builder/CalculatorList.jsx:151
+msgid "Start from a ready template — prices, formulas and conditional logic included — or from a blank canvas."
+msgstr ""
+
+#: src/builder/CalculatorList.jsx:155
+msgid "Start blank"
+msgstr ""
+
+#: src/builder/CalculatorList.jsx:156
+msgid "An empty canvas — add fields from the palette."
+msgstr ""
+
+#: src/builder/CalculatorList.jsx:182
+msgid "Shortcode"
+msgstr ""
+
+#: src/builder/CalculatorList.jsx:183
+msgid "Updated"
+msgstr ""
+
+#: src/builder/CalculatorList.jsx:184
+#: src/builder/EntriesList.jsx:90
+msgid "Actions"
+msgstr ""
+
+#: src/builder/CalculatorList.jsx:191
+#: src/builder/CalculatorList.jsx:297
+#: src/builder/CalculatorList.jsx:315
+msgid "(untitled)"
+msgstr ""
+
+#: src/builder/CalculatorList.jsx:196
+msgid "Copied!"
+msgstr ""
+
+#: src/builder/CalculatorList.jsx:196
+msgid "Copy"
+msgstr ""
+
+#: src/builder/CalculatorList.jsx:201
+msgid "Edit"
+msgstr ""
+
+#: src/builder/CalculatorList.jsx:202
+#: src/builder/CanvasOverlay.jsx:260
+msgid "Duplicate"
+msgstr ""
+
+#: src/builder/CalculatorList.jsx:203
+msgid "Export"
+msgstr ""
+
+#: src/builder/CalculatorList.jsx:204
+#: src/builder/CanvasOverlay.jsx:261
+#: src/builder/EntriesList.jsx:106
+#: src/builder/EntriesList.jsx:193
+msgid "Delete"
+msgstr ""
+
+#: src/builder/CalculatorList.jsx:215
+msgid "Plugin settings"
+msgstr ""
+
+#: src/builder/CalculatorList.jsx:217
+msgid "Delete all plugin data on uninstall"
+msgstr ""
+
+#: src/builder/CalculatorList.jsx:218
+msgid "When enabled, deleting the plugin removes calculators, entries and settings permanently."
+msgstr ""
+
+#: src/builder/CalculatorList.jsx:265
+msgid "Could not read Cost Calculator Builder data."
+msgstr ""
+
+#: src/builder/CalculatorList.jsx:277
+msgid "Import failed. Please try again."
+msgstr ""
+
+#: src/builder/CalculatorList.jsx:284
+msgid "Import from Cost Calculator Builder"
+msgstr ""
+
+#: src/builder/CalculatorList.jsx:293
+msgid "No Cost Calculator Builder calculators were found."
+msgstr ""
+
+#: src/builder/CalculatorList.jsx:297
+#, js-format
+msgid "%d field"
+msgid_plural "%d fields"
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/builder/CalculatorList.jsx:303
+#: src/builder/TemplatePicker.jsx:57
+msgid "Cancel"
+msgstr ""
+
+#: src/builder/CalculatorList.jsx:305
+msgid "Import selected"
+msgstr ""
+
+#: src/builder/CalculatorList.jsx:326
+#: src/builder/tour.js:124
+msgid "Done"
+msgstr ""
+
+#: src/builder/CanvasOverlay.jsx:221
+msgid "IF"
+msgstr ""
+
+#: src/builder/CanvasOverlay.jsx:230
+msgid "Formula error"
+msgstr ""
+
+#: src/builder/CanvasOverlay.jsx:244
+#: src/builder/panels/OptionsTab.jsx:56
+msgid "Drag to reorder"
+msgstr ""
+
+#: src/builder/CanvasOverlay.jsx:258
+#: src/builder/panels/RepeaterFields.jsx:43
+msgid "Move up"
+msgstr ""
+
+#: src/builder/CanvasOverlay.jsx:259
+#: src/builder/panels/RepeaterFields.jsx:44
+msgid "Move down"
+msgstr ""
+
+#: src/builder/CanvasToolbar.jsx:9
+msgid "Desktop"
+msgstr ""
+
+#: src/builder/CanvasToolbar.jsx:10
+msgid "Tablet"
+msgstr ""
+
+#: src/builder/CanvasToolbar.jsx:11
+msgid "Mobile"
+msgstr ""
+
+#: src/builder/CanvasToolbar.jsx:16
+msgid "Classic"
+msgstr ""
+
+#: src/builder/CanvasToolbar.jsx:17
+msgid "Minimal"
+msgstr ""
+
+#: src/builder/CanvasToolbar.jsx:18
+msgid "Midnight"
+msgstr ""
+
+#: src/builder/CanvasToolbar.jsx:19
+msgid "Soft"
+msgstr ""
+
+#: src/builder/CanvasToolbar.jsx:20
+msgid "Bold"
+msgstr ""
+
+#: src/builder/CanvasToolbar.jsx:21
+msgid "Slate"
+msgstr ""
+
+#: src/builder/CanvasToolbar.jsx:44
+msgid "Canvas width"
+msgstr ""
+
+#: src/builder/CanvasToolbar.jsx:52
+#: src/builder/panels/CalcDesign.jsx:17
+msgid "Theme"
+msgstr ""
+
+#: src/builder/CanvasToolbar.jsx:62
+msgid "Reset values"
+msgstr ""
+
+#: src/builder/CanvasToolbar.jsx:63
+msgid "Open full preview"
+msgstr ""
+
+#: src/builder/describe.js:13
+#: src/builder/panels/LogicTokens.jsx:12
+msgid "is"
+msgstr ""
+
+#: src/builder/describe.js:14
+#: src/builder/panels/LogicTokens.jsx:13
+msgid "is not"
+msgstr ""
+
+#: src/builder/describe.js:15
+#: src/builder/panels/LogicTokens.jsx:14
+msgid "contains"
+msgstr ""
+
+#: src/builder/describe.js:20
+#: src/builder/panels/LogicTokens.jsx:19
+msgid "is empty"
+msgstr ""
+
+#: src/builder/describe.js:21
+#: src/builder/panels/LogicTokens.jsx:20
+msgid "is not empty"
+msgstr ""
+
+#: src/builder/describe.js:40
+#: src/builder/panels/LogicTokens.jsx:73
+#: src/builder/panels/LogicTokens.jsx:74
+msgid "On"
+msgstr ""
+
+#: src/builder/describe.js:40
+#: src/builder/panels/LogicTokens.jsx:73
+#: src/builder/panels/LogicTokens.jsx:74
+msgid "Off"
+msgstr ""
+
+#: src/builder/describe.js:65
+#: src/builder/panels/LogicTokens.jsx:162
+msgid "OR"
+msgstr ""
+
+#: src/builder/describe.js:65
+#: src/builder/panels/LogicTokens.jsx:161
+msgid "AND"
+msgstr ""
+
+#: src/builder/describe.js:75
+msgid "HIDE"
+msgstr ""
+
+#: src/builder/describe.js:78
+msgid "REQUIRE"
+msgstr ""
+
+#: src/builder/describe.js:80
+msgid "SHOW"
+msgstr ""
+
+#: src/builder/EntriesList.jsx:21
+msgid "Could not load entries."
+msgstr ""
+
+#: src/builder/EntriesList.jsx:39
+msgid "Delete this entry permanently?"
+msgstr ""
+
+#: src/builder/EntriesList.jsx:53
+#: src/builder/EntriesList.jsx:63
+#: src/builder/StudioShell.jsx:183
+msgid "All calculators"
+msgstr ""
+
+#: src/builder/EntriesList.jsx:71
+msgid "Export CSV"
+msgstr ""
+
+#: src/builder/EntriesList.jsx:78
+msgid "No entries yet."
+msgstr ""
+
+#: src/builder/EntriesList.jsx:85
+#: src/builder/EntriesList.jsx:96
+#: src/builder/PaletteV2.jsx:13
+msgid "Date"
+msgstr ""
+
+#: src/builder/EntriesList.jsx:89
+#: src/builder/EntriesList.jsx:100
+msgid "Status"
+msgstr ""
+
+#: src/builder/EntriesList.jsx:102
+msgid "View"
+msgstr ""
+
+#: src/builder/EntriesList.jsx:104
+#: src/builder/EntriesList.jsx:191
+msgid "Mark read"
+msgstr ""
+
+#: src/builder/EntriesList.jsx:126
+msgid "Email:"
+msgstr ""
+
+#: src/builder/EntriesList.jsx:127
+msgid "Phone:"
+msgstr ""
+
+#: src/builder/EntriesList.jsx:129
+msgid "Message:"
+msgstr ""
+
+#: src/builder/EntriesList.jsx:140
+msgid "File:"
+msgid_plural "Files:"
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/builder/FormulaPanel.jsx:50
+#: src/builder/PaletteV2.jsx:25
+#: src/builder/SettingsPanel.jsx:72
+msgid "Formula"
+msgstr ""
+
+#: src/builder/FormulaPanel.jsx:51
+msgid "Reference fields as {field}, use + - * / ( ) and if(condition, then, else), min, max (2–8 args), round(x, decimals), ceil, floor, abs. Write 0.5, not .5."
+msgstr ""
+
+#: src/builder/FormulaPanel.jsx:57
+msgid "Insert field"
+msgstr ""
+
+#: src/builder/FormulaPanel.jsx:60
+msgid "— pick a field to insert —"
+msgstr ""
+
+#: src/builder/FormulaPanel.jsx:68
+msgid "(at position"
+msgstr ""
+
+#: src/builder/FormulaPanel.jsx:72
+msgid "✓ Formula OK"
+msgstr ""
+
+#: src/builder/LiveCanvas.jsx:116
+msgid "Disabled in the studio — use \"Open full preview\" to test quotes."
+msgstr ""
+
+#: src/builder/LiveCanvas.jsx:144
+msgid "Live render failed — showing the last good state."
+msgstr ""
+
+#: src/builder/LiveCanvas.jsx:145
+msgid "Retry"
+msgstr ""
+
+#: src/builder/LiveCanvas.jsx:149
+msgid "Add a field from the left to get started."
+msgstr ""
+
+#: src/builder/PaletteV2.jsx:8
+#: src/builder/panels/RepeaterFields.jsx:10
+msgid "Number"
+msgstr ""
+
+#: src/builder/PaletteV2.jsx:9
+#: src/builder/panels/RepeaterFields.jsx:11
+msgid "Slider"
+msgstr ""
+
+#: src/builder/PaletteV2.jsx:11
+msgid "Text"
+msgstr ""
+
+#: src/builder/PaletteV2.jsx:12
+msgid "Text area"
+msgstr ""
+
+#: src/builder/PaletteV2.jsx:16
+msgid "Website"
+msgstr ""
+
+#: src/builder/PaletteV2.jsx:17
+#: src/builder/panels/RepeaterFields.jsx:12
+msgid "Dropdown"
+msgstr ""
+
+#: src/builder/PaletteV2.jsx:18
+msgid "Multiple choice"
+msgstr ""
+
+#: src/builder/PaletteV2.jsx:19
+msgid "Checkboxes"
+msgstr ""
+
+#: src/builder/PaletteV2.jsx:20
+#: src/builder/panels/RepeaterFields.jsx:15
+msgid "Toggle"
+msgstr ""
+
+#: src/builder/PaletteV2.jsx:21
+msgid "Price table"
+msgstr ""
+
+#: src/builder/PaletteV2.jsx:22
+msgid "Heading"
+msgstr ""
+
+#: src/builder/PaletteV2.jsx:23
+msgid "HTML content"
+msgstr ""
+
+#: src/builder/PaletteV2.jsx:24
+msgid "Step / Section"
+msgstr ""
+
+#: src/builder/PaletteV2.jsx:26
+msgid "Repeater"
+msgstr ""
+
+#: src/builder/PaletteV2.jsx:30
+msgid "Inputs"
+msgstr ""
+
+#: src/builder/PaletteV2.jsx:31
+msgid "Choices"
+msgstr ""
+
+#: src/builder/PaletteV2.jsx:32
+msgid "Content"
+msgstr ""
+
+#: src/builder/PaletteV2.jsx:33
+msgid "Math"
+msgstr ""
+
+#: src/builder/PaletteV2.jsx:51
+msgid "Field types"
+msgstr ""
+
+#: src/builder/PaletteV2.jsx:83
+msgid "Templates"
+msgstr ""
+
+#: src/builder/PaletteV2.jsx:85
+msgid "Insert a pre-built field set into this calculator."
+msgstr ""
+
+#: src/builder/panels/CalcDesign.jsx:15
+msgid "Appearance"
+msgstr ""
+
+#: src/builder/panels/CalcDesign.jsx:18
+msgid "A ready-made look — pick one and tweak the accent below. No CSS needed."
+msgstr ""
+
+#: src/builder/panels/CalcDesign.jsx:23
+msgid "Accent color (buttons, slider, total)."
+msgstr ""
+
+#: src/builder/panels/CalcDesign.jsx:29
+msgid "Layout"
+msgstr ""
+
+#: src/builder/panels/CalcDesign.jsx:32
+msgid "Form display"
+msgstr ""
+
+#: src/builder/panels/CalcDesign.jsx:33
+msgid "Wizard splits the form into steps at each Step / Section divider."
+msgstr ""
+
+#: src/builder/panels/CalcDesign.jsx:36
+msgid "Single page"
+msgstr ""
+
+#: src/builder/panels/CalcDesign.jsx:37
+msgid "Multi-step wizard"
+msgstr ""
+
+#: src/builder/panels/CalcDesign.jsx:43
+msgid "Multi-step wizard is a Pro feature."
+msgstr ""
+
+#: src/builder/panels/CalcGeneral.jsx:14
+msgid "Currency"
+msgstr ""
+
+#: src/builder/panels/CalcGeneral.jsx:16
+msgid "Symbol"
+msgstr ""
+
+#: src/builder/panels/CalcGeneral.jsx:18
+msgid "Position"
+msgstr ""
+
+#: src/builder/panels/CalcGeneral.jsx:21
+msgid "Before amount"
+msgstr ""
+
+#: src/builder/panels/CalcGeneral.jsx:22
+msgid "After amount"
+msgstr ""
+
+#: src/builder/panels/CalcGeneral.jsx:26
+msgid "Decimals"
+msgstr ""
+
+#: src/builder/panels/CalcGeneral.jsx:27
+msgid "Thousand sep."
+msgstr ""
+
+#: src/builder/panels/CalcGeneral.jsx:31
+msgid "Decimal separator"
+msgstr ""
+
+#: src/builder/panels/CalcQuote.jsx:31
+msgid "Collect quote requests"
+msgstr ""
+
+#: src/builder/panels/CalcQuote.jsx:32
+msgid "Adds a contact form under the calculator; submissions appear under Entries."
+msgstr ""
+
+#: src/builder/panels/CalcQuote.jsx:38
+msgid "Name (always on)"
+msgstr ""
+
+#: src/builder/panels/CalcQuote.jsx:39
+msgid "Email (always on)"
+msgstr ""
+
+#: src/builder/panels/CalcQuote.jsx:43
+msgid "Notification email"
+msgstr ""
+
+#: src/builder/panels/CalcQuote.jsx:44
+msgid "Leave empty to use the site admin email."
+msgstr ""
+
+#: src/builder/panels/CalcQuote.jsx:50
+msgid "Success message"
+msgstr ""
+
+#: src/builder/panels/CalcQuote.jsx:56
+msgid "File upload"
+msgstr ""
+
+#: src/builder/panels/CalcQuote.jsx:58
+msgid "Allow a file attachment"
+msgstr ""
+
+#: src/builder/panels/CalcQuote.jsx:59
+msgid "Visitors can attach one file to their quote request."
+msgstr ""
+
+#: src/builder/panels/CalcQuote.jsx:66
+msgid "Upload field label"
+msgstr ""
+
+#: src/builder/panels/CalcQuote.jsx:71
+msgid "Allowed file types"
+msgstr ""
+
+#: src/builder/panels/CalcQuote.jsx:79
+msgid "Max file size (MB)"
+msgstr ""
+
+#: src/builder/panels/CalcQuote.jsx:87
+msgid "Max files"
+msgstr ""
+
+#: src/builder/panels/CalcQuote.jsx:88
+msgid "Above 1, visitors can attach a set — each file gets its own removable row."
+msgstr ""
+
+#: src/builder/panels/FieldGeneral.jsx:14
+msgid "Show in summary"
+msgstr ""
+
+#: src/builder/panels/FieldGeneral.jsx:15
+msgid "List this field as a line item in the quote summary."
+msgstr ""
+
+#: src/builder/panels/FieldGeneral.jsx:22
+msgid "Heading text"
+msgstr ""
+
+#: src/builder/panels/FieldGeneral.jsx:27
+msgid "Label (admin only)"
+msgstr ""
+
+#: src/builder/panels/FieldGeneral.jsx:28
+msgid "Content (HTML allowed)"
+msgstr ""
+
+#: src/builder/panels/FieldGeneral.jsx:35
+msgid "Step title"
+msgstr ""
+
+#: src/builder/panels/FieldGeneral.jsx:36
+msgid "Description (optional)"
+msgstr ""
+
+#: src/builder/panels/FieldGeneral.jsx:37
+msgid "Splits the form into a section. With the Wizard layout (Pro), each section becomes a step."
+msgstr ""
+
+#: src/builder/panels/FieldGeneral.jsx:44
+#: src/builder/panels/FieldGeneral.jsx:53
+#: src/builder/panels/OptionsTab.jsx:57
+#: src/builder/panels/RepeaterFields.jsx:63
+msgid "Label"
+msgstr ""
+
+#: src/builder/panels/FieldGeneral.jsx:46
+msgid "Edit the expression in the Formula tab. The LAST formula in the field list is shown as the grand total."
+msgstr ""
+
+#: src/builder/panels/FieldGeneral.jsx:55
+msgid "Help text"
+msgstr ""
+
+#: src/builder/panels/FieldGeneral.jsx:56
+msgid "Optional hint shown under the field."
+msgstr ""
+
+#: src/builder/panels/FieldGeneral.jsx:61
+msgid "Placeholder"
+msgstr ""
+
+#: src/builder/panels/FieldGeneral.jsx:65
+#: src/builder/panels/RepeaterFields.jsx:66
+msgid "Min"
+msgstr ""
+
+#: src/builder/panels/FieldGeneral.jsx:66
+#: src/builder/panels/RepeaterFields.jsx:67
+msgid "Max"
+msgstr ""
+
+#: src/builder/panels/FieldGeneral.jsx:67
+#: src/builder/panels/RepeaterFields.jsx:68
+msgid "Step"
+msgstr ""
+
+#: src/builder/panels/FieldGeneral.jsx:68
+#: src/builder/panels/OptionsTab.jsx:66
+#: src/builder/panels/RepeaterFields.jsx:69
+msgid "Default"
+msgstr ""
+
+#: src/builder/panels/FieldGeneral.jsx:72
+msgid "Unit suffix"
+msgstr ""
+
+#: src/builder/panels/FieldGeneral.jsx:72
+msgid "Shown after the value in the slider bubble, e.g. \"m²\"."
+msgstr ""
+
+#: src/builder/panels/FieldGeneral.jsx:79
+#: src/builder/panels/RepeaterFields.jsx:74
+msgid "Price when on"
+msgstr ""
+
+#: src/builder/panels/FieldGeneral.jsx:83
+#: src/builder/panels/RepeaterFields.jsx:75
+msgid "On by default"
+msgstr ""
+
+#: src/builder/panels/LogicTokens.jsx:15
+msgid "greater than"
+msgstr ""
+
+#: src/builder/panels/LogicTokens.jsx:16
+msgid "at least"
+msgstr ""
+
+#: src/builder/panels/LogicTokens.jsx:17
+msgid "less than"
+msgstr ""
+
+#: src/builder/panels/LogicTokens.jsx:18
+msgid "at most"
+msgstr ""
+
+#: src/builder/panels/LogicTokens.jsx:84
+msgid "— save first to reference new options —"
+msgstr ""
+
+#: src/builder/panels/LogicTokens.jsx:92
+msgid "value…"
+msgstr ""
+
+#: src/builder/panels/LogicTokens.jsx:119
+msgid "Remove rule"
+msgstr ""
+
+#: src/builder/panels/LogicTokens.jsx:140
+msgid "Add another input field first — conditions react to other fields (or a formula total)."
+msgstr ""
+
+#: src/builder/panels/LogicTokens.jsx:148
+msgid "Conditional logic"
+msgstr ""
+
+#: src/builder/panels/LogicTokens.jsx:149
+msgid "Show, hide, or require this field based on another field or the running total."
+msgstr ""
+
+#: src/builder/panels/LogicTokens.jsx:156
+msgid "When"
+msgstr ""
+
+#: src/builder/panels/LogicTokens.jsx:174
+msgid "Add condition"
+msgstr ""
+
+#: src/builder/panels/LogicTokens.jsx:177
+msgid "Then"
+msgstr ""
+
+#: src/builder/panels/LogicTokens.jsx:179
+msgid "Show"
+msgstr ""
+
+#: src/builder/panels/LogicTokens.jsx:179
+msgid "Hide"
+msgstr ""
+
+#: src/builder/panels/LogicTokens.jsx:179
+msgid "Require"
+msgstr ""
+
+#: src/builder/panels/LogicTokens.jsx:184
+msgid "The field stays visible and must be filled in before a quote can be requested."
+msgstr ""
+
+#: src/builder/panels/MatrixTab.jsx:60
+msgid "Row dimension"
+msgstr ""
+
+#: src/builder/panels/MatrixTab.jsx:60
+msgid "e.g. Size"
+msgstr ""
+
+#: src/builder/panels/MatrixTab.jsx:61
+msgid "Column dimension"
+msgstr ""
+
+#: src/builder/panels/MatrixTab.jsx:61
+msgid "e.g. Material"
+msgstr ""
+
+#: src/builder/panels/MatrixTab.jsx:65
+msgid "Add at least one row and one column."
+msgstr ""
+
+#: src/builder/panels/MatrixTab.jsx:75
+msgid "Column"
+msgstr ""
+
+#: src/builder/panels/MatrixTab.jsx:76
+msgid "Remove column"
+msgstr ""
+
+#: src/builder/panels/MatrixTab.jsx:85
+msgid "Row"
+msgstr ""
+
+#: src/builder/panels/MatrixTab.jsx:99
+msgid "+ Row"
+msgstr ""
+
+#: src/builder/panels/MatrixTab.jsx:100
+msgid "+ Column"
+msgstr ""
+
+#: src/builder/panels/MatrixTab.jsx:102
+msgid "Visitors pick one row and one column; the matching cell price is added to the total."
+msgstr ""
+
+#: src/builder/panels/OptionsTab.jsx:34
+msgid "Choose option image"
+msgstr ""
+
+#: src/builder/panels/OptionsTab.jsx:61
+msgid "Change"
+msgstr ""
+
+#: src/builder/panels/OptionsTab.jsx:61
+msgid "Image"
+msgstr ""
+
+#: src/builder/panels/OptionsTab.jsx:64
+msgid "Selected by default"
+msgstr ""
+
+#: src/builder/panels/OptionsTab.jsx:64
+msgid "Checked by default"
+msgstr ""
+
+#: src/builder/panels/OptionsTab.jsx:68
+msgid "Remove option"
+msgstr ""
+
+#: src/builder/panels/OptionsTab.jsx:71
+msgid "Add at least one option."
+msgstr ""
+
+#: src/builder/panels/OptionsTab.jsx:73
+msgid "+ Add option"
+msgstr ""
+
+#: src/builder/panels/OptionsTab.jsx:76
+msgid "Clear default"
+msgstr ""
+
+#: src/builder/panels/OptionsTab.jsx:81
+msgid "Images are stored for dropdown options but only shown for Multiple choice and Checkboxes (a native dropdown cannot render images)."
+msgstr ""
+
+#: src/builder/panels/ProPanel.jsx:6
+msgid "Multi-step wizard layout"
+msgstr ""
+
+#: src/builder/panels/ProPanel.jsx:7
+msgid "Branded PDF quotes (download & email, logo, tax/VAT)"
+msgstr ""
+
+#: src/builder/panels/ProPanel.jsx:8
+msgid "Webhooks & Zapier"
+msgstr ""
+
+#: src/builder/panels/ProPanel.jsx:9
+msgid "Quote analytics dashboard"
+msgstr ""
+
+#: src/builder/panels/ProPanel.jsx:13
+msgid "Alovio Calculator Pro"
+msgstr ""
+
+#: src/builder/panels/ProPanel.jsx:14
+msgid "Everything you use today stays free — including conditional logic. Pro adds:"
+msgstr ""
+
+#: src/builder/panels/ProPanel.jsx:16
+msgid "Get Alovio Calculator Pro"
+msgstr ""
+
+#: src/builder/panels/RepeaterFields.jsx:13
+msgid "Radio"
+msgstr ""
+
+#: src/builder/panels/RepeaterFields.jsx:14
+msgid "Checkbox group"
+msgstr ""
+
+#: src/builder/panels/RepeaterFields.jsx:37
+msgid "Row fields"
+msgstr ""
+
+#: src/builder/panels/RepeaterFields.jsx:45
+msgid "Remove row field"
+msgstr ""
+
+#: src/builder/panels/RepeaterFields.jsx:50
+msgid "Add row field"
+msgstr ""
+
+#: src/builder/panels/RepeaterFields.jsx:57
+msgid "+ Add"
+msgstr ""
+
+#: src/builder/panels/RepeaterFields.jsx:81
+msgid "Option images are stored but never shown inside repeater rows."
+msgstr ""
+
+#: src/builder/panels/RepeaterFields.jsx:87
+#: src/builder/SettingsPanel.jsx:70
+msgid "Rows"
+msgstr ""
+
+#: src/builder/panels/RepeaterFields.jsx:89
+msgid "Min rows"
+msgstr ""
+
+#: src/builder/panels/RepeaterFields.jsx:90
+msgid "Max rows"
+msgstr ""
+
+#: src/builder/panels/RepeaterFields.jsx:92
+msgid "Row label"
+msgstr ""
+
+#: src/builder/panels/RepeaterFields.jsx:92
+msgid "Use {n} for the row number, e.g. \"Room {n}\"."
+msgstr ""
+
+#: src/builder/panels/RepeaterFields.jsx:93
+msgid "Add button label"
+msgstr ""
+
+#: src/builder/panels/RepeaterFields.jsx:95
+msgid "Row expression"
+msgstr ""
+
+#: src/builder/panels/RepeaterFields.jsx:96
+msgid "Optional. May reference this repeater’s row fields only, e.g. {area} * {rate}. Leave empty to sum option/toggle prices."
+msgstr ""
+
+#: src/builder/SettingsPanel.jsx:47
+#: src/builder/SettingsPanel.jsx:84
+msgid "Calculator settings"
+msgstr ""
+
+#: src/builder/SettingsPanel.jsx:49
+#: src/builder/SettingsPanel.jsx:68
+msgid "General"
+msgstr ""
+
+#: src/builder/SettingsPanel.jsx:49
+msgid "Design"
+msgstr ""
+
+#: src/builder/SettingsPanel.jsx:49
+msgid "Quote form"
+msgstr ""
+
+#: src/builder/SettingsPanel.jsx:69
+msgid "Logic"
+msgstr ""
+
+#: src/builder/SettingsPanel.jsx:70
+msgid "Options"
+msgstr ""
+
+#: src/builder/SettingsPanel.jsx:71
+msgid "Table"
+msgstr ""
+
+#: src/builder/SettingsPanel.jsx:96
+msgid "Changes render live"
+msgstr ""
+
+#: src/builder/SettingsPanel.jsx:96
+msgid "saves"
+msgstr ""
+
+#: src/builder/StudioShell.jsx:151
+msgid "You have unsaved changes. Leave anyway?"
+msgstr ""
+
+#: src/builder/StudioShell.jsx:162
+msgid "Could not load this calculator."
+msgstr ""
+
+#: src/builder/StudioShell.jsx:168
+msgid "All changes saved"
+msgstr ""
+
+#: src/builder/StudioShell.jsx:171
+msgid "Save failed — try again"
+msgstr ""
+
+#: src/builder/StudioShell.jsx:174
+msgid "Unsaved changes"
+msgstr ""
+
+#: src/builder/StudioShell.jsx:177
+msgid "Saved"
+msgstr ""
+
+#: src/builder/StudioShell.jsx:191
+#: src/builder/StudioShell.jsx:192
+msgid "Calculator name"
+msgstr ""
+
+#: src/builder/StudioShell.jsx:197
+msgid "Undo"
+msgstr ""
+
+#: src/builder/StudioShell.jsx:198
+msgid "Redo"
+msgstr ""
+
+#: src/builder/StudioShell.jsx:200
+msgid "Saving…"
+msgstr ""
+
+#: src/builder/StudioShell.jsx:200
+msgid "Save"
+msgstr ""
+
+#: src/builder/StudioShell.jsx:204
+msgid "Pro"
+msgstr ""
+
+#: src/builder/StudioShell.jsx:210
+msgid "A newer unsaved draft of this calculator exists on this device."
+msgstr ""
+
+#: src/builder/StudioShell.jsx:212
+msgid "Restore draft"
+msgstr ""
+
+#: src/builder/StudioShell.jsx:215
+msgid "Discard"
+msgstr ""
+
+#: src/builder/StudioShell.jsx:226
+msgid "Fields"
+msgstr ""
+
+#: src/builder/StudioShell.jsx:233
+msgid "Settings"
+msgstr ""
+
+#: src/builder/StudioShell.jsx:239
+#: src/builder/StudioShell.jsx:244
+msgid "Close"
+msgstr ""
+
+#: src/builder/TemplatePicker.jsx:18
+#: src/builder/TemplatePicker.jsx:31
+msgid "New calculator"
+msgstr ""
+
+#: src/builder/TemplatePicker.jsx:25
+msgid "Could not create the calculator. Please try again."
+msgstr ""
+
+#: src/builder/TemplatePicker.jsx:37
+msgid "e.g. Cleaning quote"
+msgstr ""
+
+#: src/builder/TemplatePicker.jsx:39
+msgid "Template"
+msgstr ""
+
+#: src/builder/TemplatePicker.jsx:41
+msgid "Blank calculator"
+msgstr ""
+
+#: src/builder/TemplatePicker.jsx:42
+msgid "Start from scratch."
+msgstr ""
+
+#: src/builder/TemplatePicker.jsx:59
+msgid "Create"
+msgstr ""
+
+#: src/builder/tour.js:8
+msgid "Add fields"
+msgstr ""
+
+#: src/builder/tour.js:9
+msgid "Click a field type to add it, or drag it straight to a spot on the canvas."
+msgstr ""
+
+#: src/builder/tour.js:13
+msgid "This IS your calculator"
+msgstr ""
+
+#: src/builder/tour.js:14
+msgid "The canvas runs the real calculator — type values and totals update instantly. Click any field to edit it."
+msgstr ""
+
+#: src/builder/tour.js:18
+msgid "Save when ready"
+msgstr ""
+
+#: src/builder/tour.js:19
+msgid "Save publishes your changes. Undo and redo have your back while you experiment."
+msgstr ""
+
+#: src/builder/tour.js:121
+msgid "Skip tour"
+msgstr ""
+
+#: src/builder/tour.js:124
+msgid "Next"
+msgstr ""
+
+#: src/block/block.json
+msgctxt "block title"
+msgid "Alovio Calculator"
+msgstr ""
+
+#: src/block/block.json
+msgctxt "block description"
+msgid "Embed a cost/quote calculator."
+msgstr ""
