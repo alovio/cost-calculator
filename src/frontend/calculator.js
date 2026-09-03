@@ -36,6 +36,11 @@ function readValue( scope, type ) {
 			const box = scope.querySelector( 'input[type="checkbox"]' );
 			return box && box.checked ? '1' : '';
 		}
+		case 'price_matrix': {
+			const row = scope.querySelector( '[data-alc-matrix="row"]' );
+			const col = scope.querySelector( '[data-alc-matrix="col"]' );
+			return `${ row ? row.value : '' }|${ col ? col.value : '' }`;
+		}
 	}
 	return undefined;
 }

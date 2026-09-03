@@ -8,15 +8,19 @@ namespace Alovio\Calculator\Fields;
  */
 final class FieldTypes {
 
-	public const FREE = [ 'number', 'slider', 'select', 'radio', 'checkbox_group', 'toggle', 'quantity', 'text', 'heading', 'html', 'formula', 'step', 'repeater', 'date', 'email', 'phone', 'url', 'textarea' ];
+	public const FREE = [ 'number', 'slider', 'select', 'radio', 'checkbox_group', 'toggle', 'quantity', 'price_matrix', 'text', 'heading', 'html', 'formula', 'step', 'repeater', 'date', 'email', 'phone', 'url', 'textarea' ];
 
 	private const CHOICE = [ 'select', 'radio', 'checkbox_group' ];
 
-	/** Fields a visitor types/picks values into. */
+	/**
+	 * Fields a visitor types/picks values into, usable as condition CONTROLLERS.
+	 * price_matrix is deliberately absent: it is priced/referenceable but not a
+	 * condition source in v1 (it can still be a condition TARGET like any field).
+	 */
 	private const INPUT = [ 'number', 'slider', 'select', 'radio', 'checkbox_group', 'toggle', 'quantity', 'text', 'date', 'email', 'phone', 'url', 'textarea' ];
 
 	/** Fields usable as {refs} in formulas (spec §6 formula value map). */
-	private const REFERENCEABLE = [ 'number', 'slider', 'select', 'radio', 'checkbox_group', 'toggle', 'quantity', 'formula', 'repeater' ];
+	private const REFERENCEABLE = [ 'number', 'slider', 'select', 'radio', 'checkbox_group', 'toggle', 'quantity', 'price_matrix', 'formula', 'repeater' ];
 
 	/** Types allowed INSIDE a repeater (spec §3.1: no nesting, no content/formula children). */
 	public const REPEATER_CHILD_TYPES = [ 'number', 'slider', 'select', 'radio', 'checkbox_group', 'toggle', 'quantity' ];

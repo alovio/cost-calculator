@@ -111,4 +111,26 @@ describe( 'compute (parity with PHP Evaluation)', () => {
 		] );
 		expect( run( fields, prepare( fields ), {} ).lineItems ).toEqual( [] );
 	} );
+
+	it( 'price matrix prices the selected cell (PHP parity)', () => {
+		const fields = [
+			norm( { id: 'sizes', type: 'price_matrix', label: 'Options', showInSummary: true, rowLabel: 'Size', colLabel: 'Material',
+				rows: [ { value: 'opt_s', label: 'S' }, { value: 'opt_l', label: 'L' } ],
+				columns: [ { value: 'opt_cot', label: 'Cotton' }, { value: 'opt_silk', label: 'Silk' } ],
+				cells: { 'opt_s|opt_cot': 10, 'opt_s|opt_silk': 18, 'opt_l|opt_cot': 12, 'opt_l|opt_silk': 20 } } ),
+			norm( { id: 'total', type: 'formula', label: 'Total', showInSummary: true, expression: '{sizes}' } ),
+		];
+
+		const r = run( fields, prepare( fields ), { sizes: 'opt_l|opt_silk' } ); // L / Silk = 20
+		expect( r.totalScaled ).toBe( 200000 );
+		expect( r.lineItems.map( ( i ) => i.id ) ).toEqual( [ 'sizes', 'total' ] );
+		expect( r.lineItems[ 0 ].isCurrency ).toBe( true );
+		expect( r.lineItems[ 0 ].amount ).toBe( 200000 );
+		expect( r.values.sizes ).toBe( 200000 ); // {sizes} formula ref resolves to the cell price
+
+		// Invalid, half, and absent selections all price to zero.
+		expect( run( fields, prepare( fields ), { sizes: 'opt_l|opt_nope' } ).totalScaled ).toBe( 0 );
+		expect( run( fields, prepare( fields ), { sizes: 'opt_l|' } ).totalScaled ).toBe( 0 );
+		expect( run( fields, prepare( fields ), {} ).totalScaled ).toBe( 0 );
+	} );
 } );

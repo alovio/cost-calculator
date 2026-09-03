@@ -10,9 +10,20 @@ class FieldTypesTest extends TestCase {
 	public function test_free_list_matches_spec_section_6(): void {
 		Filters\expectApplied( 'alovio_calc_field_types' )->andReturnFirstArg();
 		$this->assertSame(
-			[ 'number', 'slider', 'select', 'radio', 'checkbox_group', 'toggle', 'quantity', 'text', 'heading', 'html', 'formula', 'step', 'repeater', 'date', 'email', 'phone', 'url', 'textarea' ],
+			[ 'number', 'slider', 'select', 'radio', 'checkbox_group', 'toggle', 'quantity', 'price_matrix', 'text', 'heading', 'html', 'formula', 'step', 'repeater', 'date', 'email', 'phone', 'url', 'textarea' ],
 			FieldTypes::all()
 		);
+	}
+
+	public function test_price_matrix_is_priced_referenceable_but_not_a_controller(): void {
+		// It contributes a price and can be used in formulas, but is NOT a condition
+		// source in v1 (not INPUT), and is not a choice or a repeater child.
+		$this->assertContains( 'price_matrix', FieldTypes::all() );
+		$this->assertTrue( FieldTypes::is_referenceable( 'price_matrix' ) );
+		$this->assertFalse( FieldTypes::is_input( 'price_matrix' ) );
+		$this->assertFalse( FieldTypes::is_condition_controller( 'price_matrix' ) );
+		$this->assertFalse( FieldTypes::is_choice( 'price_matrix' ) );
+		$this->assertFalse( FieldTypes::is_repeater_child( 'price_matrix' ) );
 	}
 
 	public function test_text_like_types_are_inputs_and_controllers_not_referenceable(): void {

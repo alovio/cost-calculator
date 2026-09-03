@@ -18,6 +18,7 @@ const LABELS = () => ( {
 	radio: __( 'Multiple choice', 'alovio-calculator' ),
 	checkbox_group: __( 'Checkboxes', 'alovio-calculator' ),
 	toggle: __( 'Toggle', 'alovio-calculator' ),
+	price_matrix: __( 'Price table', 'alovio-calculator' ),
 	heading: __( 'Heading', 'alovio-calculator' ),
 	html: __( 'HTML content', 'alovio-calculator' ),
 	step: __( 'Step / Section', 'alovio-calculator' ),
@@ -27,7 +28,7 @@ const LABELS = () => ( {
 
 const CATEGORIES = () => [
 	{ key: 'inputs', label: __( 'Inputs', 'alovio-calculator' ), types: [ 'number', 'slider', 'quantity', 'text', 'textarea', 'date', 'email', 'phone', 'url' ] },
-	{ key: 'choices', label: __( 'Choices', 'alovio-calculator' ), types: [ 'select', 'radio', 'checkbox_group', 'toggle' ] },
+	{ key: 'choices', label: __( 'Choices', 'alovio-calculator' ), types: [ 'select', 'radio', 'checkbox_group', 'toggle', 'price_matrix' ] },
 	{ key: 'content', label: __( 'Content', 'alovio-calculator' ), types: [ 'heading', 'html', 'step' ] },
 	{ key: 'math', label: __( 'Math', 'alovio-calculator' ), types: [ 'formula', 'repeater' ] },
 ];

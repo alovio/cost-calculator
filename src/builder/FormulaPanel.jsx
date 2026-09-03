@@ -4,7 +4,7 @@ import { __ } from '@wordpress/i18n';
 import { validateExpression } from './formula-validation';
 
 
-const REFERENCEABLE = [ 'number', 'slider', 'select', 'radio', 'checkbox_group', 'toggle', 'quantity', 'formula' ];
+const REFERENCEABLE = [ 'number', 'slider', 'select', 'radio', 'checkbox_group', 'toggle', 'quantity', 'price_matrix', 'formula' ];
 
 /** Advisory only — errors NEVER block saving (spec §7: safe-0 on the front end). */
 export default function FormulaPanel( { field, fields, set } ) {

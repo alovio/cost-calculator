@@ -34,6 +34,44 @@ class EvaluationTest extends TestCase {
 		] ] );
 	}
 
+	private function matrix_config(): array {
+		return FieldSchema::normalize( [ 'fields' => [
+			[ 'id' => 'sizes', 'type' => 'price_matrix', 'label' => 'Options', 'showInSummary' => true,
+				'rowLabel' => 'Size', 'colLabel' => 'Material',
+				'rows'    => [ [ 'value' => 'opt_s', 'label' => 'S' ], [ 'value' => 'opt_l', 'label' => 'L' ] ],
+				'columns' => [ [ 'value' => 'opt_cot', 'label' => 'Cotton' ], [ 'value' => 'opt_silk', 'label' => 'Silk' ] ],
+				'cells'   => [ 'opt_s|opt_cot' => 10, 'opt_s|opt_silk' => 18, 'opt_l|opt_cot' => 12, 'opt_l|opt_silk' => 20 ],
+			],
+			[ 'id' => 'total', 'type' => 'formula', 'label' => 'Total', 'showInSummary' => true, 'expression' => '{sizes}' ],
+		] ] );
+	}
+
+	public function test_price_matrix_prices_the_selected_cell(): void {
+		$config = $this->matrix_config();
+
+		$r = Evaluation::run( $config, [ 'sizes' => 'opt_l|opt_silk' ] ); // L / Silk = 20
+		$this->assertSame( 200000, $r['totalScaled'] );
+		$this->assertSame( [ 'sizes', 'total' ], array_column( $r['lineItems'], 'id' ) );
+		$this->assertTrue( $r['lineItems'][0]['isCurrency'] );
+		$this->assertSame( 200000, $r['lineItems'][0]['amount'] );
+
+		// A formula {ref} to the matrix resolves to the same scaled price.
+		$this->assertSame( 200000, $r['values']['sizes'] );
+	}
+
+	public function test_price_matrix_invalid_or_absent_selection_is_zero(): void {
+		$config = $this->matrix_config();
+
+		$badCol = Evaluation::run( $config, [ 'sizes' => 'opt_l|opt_nope' ] );
+		$this->assertSame( 0, $badCol['totalScaled'] );
+
+		$half = Evaluation::run( $config, [ 'sizes' => 'opt_l|' ] );
+		$this->assertSame( 0, $half['totalScaled'] );
+
+		$none = Evaluation::run( $config, [] );
+		$this->assertSame( 0, $none['totalScaled'] );
+	}
+
 	public function test_happy_path_total_and_line_items(): void {
 		$r = Evaluation::run( $this->config(), [ 'area' => '50', 'service' => 'opt_deep', 'express' => '1' ] );
 		$this->assertSame( 2500000, $r['totalScaled'] ); // 50*4 + 50 = 250

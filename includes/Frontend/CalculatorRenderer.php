@@ -174,6 +174,14 @@ final class CalculatorRenderer {
 					$label
 				);
 
+			case 'price_matrix':
+				return sprintf(
+					'<fieldset class="alc-matrix"><legend>%1$s</legend><div class="alc-matrix__axes">%2$s%3$s</div></fieldset>',
+					$label,
+					self::matrix_axis( 'row', (string) ( $field['rowLabel'] ?? '' ), (array) ( $field['rows'] ?? array() ) ),
+					self::matrix_axis( 'col', (string) ( $field['colLabel'] ?? '' ), (array) ( $field['columns'] ?? array() ) )
+				);
+
 			case 'text':
 				return sprintf(
 					'<label for="alc-%1$s">%2$s</label><input type="text" id="alc-%1$s" placeholder="%3$s">',
@@ -395,6 +403,29 @@ final class CalculatorRenderer {
 			. '<button type="submit" class="alc-quote__submit">' . esc_html__( 'Request quote', 'alovio-calculator' ) . '</button>'
 			. '<div class="alc-quote-feedback" role="status"></div>'
 			. '</form>';
+	}
+
+	/**
+	 * One dimension of a price matrix: a titled <select> tagged data-alc-matrix="row|col".
+	 * The reader (calculator.js) composes the two values into "rowSlug|colSlug".
+	 */
+	private static function matrix_axis( string $axis, string $title, array $items ): string {
+		$options = '<option value="">' . esc_html__( '— select —', 'alovio-calculator' ) . '</option>';
+		foreach ( $items as $it ) {
+			$options .= sprintf(
+				'<option value="%s"%s>%s</option>',
+				esc_attr( (string) ( $it['value'] ?? '' ) ),
+				! empty( $it['default'] ) ? ' selected' : '',
+				esc_html( (string) ( $it['label'] ?? '' ) )
+			);
+		}
+		$heading = '' !== $title ? '<span class="alc-matrix__title">' . esc_html( $title ) . '</span>' : '';
+		return sprintf(
+			'<label class="alc-matrix__axis">%1$s<select data-alc-matrix="%2$s">%3$s</select></label>',
+			$heading,
+			esc_attr( $axis ),
+			$options
+		);
 	}
 
 	private static function range_attrs( array $field ): string {

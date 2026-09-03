@@ -265,8 +265,25 @@ final class Evaluation {
 				return $sum;
 			case 'toggle':
 				return self::toggle_on( $field, $v ) ? DecimalMath::toScaled( $field['price'] ) : 0;
+			case 'price_matrix':
+				$key = self::valid_cell( $field, is_string( $v ) ? $v : '' );
+				return '' === $key ? 0 : DecimalMath::toScaled( (float) ( $field['cells'][ $key ] ?? 0 ) );
 		}
 		return 0;
+	}
+
+	/**
+	 * A price-matrix raw value is "rowSlug|colSlug". Returns the composite only when
+	 * both halves are real axis slugs, else '' (mirrors valid_slug for choice fields).
+	 */
+	private static function valid_cell( array $field, string $v ): string {
+		if ( '' === $v || false === strpos( $v, '|' ) ) {
+			return '';
+		}
+		list( $rs, $cs ) = explode( '|', $v, 2 );
+		$rowOk = in_array( $rs, array_column( (array) ( $field['rows'] ?? [] ), 'value' ), true );
+		$colOk = in_array( $cs, array_column( (array) ( $field['columns'] ?? [] ), 'value' ), true );
+		return ( $rowOk && $colOk ) ? $rs . '|' . $cs : '';
 	}
 
 	private static function clamped_number( array $field, $v ): float {
@@ -294,9 +311,9 @@ final class Evaluation {
 		return array_values( array_intersect( array_map( 'strval', $vs ), $valid ) );
 	}
 
-	/** Currency line items = choice/toggle (their amounts are money); numeric inputs display as plain counts. */
+	/** Currency line items = choice/toggle/price-matrix (their amounts are money); numeric inputs display as plain counts. */
 	private static function is_priced( array $field ): bool {
-		return FieldTypes::is_choice( $field['type'] ) || 'toggle' === $field['type'];
+		return FieldTypes::is_choice( $field['type'] ) || 'toggle' === $field['type'] || 'price_matrix' === $field['type'];
 	}
 
 	/** JSON-tolerant on/off: null ⇒ field default; 0, 0.0, '', '0', false, [] ⇒ off; anything else ⇒ on. Single source — used by BOTH value maps so they cannot drift. */

@@ -10,9 +10,12 @@ import { activeMap, fieldRequired } from './conditional-logic';
 /** Fixed-point cap: bounds the formula↔condition feedback loop (cycle safety). */
 const MAX_PASSES = 8;
 
-const REFERENCEABLE_INPUTS = [ 'number', 'slider', 'select', 'radio', 'checkbox_group', 'toggle', 'quantity' ];
+const REFERENCEABLE_INPUTS = [ 'number', 'slider', 'select', 'radio', 'checkbox_group', 'toggle', 'quantity', 'price_matrix' ];
 const TEXT_LIKE = [ 'text', 'date', 'email', 'phone', 'url', 'textarea' ];
-const CONTROLLERS = [ ...REFERENCEABLE_INPUTS, ...TEXT_LIKE ];
+// Condition controllers exclude price_matrix (priced/referenceable, but not a
+// condition source in v1 — mirrors PHP FieldTypes::INPUT).
+const CONTROLLER_INPUTS = [ 'number', 'slider', 'select', 'radio', 'checkbox_group', 'toggle', 'quantity' ];
+const CONTROLLERS = [ ...CONTROLLER_INPUTS, ...TEXT_LIKE ];
 const NUMERIC = [ 'number', 'slider', 'quantity' ];
 
 /** Compile every formula once at init. */
@@ -82,6 +85,17 @@ function validSlugs( field, vs ) {
 	return ( Array.isArray( vs ) ? vs : [] ).map( String ).filter( ( v ) => valid.has( v ) );
 }
 
+/** "rowSlug|colSlug", valid only when both halves are real axis slugs (mirror of PHP valid_cell). */
+function validCell( field, v ) {
+	if ( typeof v !== 'string' || v.indexOf( '|' ) === -1 ) {
+		return '';
+	}
+	const [ rs, cs ] = v.split( '|' );
+	const rowOk = ( field.rows || [] ).some( ( r ) => r.value === rs );
+	const colOk = ( field.columns || [] ).some( ( c ) => c.value === cs );
+	return rowOk && colOk ? `${ rs }|${ cs }` : '';
+}
+
 function toggleOn( field, v ) {
 	if ( v === null || v === undefined ) {
 		return !! field.default;
@@ -144,12 +158,16 @@ function inputAmount( field, v ) {
 		}
 		case 'toggle':
 			return toggleOn( field, v ) ? toScaled( field.price || 0 ) : 0;
+		case 'price_matrix': {
+			const key = validCell( field, typeof v === 'string' ? v : '' );
+			return key === '' ? 0 : toScaled( ( field.cells || {} )[ key ] || 0 );
+		}
 	}
 	return 0;
 }
 
 function isPriced( field ) {
-	return [ 'select', 'radio', 'checkbox_group', 'toggle' ].includes( field.type );
+	return [ 'select', 'radio', 'checkbox_group', 'toggle', 'price_matrix' ].includes( field.type );
 }
 
 /** "{n}" substitution; empty template falls back to "<label> <n>" (PHP row_label mirror). */

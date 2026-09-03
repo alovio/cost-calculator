@@ -4,7 +4,7 @@
  */
 import { compile, references, orderFormulas, FormulaError } from '../shared/formula';
 
-const REFERENCEABLE = [ 'number', 'slider', 'select', 'radio', 'checkbox_group', 'toggle', 'quantity', 'formula' ];
+const REFERENCEABLE = [ 'number', 'slider', 'select', 'radio', 'checkbox_group', 'toggle', 'quantity', 'price_matrix', 'formula' ];
 
 /**
  * @param {string} expression Draft expression.

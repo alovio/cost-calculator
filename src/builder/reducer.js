@@ -16,6 +16,7 @@ export const DEFAULTS = {
 	checkbox_group: { label: 'Check all that apply', options: [ { label: 'Option 1', price: 0 } ], showInSummary: false },
 	toggle: { label: 'Toggle', price: 0, default: false, showInSummary: false },
 	quantity: { label: 'Quantity', min: 0, max: null, step: 1, default: 1, showInSummary: false },
+	price_matrix: { label: 'Price table', rowLabel: 'Size', colLabel: 'Material', showInSummary: true },
 	text: { label: 'Text', placeholder: '', showInSummary: false },
 	date: { label: 'Date', placeholder: '', showInSummary: false },
 	email: { label: 'Email', placeholder: '', showInSummary: false },
@@ -35,6 +36,15 @@ let counter = 0;
 export function makeId() {
 	counter += 1;
 	return `fld_${ counter }_${ Math.random().toString( 36 ).slice( 2, 7 ) }`;
+}
+
+/**
+ * A client-side opt_ slug for a matrix row/column. The server preserves a valid
+ * unique opt_ value (FieldSchema::normalize_axis), so cell keys survive the save
+ * round-trip without re-keying — the same contract choice options rely on.
+ */
+export function newSlug() {
+	return `opt_${ Math.random().toString( 36 ).slice( 2, 8 ) }`;
 }
 
 export const HISTORY_LIMIT = 50;
@@ -64,6 +74,12 @@ function makeField( fieldType, id ) {
 	const field = { id, type: fieldType, ...defaults };
 	if ( defaults.options ) {
 		field.options = cloneOptions( defaults.options );
+	}
+	if ( fieldType === 'price_matrix' ) {
+		// Fresh per-instance axes (own slugs) so cells never share references.
+		field.rows = [ { value: newSlug(), label: 'Small' }, { value: newSlug(), label: 'Large' } ];
+		field.columns = [ { value: newSlug(), label: 'Basic' }, { value: newSlug(), label: 'Premium' } ];
+		field.cells = {};
 	}
 	return field;
 }

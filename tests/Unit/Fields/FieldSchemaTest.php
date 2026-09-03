@@ -34,6 +34,29 @@ class FieldSchemaTest extends TestCase {
 		$this->assertSame( 2.5, $opts[0]['price'] );
 	}
 
+	public function test_price_matrix_normalizes_axes_and_rebuilds_cells(): void {
+		$out = FieldSchema::normalize( $this->config( [
+			[ 'id' => 'grid', 'type' => 'price_matrix', 'label' => 'Grid', 'rowLabel' => 'Size', 'colLabel' => 'Material',
+				'rows'    => [ [ 'value' => 'opt_s', 'label' => 'S' ], [ 'label' => 'L' ] ], // one preserved, one new
+				'columns' => [ [ 'value' => 'opt_cot', 'label' => 'Cotton' ] ],
+				'cells'   => [ 'opt_s|opt_cot' => '10.5', 'stale|key' => 99 ],               // one real, one stale
+			],
+		] ) );
+		$f = $out['fields'][0];
+
+		$this->assertSame( 'opt_s', $f['rows'][0]['value'] );                                    // valid client slug kept
+		$this->assertMatchesRegularExpression( '/^opt_[a-z0-9]{4,8}$/', $f['rows'][1]['value'] ); // fresh slug for the new row
+		$this->assertNotSame( 'opt_s', $f['rows'][1]['value'] );
+		$this->assertSame( 'opt_cot', $f['columns'][0]['value'] );
+
+		// Cells rebuilt for EVERY current pair (2 rows × 1 col): price coerced, stale key dropped, missing ⇒ 0.
+		$gen = $f['rows'][1]['value'];
+		$this->assertCount( 2, $f['cells'] );
+		$this->assertSame( 10.5, $f['cells']['opt_s|opt_cot'] );
+		$this->assertSame( 0.0, $f['cells'][ $gen . '|opt_cot' ] );
+		$this->assertArrayNotHasKey( 'stale|key', $f['cells'] );
+	}
+
 	public function test_field_help_text_is_sanitized(): void {
 		$out = FieldSchema::normalize( $this->config( [
 			[ 'id' => 'qty', 'type' => 'number', 'label' => 'Quantity', 'help' => '  How many <b>units</b>?  ' ],

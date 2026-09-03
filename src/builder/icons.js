@@ -25,6 +25,7 @@ export const ICONS = {
 	radio: <svg { ...P }><circle cx="12" cy="12" r="8" /><circle cx="12" cy="12" r="3" fill="currentColor" /></svg>,
 	checkbox_group: <svg { ...P }><rect x="3" y="3" width="8" height="8" rx="2" /><path d="m5 7 1.5 1.5L9.5 5" /><rect x="13" y="13" width="8" height="8" rx="2" /></svg>,
 	toggle: <svg { ...P }><rect x="3" y="8" width="18" height="8" rx="4" /><circle cx="15.5" cy="12" r="2.4" fill="currentColor" /></svg>,
+	price_matrix: <svg { ...P }><rect x="3" y="4" width="18" height="16" rx="2" /><path d="M3 9h18M9 9v11M3 14.5h18" /></svg>,
 	heading: <svg { ...P }><path d="M6 4v16M18 4v16M6 12h12" /></svg>,
 	html: <svg { ...P }><path d="m9 8-4 4 4 4M15 8l4 4-4 4" /></svg>,
 	step: <svg { ...P }><path d="M6 21V4h10l-2 3.5 2 3.5H6" /></svg>,

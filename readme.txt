@@ -2,9 +2,9 @@
 Contributors: 74h1r
 Tags: cost calculator, price calculator, quote calculator, calculator builder, estimation
 Requires at least: 6.2
-Tested up to: 7.0
+Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 2.1.0
+Stable tag: 2.2.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -98,6 +98,10 @@ PHP 7.4 and newer, including PHP 8.4.
 7. Quote requests can carry attachments — a floor plan and photos, each removable before sending
 
 == Changelog ==
+
+= 2.2.0 =
+* NEW: **Price table** field. Give visitors two dropdowns — say Size and Material — and set a price for every combination in a simple grid. The visitor picks one of each and the matching cell's price drops into the total as its own summary line. It's the classic "size × material → price" that spreadsheets do and most calculators make you fake with formulas — now a field you fill in like a table. Works with conditional logic and can be referenced in formulas like any other field.
+* Tested up to WordPress 7.1.
 
 = 2.1.0 =
 * NEW: the quote form accepts several files. Set **Max files** (1–10) next to the size limit and visitors can attach a set — a floor plan and two photos, say — instead of one file replacing the last. Each upload gets its own removable row, the entry lists a download link per file, the notification email names them all, and the CSV export lists them in its cell.

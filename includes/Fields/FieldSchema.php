@@ -119,6 +119,17 @@ final class FieldSchema {
 				$field['options'] = self::normalize_options( (array) ( $raw['options'] ?? [] ), $type );
 				break;
 
+			case 'price_matrix':
+				$field['rowLabel'] = sanitize_text_field( (string) ( $raw['rowLabel'] ?? '' ) );
+				$field['colLabel'] = sanitize_text_field( (string) ( $raw['colLabel'] ?? '' ) );
+				// Rows and columns share one slug registry so a cell key (rowSlug|colSlug)
+				// is always unambiguous. Slugs a valid client sent (opt_…) are preserved.
+				$used              = [];
+				$field['rows']     = self::normalize_axis( (array) ( $raw['rows'] ?? [] ), $used );
+				$field['columns']  = self::normalize_axis( (array) ( $raw['columns'] ?? [] ), $used );
+				$field['cells']    = self::normalize_cells( (array) ( $raw['cells'] ?? [] ), $field['rows'], $field['columns'] );
+				break;
+
 			case 'formula':
 				$field['expression'] = substr( trim( (string) ( $raw['expression'] ?? '' ) ), 0, self::EXPRESSION_LIMIT );
 				break;
@@ -191,6 +202,56 @@ final class FieldSchema {
 			unset( $o );
 		}
 		return $options;
+	}
+
+	/**
+	 * One axis (rows or columns) of a price matrix: a list of { value, label } with
+	 * server-assigned stable opt_ slugs (a valid unique opt_ the client sent is kept,
+	 * so cell keys survive a save round-trip). At most one default (first wins).
+	 * $used is shared across both axes so row and column slugs never collide.
+	 */
+	private static function normalize_axis( array $rawItems, array &$used ): array {
+		$items = [];
+		foreach ( $rawItems as $it ) {
+			if ( ! is_array( $it ) ) {
+				continue;
+			}
+			$value = sanitize_key( (string) ( $it['value'] ?? '' ) );
+			if ( '' === $value || 0 !== strpos( $value, 'opt_' ) || isset( $used[ $value ] ) ) {
+				$value = self::generate_slug( $used );
+			}
+			$used[ $value ] = true;
+			$items[]        = [
+				'value'   => $value,
+				'label'   => sanitize_text_field( (string) ( $it['label'] ?? '' ) ),
+				'default' => ! empty( $it['default'] ),
+			];
+		}
+		$found = false;
+		foreach ( $items as &$o ) {
+			if ( $o['default'] && $found ) {
+				$o['default'] = false;
+			}
+			$found = $found || $o['default'];
+		}
+		unset( $o );
+		return $items;
+	}
+
+	/**
+	 * The price grid: one float per (row, column) pair, keyed "rowSlug|colSlug".
+	 * Rebuilt for EVERY current pair (missing ⇒ 0, stale keys dropped) so the stored
+	 * grid always matches the current axes — mirrored by the client on rehydrate.
+	 */
+	private static function normalize_cells( array $rawCells, array $rows, array $columns ): array {
+		$cells = [];
+		foreach ( $rows as $r ) {
+			foreach ( $columns as $c ) {
+				$key           = $r['value'] . '|' . $c['value'];
+				$cells[ $key ] = isset( $rawCells[ $key ] ) && is_numeric( $rawCells[ $key ] ) ? (float) $rawCells[ $key ] : 0.0;
+			}
+		}
+		return $cells;
 	}
 
 	/**

@@ -148,6 +148,31 @@
 	}
 }
 
+.alc-matrix {
+	&__axes {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 12px;
+	}
+
+	&__axis {
+		display: flex;
+		flex-direction: column;
+		gap: 4px;
+		flex: 1 1 150px;
+	}
+
+	&__title {
+		font-size: 0.85em;
+		font-weight: 600;
+		color: var(--alc-muted, #6b7280);
+	}
+
+	select {
+		max-width: none; /* fill the axis column instead of the shared 320px cap */
+	}
+}
+
 .alc-field__help {
 	margin: 4px 0 0;
 	font-size: 0.85em;

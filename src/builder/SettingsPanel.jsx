@@ -6,6 +6,7 @@ import { ICONS } from './icons';
 import FieldGeneral from './panels/FieldGeneral';
 import LogicTokens from './panels/LogicTokens';
 import OptionsTab from './panels/OptionsTab';
+import MatrixTab from './panels/MatrixTab';
 import FormulaTab from './panels/FormulaTab';
 import RepeaterFields from './panels/RepeaterFields';
 import CalcGeneral from './panels/CalcGeneral';
@@ -58,12 +59,16 @@ export default function SettingsPanel( { proOpen } ) {
 	}
 
 	const isRepeater = 'repeater' === field.type;
-	const third = ( CHOICE.indexOf( field.type ) !== -1 || isRepeater ) ? 'options' : 'formula' === field.type ? 'formula' : null;
+	const isMatrix   = 'price_matrix' === field.type;
+	const third      = ( CHOICE.indexOf( field.type ) !== -1 || isRepeater ) ? 'options'
+		: isMatrix ? 'matrix'
+			: 'formula' === field.type ? 'formula' : null;
 	const set = ( patch ) => updateField( field.id, patch );
 	const tabs = [
 		[ 'general', __( 'General', 'alovio-calculator' ) ],
 		[ 'logic', __( 'Logic', 'alovio-calculator' ) ],
 		...( 'options' === third ? [ [ 'options', isRepeater ? __( 'Rows', 'alovio-calculator' ) : __( 'Options', 'alovio-calculator' ) ] ] : [] ),
+		...( 'matrix' === third ? [ [ 'matrix', __( 'Table', 'alovio-calculator' ) ] ] : [] ),
 		...( 'formula' === third ? [ [ 'formula', __( 'Formula', 'alovio-calculator' ) ] ] : [] ),
 	];
 
@@ -84,6 +89,7 @@ export default function SettingsPanel( { proOpen } ) {
 				{ 'general' === tab && <FieldGeneral field={ field } set={ set } /> }
 				{ 'logic' === tab && <LogicTokens field={ field } /> }
 				{ 'options' === tab && 'options' === third && ( isRepeater ? <RepeaterFields field={ field } /> : <OptionsTab field={ field } set={ set } /> ) }
+				{ 'matrix' === tab && 'matrix' === third && <MatrixTab field={ field } set={ set } /> }
 				{ 'formula' === tab && 'formula' === third && <FormulaTab field={ field } fields={ fields } set={ set } /> }
 			</div>
 			<div className="alcb-sp-foot">
