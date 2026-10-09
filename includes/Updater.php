@@ -35,6 +35,13 @@ final class Updater {
 	private const CACHE_TTL = 6 * HOUR_IN_SECONDS;
 
 	public function register(): void {
+		// An opt-out counts for more than the statistics do. A site that would
+		// rather tell us nothing defines this and still updates by hand from
+		// alovio.org; nothing else about the plugin changes.
+		if ( defined( 'ALOVIO_NO_UPDATE_CHECK' ) && ALOVIO_NO_UPDATE_CHECK ) {
+			return;
+		}
+
 		add_filter( 'update_plugins_' . self::HOST, array( $this, 'offer' ), 10, 3 );
 	}
 
