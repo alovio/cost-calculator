@@ -2,8 +2,9 @@
 /**
  * Plugin Name: Alovio Calculator – Cost, Price & Quote Calculator Builder
  * Plugin URI: https://alovio.org/calculator
+ * Update URI: https://licenses.alovio.org/alovio-calculator
  * Description: Build cost, price and quote calculators with live totals, free conditional logic, and lead capture.
- * Version: 2.2.0
+ * Version: 2.3.0
  * Requires at least: 6.2
  * Requires PHP: 7.4
  * Author: Alovio
@@ -15,7 +16,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
-define( 'ALOVIO_CALC_VERSION', '2.2.0' );
+define( 'ALOVIO_CALC_VERSION', '2.3.0' );
 define( 'ALOVIO_CALC_FILE', __FILE__ );
 define( 'ALOVIO_CALC_DIR', plugin_dir_path( __FILE__ ) );
 define( 'ALOVIO_CALC_URL', plugin_dir_url( __FILE__ ) );
@@ -32,5 +33,8 @@ spl_autoload_register(
 		}
 	}
 );
+
+// Updates come from our own server rather than the plugin directory.
+( new Alovio\Calculator\Updater() )->register();
 
 Alovio\Calculator\Plugin::instance()->boot();

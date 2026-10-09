@@ -4,7 +4,7 @@ Tags: cost calculator, price calculator, quote calculator, calculator builder, e
 Requires at least: 6.2
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 2.2.0
+Stable tag: 2.3.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -98,6 +98,9 @@ PHP 7.4 and newer, including PHP 8.4.
 7. Quote requests can carry attachments — a floor plan and photos, each removable before sending
 
 == Changelog ==
+
+= 2.3.0 =
+* Alovio Calculator is now distributed from alovio.org, and this version updates itself from there: new releases appear on the Plugins → Updates screen as usual, with no key and nothing to sign up for. Nothing else about the plugin changed.
 
 = 2.2.0 =
 * NEW: **Price table** field. Give visitors two dropdowns — say Size and Material — and set a price for every combination in a simple grid. The visitor picks one of each and the matching cell's price drops into the total as its own summary line. It's the classic "size × material → price" that spreadsheets do and most calculators make you fake with formulas — now a field you fill in like a table. Works with conditional logic and can be referenced in formulas like any other field.
