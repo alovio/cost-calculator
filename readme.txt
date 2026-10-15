@@ -4,7 +4,7 @@ Tags: cost calculator, price calculator, quote calculator, calculator builder, e
 Requires at least: 6.2
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 2.3.1
+Stable tag: 2.4.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -89,9 +89,9 @@ PHP 7.4 and newer, including PHP 8.4.
 
 == Privacy ==
 
-**Update checks.** This plugin is distributed from alovio.org rather than the WordPress.org plugin directory, so it asks alovio.org for its updates. About twice a day WordPress sends one request to licenses.alovio.org carrying three things: the plugin slug, the version you are running, and your site's domain. Nothing else leaves your site — no personal data, no customer data, no content, and no licence key, because the free plugins have none.
+**Update checks.** This plugin is distributed from alovio.org rather than the WordPress.org plugin directory, so it asks alovio.org for its updates. About twice a day WordPress sends one request to licenses.alovio.org carrying five things: the plugin slug, the version you are running, your site's domain, and the WordPress and PHP versions it runs on. Nothing else leaves your site — no personal data, no customer data, no content, and no licence key, because the free plugins have none.
 
-We keep one record per site: the domain, the version, when it was first seen and when it was last seen. It exists so we know how many sites run the plugin and which versions are still in use, which is what tells us whether a release has reached people and which versions still need supporting. It is never sold, never shared with anyone, and never used to contact you.
+We keep one record per site: the domain, the version, the WordPress and PHP versions, and when it was first and last seen. It exists so we know how many sites run the plugin and which versions are still in use, which is what tells us whether a release has reached people and which versions still need supporting — and so that raising the WordPress or PHP a release requires is a decision about real sites rather than a guess. It is never sold, never shared with anyone, and never used to contact you.
 
 **Switching it off.** Add this to wp-config.php:
 
@@ -110,6 +110,10 @@ The plugin then sends nothing at all. It also stops being told about new version
 7. Quote requests can carry attachments — a floor plan and photos, each removable before sending
 
 == Changelog ==
+
+= 2.4.0 =
+
+* The update check now also reports the WordPress and PHP version the site runs on, so a future release can raise what it requires knowing who that would actually affect. Nothing else was added, and the opt-out still switches all of it off. See the Privacy section.
 
 = 2.3.1 =
 * Update checks can now be switched off entirely with `define( 'ALOVIO_NO_UPDATE_CHECK', true );` in wp-config.php, and the new Privacy section above sets out exactly what an update check sends and what is kept.

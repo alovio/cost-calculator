@@ -109,6 +109,11 @@ final class Updater {
 						'product'          => self::PRODUCT,
 						'domain'           => $this->domain(),
 						'installedVersion' => ALOVIO_CALC_VERSION,
+						// What the directory used to tell us and no longer can: the two
+						// versions that decide whether a release can raise its floor.
+						// Nothing identifying, nothing about content or customers.
+						'wp'               => get_bloginfo( 'version' ),
+						'php'              => PHP_VERSION,
 					)
 				),
 			)
